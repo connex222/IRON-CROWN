@@ -15,14 +15,15 @@ function avatar(p){return AVATARS.find(a=>a.id===p.avatar);}
 function perk(room,p,key){return advanced(room)&&p.avatar===key;}
 function has(p,u){return p.upgrades.includes(u);}
 function tileNeighbours(room,tile){return neighbours(tile,new Map(room.tiles.map(t=>[t.id,t])));}
-function addFeed(room,message,kind='news',extra={}){room.seq++;room.feed.push({seq:room.seq,message,kind,...extra});if(room.feed.length>40)room.feed.shift();}
+function addFeed(room,message,kind='news',extra={}){room.seq++;room.feed.push({seq:room.seq,at:Date.now(),message,kind,...extra});if(room.feed.length>40)room.feed.shift();}
+function react(p,mood,reason=''){if(!p)return;p.reaction=mood;p.reactionReason=reason;p.reactionUntil=Date.now()+4000;}
 function createRoom(code){return {code,hostToken:id(),mode:'standard',status:'lobby',round:0,era:'steam',deadline:0,seq:0,feed:[],players:[],tiles:[],routes:[],ticketDeck:[],events:[],event:null,placement:[],placementIndex:0,pending:[],clashes:[],revealCursor:0,offer:null,settings:MODE.standard,turnOffset:0,lastWinner:null,retiredAt:null};}
 function addPlayer(room,name,ai=false){
  if(room.status!=='lobby')throw Error('This game has already started.');
  if(room.players.length>=8)throw Error('Room full (maximum eight players).');
  const clean=String(name||'').trim().slice(0,22).replace(/[<>]/g,'');
  if(!clean)throw Error('Enter your name.');
- const p={id:id(),token:id(),name:clean,seat:room.players.length,ai,avatar:null,connected:!!ai,resources:stock(),tickets:[],ticketChoices:[],upgrades:[],draftChoices:[],draftDone:false,actions:[null,null],locked:false,telegraphUsed:false,smuggleUsed:false,bankResource:'coal',bonusPrestige:0,prestige:0,breakdown:{},tutorialDone:false};
+ const p={id:id(),token:id(),name:clean,seat:room.players.length,ai,avatar:null,connected:!!ai,resources:stock(),tickets:[],ticketChoices:[],upgrades:[],draftChoices:[],draftDone:false,actions:[null,null],locked:false,telegraphUsed:false,smuggleUsed:false,bankResource:'coal',bonusPrestige:0,prestige:0,breakdown:{},tutorialDone:false,reaction:'neutral',reactionReason:'',reactionUntil:0};
  room.players.push(p);if(ai)chooseAvatar(room,p,AVATARS.find(a=>!room.players.some(x=>x!==p&&x.avatar===a.id)).id);
  addFeed(room,`${p.name} has joined the railway race.`);return p;
 }
@@ -38,7 +39,7 @@ function startGame(room,mode){
  if(room.players.length<2)throw Error('At least two players are required.');
  if(room.players.some(p=>!p.avatar))throw Error('Every player needs a tycoon.');
  const generated=generateMap();room.tiles=generated.tiles;room.routes=generated.routes;room.ticketDeck=generated.deck;room.events=shuffle([...EVENTS]);room.mode=mode;room.settings=MODE[mode];room.round=0;room.era='steam';
- for(const p of room.players){p.resources=stock();p.tickets=[];p.ticketChoices=room.ticketDeck.splice(0,3);p.upgrades=[];p.actions=[null,null];p.locked=false;p.prestige=0;p.bonusPrestige=0;}
+ for(const p of room.players){p.resources=stock();p.tickets=[];p.ticketChoices=room.ticketDeck.splice(0,3);p.upgrades=[];p.actions=[null,null];p.locked=false;p.prestige=0;p.bonusPrestige=0;p.reaction='neutral';p.reactionUntil=0;p.reactionReason='';}
  room.status='tickets';room.deadline=Date.now()+45_000;addFeed(room,'The Crown has summoned the railway tycoons! Choose your tickets.','era');
  autopilot(room);
 }
@@ -225,7 +226,7 @@ function beginReveal(room){room.status='reveal';room.deadline=Date.now()+(room.p
 function attempt(room,p,action){
  if(action.type==='skip')return addFeed(room,`${p.name} passed an action.`);
  const cost=costOf(room,p,action);
- const fail=reason=>{addFeed(room,`${p.name}: ${reason}. +1 Gold consolation.`,'fail',{player:p.id});p.resources.gold++;};
+ const fail=reason=>{react(p,'furious','Failed order');addFeed(room,`${p.name}: ${reason}. +1 Gold consolation.`,'fail',{player:p.id});p.resources.gold++;};
  if(!canPay(p.resources,cost))return fail('insufficient resources at Reveal');
  const t=action.tile?byId(room,action.tile):null;
  switch(action.type){
@@ -248,7 +249,7 @@ function attempt(room,p,action){
   const group=room.clashes.find(c=>c.tile===t.id);if(group)group.claimants.push({player:p.id,kind:'attack',sources:action.sources,cost});
   else room.clashes.push({tile:t.id,claimants:[{player:p.id,kind:'attack',sources:action.sources,cost}],defender:t.owner});
   addFeed(room,`${p.name} marches on ${t.name||typeTitle(t)}!`,'attack',{tile:t.id,player:p.id});break;}
- case 'city':t.city=true;t.cityOn=Date.now();assignGrandStation(room,p);addFeed(room,`${p.name} founded a new City at ${t.name}.`,'city',{tile:t.id,player:p.id});break;
+ case 'city':t.city=true;t.cityOn=Date.now();assignGrandStation(room,p);react(p,'smug','New city founded');addFeed(room,`${p.name} founded a new City at ${t.name}.`,'city',{tile:t.id,player:p.id});break;
  case 'track':{const r=room.routes.find(r=>r.id===action.route);r.owner=p.id;addFeed(room,`${p.name} completed the ${routeName(room,r)} railway!`,'track',{route:r.id,player:p.id});break;}
  case 'recruit':t.soldiers+=action.count;addFeed(room,`${p.name} recruited ${action.count} Soldier${action.count===1?'':'s'}.`,'recruit',{tile:t.id,player:p.id});break;
  case 'research':{
@@ -297,6 +298,7 @@ function resolveClashes(room){
  for(const c of contestants){const p=room.players.find(x=>x.id===c.player);c.roll=die(room,p);c.bonus=c.defender?(defense+(tile.city?1:0)+(has(p,'fort')?1:0)):0;c.strength=c.roll+c.units+c.bonus;}
  contestants.sort((a,b)=>b.strength-a.strength||Number(b.defender)-Number(a.defender)||room.players.findIndex(p=>p.id===a.player)-room.players.findIndex(p=>p.id===b.player));
  const winner=contestants[0],winP=room.players.find(p=>p.id===winner.player);
+ for(const c of contestants){const actor=room.players.find(p=>p.id===c.player);react(actor,c===winner?'smug':'furious',c===winner?'Won a clash':'Lost a clash');}
  for(const c of contestants){const isWinner=c===winner;
   if(c.defender){if(isWinner)tile.soldiers=Math.max(0,tile.soldiers-1);else tile.soldiers=Math.max(0,tile.soldiers-troopLoss(tile.soldiers));}
   else{
@@ -322,6 +324,8 @@ function score(room,p){
  return {depot,city,tickets,completed:completed.map(t=>t.id),unfinished,grand,bonus:p.bonusPrestige,total};
 }
 function updatePrestige(room){
+ const oldTrophies={...(room.trophies||{})};
+ const completedBefore=new Map(room.players.map(p=>[p.id,new Set(p.breakdown?.completed||[])]));
  const sc=room.players.map(p=>({p,s:score(room,p)}));
  let largestArmy=null;const bySoldiers=room.players.map(p=>({p,count:owned(room,p).reduce((n,t)=>n+t.soldiers,0)})).sort((a,b)=>b.count-a.count);
  if(bySoldiers[0].count>=5&&bySoldiers[0].count>bySoldiers[1]?.count)largestArmy=bySoldiers[0].p.id;
@@ -329,6 +333,8 @@ function updatePrestige(room){
  if(byRail[0].count>0&&byRail[0].count>byRail[1]?.count)longest=byRail[0].p.id;
  for(const {p,s} of sc){s.army=largestArmy===p.id?2:0;s.rail=longest===p.id?2:0;p.prestige=s.total+s.army+s.rail;p.breakdown=s;}
  room.trophies={army:largestArmy,rail:longest};
+ for(const {p,s} of sc){const previous=completedBefore.get(p.id);if(s.completed.some(id=>!previous.has(id))){react(p,'smug','Destination completed');addFeed(room,`${p.name} fulfilled a secret railway contract!`,'ticket',{player:p.id});}}
+ for(const key of ['army','rail']){const before=oldTrophies[key],after=room.trophies[key];if(before===after)continue;const name=key==='army'?'Largest Army':'Longest Railway';if(before){const loser=room.players.find(p=>p.id===before);react(loser,'furious',`Lost ${name}`);addFeed(room,`${loser?.name||'A company'} lost the ${name} trophy.`,'trophy',{player:before,change:'lost'});}if(after){const winner=room.players.find(p=>p.id===after);react(winner,'smug',`Won ${name}`);addFeed(room,`${winner?.name||'A company'} claimed the ${name} trophy!`,'trophy',{player:after,change:'won'});}}
 }
 function concludeRound(room){
  if(eventIs(room,'royal')){
@@ -338,7 +344,7 @@ function concludeRound(room){
  updatePrestige(room);
  const ranking=[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length);
  const finish=ranking[0].prestige>=room.settings.target||room.round>=room.settings.rounds;
- if(finish){room.status='finished';room.lastWinner=ranking[0].id;room.deadline=0;addFeed(room,`THE CROWN GOES TO ${ranking[0].name.toUpperCase()}! ${ranking[0].prestige} Prestige.`,'win',{player:ranking[0].id});}
+ if(finish){react(ranking[0],'smug','Crowned champion');room.status='finished';room.lastWinner=ranking[0].id;room.deadline=0;addFeed(room,`THE CROWN GOES TO ${ranking[0].name.toUpperCase()}! ${ranking[0].prestige} Prestige.`,'win',{player:ranking[0].id});}
  else startRound(room);
 }
 function revealStep(room){
@@ -391,6 +397,6 @@ function tick(room,now=Date.now()){
  if(room.status==='reveal'){revealStep(room);return true;}
  return false;
 }
-function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:p.breakdown})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,offer:room.offer?{from:room.offer.from,to:room.offer.to,compelled:room.offer.compelled,deadline:room.offer.deadline}:null,winner:room.lastWinner,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length).map(p=>p.id):null};}
+function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:p.breakdown,reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,offer:room.offer?{from:room.offer.from,to:room.offer.to,compelled:room.offer.compelled,deadline:room.offer.deadline}:null,winner:room.lastWinner,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length).map(p=>p.id):null};}
 function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offer:room.offer?.to===p.id?room.offer:null};}
 module.exports={createRoom,addPlayer,chooseAvatar,startGame,chooseTickets,placeDepot,chooseUpgrade,setAction,lockIn,replyOffer,telegraph,publicView,privateView,tick,autopilot,legalTargets,costOf,tradeRate,score,updatePrestige,beginIncome,beginPlan,revealStep,beginReveal,resolveClashes,owned,routeName,eraOf,avatar};

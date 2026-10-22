@@ -122,3 +122,53 @@ test('Phase 3 embeds premium working lobby, human actor selection and event reac
  for(const fragment of ['tycoon-intro','avatar-gallery','actor-perk','player-showcase','watch-mood','phone-join-scene'])assert.ok(phone.includes(fragment),fragment);
  for (const html of [tv,phone])assert.doesNotMatch(html,/<script\s+src=|https:\/\/fonts\.|https:\/\/cdnjs\./);
 });
+
+// PHASE 3 continuation — authoritative character reaction contract.
+test('Phase 3: building a City sets a public four-second smug reaction',()=>{
+ const {r,ps}=setup();const [p,q]=ps;
+ const town=r.tiles.find(t=>t.type==='town');town.owner=p.id;town.city=false;
+ g.tick(r,r.deadline+1);p.resources={coal:10,timber:10,grain:10,steel:10,gold:10};
+ g.setAction(r,p,0,{type:'city',tile:town.id});g.setAction(r,p,1,{type:'skip'});g.lockIn(r,p);g.lockIn(r,q);
+ g.revealStep(r);const shown=g.publicView(r).players.find(x=>x.id===p.id);
+ assert.equal(town.city,true);assert.equal(shown.reaction,'smug');assert.equal(shown.reactionReason,'New city founded');
+ assert.ok(shown.reactionUntil>Date.now());
+});
+test('Phase 3: failed plans cause furious reaction, no secret private details in public state',()=>{
+ const {r,ps}=setup();const [p,q]=ps;
+ const target=r.tiles.find(t=>t.type==='town');target.owner=p.id;target.city=false;
+ g.tick(r,r.deadline+1);p.resources={coal:10,timber:10,grain:10,steel:10,gold:10};
+ g.setAction(r,p,0,{type:'city',tile:target.id});g.setAction(r,p,1,{type:'skip'});g.lockIn(r,p);g.lockIn(r,q);
+ target.owner=q.id;g.revealStep(r);
+ const pub=g.publicView(r);assert.equal(pub.players.find(x=>x.id===p.id).reaction,'furious');
+ assert.ok(pub.feed.some(x=>x.kind==='fail'&&x.player===p.id));
+ assert.ok(pub.feed.every(x=>Number.isFinite(x.at)));
+ assert.ok(!JSON.stringify(pub).includes(p.token));
+});
+test('Phase 3: trophy changes trigger winner and loser emotions only when ownership changes',()=>{
+ const {r,ps}=setup();const [p,q]=ps;
+ const ownP=g.owned(r,p)[0],ownQ=g.owned(r,q)[0];ownP.soldiers=7;ownQ.soldiers=1;
+ g.updatePrestige(r);assert.equal(g.publicView(r).players.find(x=>x.id===p.id).reaction,'smug');
+ assert.equal(r.trophies.army,p.id);
+ ownP.soldiers=0;ownQ.soldiers=9;g.updatePrestige(r);
+ assert.equal(r.trophies.army,q.id);assert.equal(p.reaction,'furious');assert.equal(q.reaction,'smug');
+ const count=r.feed.filter(x=>x.kind==='trophy').length;g.updatePrestige(r);
+ assert.equal(r.feed.filter(x=>x.kind==='trophy').length,count,'no repeated trophy reactions');
+});
+test('Phase 3: contenders react to clash results with defender and claimant treated distinctly',()=>{
+ const {r,ps}=setup();const [p,q]=ps;
+ const tile=r.tiles.find(x=>!x.owner&&x.type==='forest');assert.ok(tile);
+ r.clashes=[{tile:tile.id,defender:null,claimants:[{player:p.id,kind:'build',sources:[],cost:{timber:1,grain:1}},{player:q.id,kind:'build',sources:[],cost:{timber:1,grain:1}}]}];
+ g.resolveClashes(r);
+ assert.ok([p.id,q.id].includes(tile.owner));
+ const winner=r.players.find(x=>x.id===tile.owner),loser=r.players.find(x=>x.id!==tile.owner);
+ assert.equal(winner.reaction,'smug');assert.equal(loser.reaction,'furious');
+ assert.ok(r.feed.some(x=>x.kind==='clash'&&x.results.length===2));
+});
+test('Phase 3: TV and phone honour live server reactions and display era-specific visuals',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const tv=fs.readFileSync(path.resolve(__dirname,'../public/tv.html'),'utf8');
+ const ph=fs.readFileSync(path.resolve(__dirname,'../public/phone.html'),'utf8');
+ for(const ui of [tv,ph]){assert.match(ui,/reactionUntil/);assert.match(ui,/dataset\.era/);assert.match(ui,/data-live-portrait|data-player-avatar/);}
+ assert.match(tv,/TROPHY CLAIMED/);assert.match(tv,/DESTINATION FULFILLED/);
+ assert.match(ph,/watch-mood/);assert.doesNotMatch(ph,/<script[^>]+src=/i);
+});
