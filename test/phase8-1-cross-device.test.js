@@ -33,7 +33,7 @@ test('Cross-device: three steps, seven action costs, Prestige and private-ticket
  for(const name of ['Build Depot','Upgrade to City','Lay Track','Recruit','Trade','Research','Attack'])assert.ok(t.includes(name));
  assert.match(t,/10 Prestige/);assert.match(t,/15/);
  assert.match(p,/10 Prestige in Quick/);
- assert.match(p,/Keep 2 or 3 private Destination Tickets/);
+ assert.match(p,/keep 2 or 3 private Destination Tickets/i);
  assert.match(p,/20-second offer/);
 });
 test('Lore is clearly fictional while history has correctly scoped Victorian milestones',()=>{
