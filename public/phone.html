@@ -56,6 +56,30 @@ label,.draft-card small,.slot small,.actor-title,.actor-quote,.actor-perk,.actor
 .era-portrait-card .eyebrow{color:#ffe09a}.era-portrait-card h1{font-size:31px}.era-portrait-card p{font-size:15px;line-height:1.5}
 .era-portrait-card img{width:112px;height:155px;object-fit:cover;object-position:center 18%;border:2px solid var(--era-edge,#b99d5f);border-radius:7px;filter:drop-shadow(0 7px 12px #0005)}
 @media(max-width:370px){.era-portrait-card{grid-template-columns:minmax(0,1fr) 90px}.era-portrait-card img{width:90px;height:135px}.era-portrait-card h1{font-size:27px}}
+
+/* Phase 3.4 — compact character selection with private character dossiers. */
+.avatar-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.actor-card{min-width:0;background:linear-gradient(165deg,#132d2b,#111b20);color:#f9eacf;border:2px solid var(--actor);border-radius:15px;overflow:hidden;box-shadow:0 10px 24px #0003;display:flex;flex-direction:column;text-align:center;position:relative}
+.actor-card .portrait-cover{width:100%;height:auto;aspect-ratio:1/.82;object-fit:cover;object-position:center 18%;border-bottom:3px solid var(--actor);display:block;background:#231d1b}
+.actor-card .actor-title{font-size:14px;color:#f3d084;padding-top:10px}
+.actor-card .actor-name{font-size:clamp(16px,3.8vw,21px);min-height:45px;display:grid;place-items:center;padding:4px 9px;margin:0}
+.actor-card .actor-actions{display:grid;gap:7px;padding:8px 10px 13px;margin-top:auto}
+.actor-card .actor-actions button{min-height:56px;font-size:16px;border-radius:9px;font-weight:700;cursor:pointer}
+.actor-card .actor-actions .choose{background:linear-gradient(150deg,#f7d68d,#b88c36);border:2px solid #f3d18c;color:#20180c}
+.actor-card .actor-actions .details{background:#1b302e;color:#f5dfae;border:1px solid #987c4b}
+.actor-card .actor-actions button:focus-visible,.profile-switch:focus-visible{outline:3px solid #fff1bd;outline-offset:3px}
+.actor-card .taken{position:absolute;top:10px;right:6px;background:#50221d;border:1px solid #f0c36e;color:#fff;padding:5px 9px;border-radius:6px;font-size:14px;font-weight:800}
+.actor-card .choose:disabled{opacity:.5;cursor:not-allowed}
+.profile-cover{width:100%;max-height:340px;object-fit:contain;object-position:center;background:linear-gradient(160deg,#142d2e,#271d19);border:2px solid var(--brass);border-radius:13px}
+.profile-panel{max-width:550px;margin:12px auto 28px;overflow:auto}
+.profile-panel h1{font-size:clamp(29px,8vw,42px)}
+.profile-switches{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:12px 0 14px}
+.profile-switch{min-height:56px;border-radius:9px;background:var(--panel);color:var(--text);border:1px solid var(--line);font-weight:700;font-size:16px}
+.profile-switch[aria-pressed="true"]{background:var(--brass);color:#15110b;border-color:var(--brass)}
+.profile-copy{padding:13px;background:var(--glow);border-radius:12px;line-height:1.55;font-size:16px}
+.profile-copy strong{display:block;margin-bottom:5px}
+@media(max-width:360px){.avatar-gallery{gap:8px}.actor-card .actor-actions{padding:7px}.actor-card .actor-actions button{font-size:16px}}
+@media(prefers-reduced-motion:reduce){.actor-card,.profile-cover{transition:none}}
 </style></head><body>
 <header><div><div><img src="/art/iron-crown-premium.png" class="phone-logo" alt="Iron Crown"></div><div class="status" id="status">PRIVATE CONTROLLER</div></div><button id="rules" class="btn alt tiny" style="width:auto;color:#f4e7cb">Rules</button></header>
 <div id="connection" class="banner hidden">Reconnecting… Your seat is safe.</div><main class="wrap" id="app"></main><div id="toast" class="toast hidden"></div><div id="rulesOverlay" class="rule-overlay hidden"></div>
@@ -64,6 +88,35 @@ label,.draft-card small,.slot small,.actor-title,.actor-quote,.actor-perk,.actor
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ids=['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'],people=[['augusta','Lady Augusta','The Duchess','#B3261E'],['silas','Silas Brunel-Crane','The Engineer','#1F4FA8'],['jack','Lucky Jack','The Gambler','#1E7A46'],['ada','Mrs Ada Pennyworth','The Banker','#C99A2E'],['rupert','Colonel Fairfax','The Colonel','#22305A'],['nell','Nell Thackery','The Union Boss','#C2571A'],['ottoline','Prof. Ottoline Vex','The Inventor','#6B3FA0'],['ezra','Mr Ezra Coldwell','The Smuggler','#167B7B']];
 const bios={augusta:['A noble eye for power','Cities cost 1 less Grain'],silas:['The genius behind the rails','Track costs 1 less Steel per route'],jack:['Fortune favours the daring','Reroll your die once per clash'],ada:['Every empire needs a ledger','Bank trades 2:1 for a chosen resource'],rupert:['Discipline conquers all','Recruit costs 1 Gold per Soldier'],nell:['The people move the country','Immune to Coal Strike and Harsh Winter'],ottoline:['Tomorrow belongs to invention','Research costs 1 less Gold; extra draft choice'],ezra:['Every border has a price','One favourable 2:1 trade per round is compulsory']};
+const wardrobe={
+ augusta:['Bonnet and shawl','Feathered hat','Tiara and electric-lit brooch'],
+ silas:['Cap and overalls','Top hat and frock coat','Bowler and lightbulb tie-pin'],
+ jack:['Flat cap','Bowler hat','White dinner jacket'],
+ ada:['Plain working dress','Fur collar','Pearls and lorgnette'],
+ rupert:['Red tunic','Khaki jacket','Dress uniform and sash'],
+ nell:['Shawl','Union badge','Megaphone in hand'],
+ ottoline:['Goggles raised','Goggles lowered, sparks','Crackling coil on shoulder'],
+ ezra:["Fisherman's coat",'Long greatcoat','Silk scarf and cigarette holder']
+};
+const traits={
+ augusta:'Politically connected and relentlessly ambitious. She turns prosperous towns into powerful cities.',
+ silas:'A restless railway engineer who sees bridges and stations where others see obstacles.',
+ jack:'An affable opportunist. He believes a bold gamble can change any railway fortune.',
+ ada:'A precise financier. A sensible exchange rate can be more powerful than an army.',
+ rupert:'A decorated officer who values order, military strength and territorial control.',
+ nell:'A formidable organiser who keeps industry moving when the country faces disruption.',
+ ottoline:'An inventive mind whose experiments turn new technology into an advantage.',
+ ezra:'A shrewd trader with contacts at every port and a deal for every occasion.'
+};
+let profileEra='steam',profileMood='neutral';
+const profilePath=(actor,era,mood)=>`/art/avatars/${actor}_${era}_${mood}.png`;
+function showProfile(actor){if(!ids.includes(actor))return;profileEra='steam';profileMood='neutral';
+ const overlay=$('rulesOverlay');overlay.classList.remove('hidden');
+ overlay.innerHTML=`<section class="card gold profile-panel" role="dialog" aria-modal="true" aria-labelledby="profileTitle"><div class="eyebrow">PRIVATE TYCOON DOSSIER</div><h1 id="profileTitle" tabindex="-1">${esc(people.find(p=>p[0]===actor)?.[1])}</h1><p class="caption">${esc(people.find(p=>p[0]===actor)?.[2])}</p><img id="profilePortrait" class="profile-cover" src="${profilePath(actor,profileEra,profileMood)}" alt="Character appearance preview"><p class="profile-copy">${esc(traits[actor])}</p><h3>Explore the three eras</h3><div class="profile-switches">${['steam','iron','electric'].map(e=>`<button class="profile-switch" data-era="${e}" aria-pressed="${profileEra===e}">${e[0].toUpperCase()+e.slice(1)}</button>`).join('')}</div><h3>Character reactions</h3><div class="profile-switches">${['neutral','smug','furious'].map(m=>`<button class="profile-switch" data-mood="${m}" aria-pressed="${profileMood===m}">${m[0].toUpperCase()+m.slice(1)}</button>`).join('')}</div><div id="profileOutfit" class="profile-copy"></div><div class="profile-copy"><strong>Advanced mode ability</strong>${esc(bios[actor][1])}<p style="margin-bottom:0">Abilities are disabled in Quick and Standard games.</p></div><button class="btn" id="profileChoose">Choose this tycoon</button><button class="btn alt" id="profileClose">Return to the roster</button></section>`;
+ const refresh=()=>{const img=$('profilePortrait');img.src=profilePath(actor,profileEra,profileMood);img.alt=`${people.find(p=>p[0]===actor)?.[1]} — ${profileEra} era, ${profileMood} expression`;const note=wardrobe[actor][['steam','iron','electric'].indexOf(profileEra)];$('profileOutfit').innerHTML=`<strong>${profileEra[0].toUpperCase()+profileEra.slice(1)}-era costume direction</strong>${esc(note)}<br><span class="caption">Portrait treatments are previews; separately illustrated facial poses and costumes are still in production.</span>`;overlay.querySelectorAll('[data-era]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.era===profileEra)));overlay.querySelectorAll('[data-mood]').forEach(x=>x.setAttribute('aria-pressed',String(x.dataset.mood===profileMood)));};
+ overlay.querySelectorAll('[data-era]').forEach(b=>b.onclick=()=>{profileEra=b.dataset.era;refresh();});overlay.querySelectorAll('[data-mood]').forEach(b=>b.onclick=()=>{profileMood=b.dataset.mood;refresh();});
+ const taken=publicS?.players.some(p=>p.id!==pid&&p.avatar===actor);$('profileChoose').disabled=!!taken;$('profileChoose').textContent=taken?'Already chosen by another player':'Choose this tycoon';$('profileChoose').onclick=()=>{overlay.classList.add('hidden');send('avatar',{avatar:actor});};$('profileClose').onclick=()=>overlay.classList.add('hidden');refresh();overlay.scrollTop=0;$('profileTitle').focus({preventScroll:true});
+}
 const resourceIcons={coal:'⚒',timber:'♠',grain:'❀',steel:'⚙',gold:'◉'},actionNames={build:'Build Depot',city:'Upgrade City',track:'Lay Track',recruit:'Recruit',trade:'Trade',research:'Research',attack:'Attack',skip:'Pass'},actionIcons={build:'⌂',city:'♜',track:'🚂',recruit:'⚔',trade:'⇄',research:'⚙',attack:'♞',skip:'·'},typeNames={coal:'Coalfield',forest:'Forest',farm:'Farmland',steel:'Steelworks',town:'Market Town',hill:'Hills',lake:'Lake',capital:'Capital'};
 const saved=()=>{try{return JSON.parse(localStorage.getItem('ironPhone')||'null');}catch{return null;}};
 let ws,room=new URLSearchParams(location.search).get('room')?.toUpperCase()||saved()?.room||'',pid=null,token=null,publicS=null,privateS=null,view='join',actionSlot=0,editor=null,editType='',lastRenderKey='',seenSeq=0,toastTimer=null,spectateTickets=false,manualName='',requestedJoin=false,activeTab='plan',telegraphMode=false;
@@ -108,8 +161,8 @@ function render(){const s=publicS,p=privateS;document.body.dataset.era=s?.era||'
  renderWatch();
 }
 function renderAvatar(){const taken=new Set(publicS.players.filter(x=>x.id!==pid).map(x=>x.avatar));
- $('app').innerHTML=`<section class="tycoon-intro"><div class="eyebrow">THE TYCOONS OF IRON CROWN</div><h1>Choose your rival.</h1><p>Eight extraordinary people. One railway empire. Each character has a signature strategy in Advanced mode.</p></section><section class="avatar-gallery grid2">${people.map(([id,name,title,colour])=>`<button class="avatar-choice" data-avatar="${id}" ${taken.has(id)?'disabled':''} style="--actor:${colour}"><img src="${avatar(id)}" alt="Portrait of ${esc(name)}"><span class="actor-title">${esc(title)}</span><span class="actor-name">${esc(name)}</span><span class="actor-quote">“${esc(bios[id][0])}”</span><span class="actor-perk">${esc(bios[id][1])}</span>${taken.has(id)?'<span class="actor-taken">TAKEN</span>':'<span class="actor-choose">CHOOSE TYCOON →</span>'}</button>`).join('')}</section>`;
- $('app').querySelectorAll('[data-avatar]').forEach(b=>b.onclick=()=>send('avatar',{avatar:b.dataset.avatar}));
+ $('app').innerHTML=`<section class="tycoon-intro"><div class="eyebrow">THE TYCOONS OF IRON CROWN</div><h1>Choose your tycoon.</h1><p>Eight rivals. One crown. View each dossier before taking your seat. Character abilities apply in Advanced mode only.</p></section><section class="avatar-gallery">${people.map(([id,name,title,colour])=>`<article class="actor-card" style="--actor:${colour}"><img class="portrait-cover" src="${avatar(id)}" alt="Portrait of ${esc(name)}"><span class="actor-title">${esc(title)}</span><h2 class="actor-name">${esc(name)}</h2>${taken.has(id)?'<span class="taken">TAKEN</span>':''}<div class="actor-actions"><button class="choose" data-avatar="${id}" ${taken.has(id)?'disabled':''}>${taken.has(id)?'Unavailable':'Choose'}</button><button class="details" data-profile="${id}">View dossier</button></div></article>`).join('')}</section>`;
+ $('app').querySelectorAll('[data-avatar]').forEach(b=>b.onclick=()=>send('avatar',{avatar:b.dataset.avatar}));$('app').querySelectorAll('[data-profile]').forEach(b=>b.onclick=()=>showProfile(b.dataset.profile));
 }
 function renderLobby(){const me=current(),a=people.find(x=>x[0]===me.avatar);
  $('app').innerHTML=`<section class="card player-showcase" style="--actor:${a?.[3]||'#b18b47'}"><div class="eyebrow">YOUR TYCOON · ROOM ${esc(publicS.code)}</div><img class="hero-actor" data-live-portrait="${me.avatar}" src="${avatar(me.avatar)}" alt="Your tycoon, ${esc(a?.[1]||me.name)}"><h1>${esc(a?.[1]||me.name)}</h1><div class="actor-role">${esc(a?.[2]||'Tycoon')}</div><p>“${esc(bios[me.avatar]?.[0]||'The railway awaits.') }”</p><div class="perk-box"><b>ADVANCED MODE ADVANTAGE</b><span>${esc(bios[me.avatar]?.[1]||'')}</span></div><p>The host starts the railway race. Keep your private plans on this phone.</p></section><section class="card"><h3>Tycoons gathered · ${publicS.players.length}/8</h3>${publicS.players.map(pl=>`<div class="sheet-row gathering"><img src="${avatar(pl.avatar||'augusta')}" alt=""><span>${esc(pl.name)} ${pl.id===pid?'(you)':''}</span><span class="right">${pl.avatar?'✔ Ready':'Choosing…'}</span></div>`).join('')}</section>`;
@@ -222,6 +275,7 @@ function renderResults(){const ranking=[...publicS.players].sort((a,b)=>publicS.
  $('app').innerHTML=`<section class="card gold" style="text-align:center"><div class="eyebrow">The crown has been awarded</div><h1>${place===1?'♛ You are the Iron Crown!':'The Railway Race Is Over'}</h1><img class="big-avatar" src="${avatar(me.avatar,place===1?'smug':'neutral')}" alt="Your tycoon"><h2>${place===1?'Champion':`You finished #${place}`}</h2><p><strong style="font-size:32px;color:var(--brass)">★ ${me.prestige} Prestige</strong></p></section><section class="card"><h2>Your Prestige breakdown</h2>${[['Market Towns',b.depot],['Cities',b.city],['Completed Tickets',b.tickets],['Longest Railway Trophy',b.rail],['Largest Army Trophy',b.army],['Grand Station',b.grand],['Royal Prestige',b.bonus],['Unfinished tickets penalty',-b.unfinished]].map(([name,val])=>`<div class="sheet-row"><span>${name}</span><b>${val||0}</b></div>`).join('')}</section><section class="card"><h2>Final rankings</h2>${ranking.map((p,i)=>`<div class="sheet-row"><span>${i+1}. ${esc(p.name)}</span><b>★ ${p.prestige}</b></div>`).join('')}<p class="caption">The host can begin a new game on the TV.</p></section>`;
 }
 const ruleCopy=[['1. Earn the crown','First to 15 Prestige (10 in Quick), or highest at the end, wins. Market Town depots, cities, tickets and trophies score points.'],['2. Place two Depots','Choose free production tiles in snake order. Each starting Depot gets one Soldier. Your phone keeps your tickets hidden.'],['3. Income and orders','Your holdings produce every round. Secretly choose two actions (Research at most once), then Lock In. Unused actions pass at the deadline.'],['4. Build and trade','New Depots cost Timber and Grain. Cities cost Grain, Steel and Coal. Whole routes cost Timber and Steel per segment. Trade with the bank or offer to another tycoon.'],['5. Clash for territory','Attack adjacent enemy tiles with Soldiers. Add a die (1–6), with Hills/City bonuses for the defender. Ties go to the defender. No player is ever eliminated.'],['6. Progress through eras','Steam, Iron, then Electric. Each era offers an Upgrade. Advanced mode adds events, character perks and unfinished-ticket penalties.']];
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('rulesOverlay').classList.contains('hidden'))$('rulesOverlay').classList.add('hidden');});
 $('rules').onclick=()=>{$('rulesOverlay').innerHTML=`<section class="card gold"><div class="eyebrow">A pocket rulebook</div><h1>How to Play</h1>${ruleCopy.map(([t,v])=>`<div class="ticket"><h3>${t}</h3><p>${v}</p></div>`).join('')}<button class="btn" id="closeRules">Back to the game</button></section>`;$('rulesOverlay').classList.remove('hidden');$('closeRules').onclick=()=>$('rulesOverlay').classList.add('hidden');};
 render();connect();
 </script></body></html>

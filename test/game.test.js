@@ -172,3 +172,33 @@ test('Phase 3: TV and phone honour live server reactions and display era-specifi
  assert.match(tv,/TROPHY CLAIMED/);assert.match(tv,/DESTINATION FULFILLED/);
  assert.match(ph,/watch-mood/);assert.doesNotMatch(ph,/<script[^>]+src=/i);
 });
+
+// PHASE 3 (v1.4) — compact premium character dossiers and gallery.
+test('Phase 3.4: mobile selector includes eight accessible independent selections and dossiers',()=>{
+ const fs=require('node:fs'), path=require('node:path');
+ const html=fs.readFileSync(path.resolve(__dirname,'../public/phone.html'),'utf8');
+ for(const id of require('../src/constants').AVATARS.map(x=>x.id)){
+  assert.match(html,new RegExp(`\\b${id}:\\s*\\[`),'Missing character wardrobe: '+id);
+  assert.match(html,new RegExp(`\\b${id}:\\s*['\"]`),'Missing character personality: '+id);
+ }
+ for(const phrase of ['actor-card','data-avatar','data-profile','PRIVATE TYCOON DOSSIER','aria-pressed','profileEra','profileMood','profileChoose','profileClose','tabindex="-1"'])assert.ok(html.includes(phrase),phrase);
+ assert.ok(html.includes("taken.has(id)?'disabled'"),'Unavailable tycoons must not be selectable');
+ assert.ok(!html.includes('<button class="avatar-choice"'), 'Old long-form selector must be replaced');
+});
+test('Phase 3.4: TV gallery supports all eight people, eras, screen reader friendly controls and closing',()=>{
+ const fs=require('node:fs'), path=require('node:path');
+ const html=fs.readFileSync(path.resolve(__dirname,'../public/tv.html'),'utf8');
+ for(const phrase of ['id="galleryBtn"','galleryActors','showTycoons()','tycoon-gallery-grid','gallery-feature','aria-pressed','data-gallery-era','closeGallery','galleryEra'])assert.ok(html.includes(phrase),phrase);
+ const section=html.substring(html.indexOf('const galleryActors=['),html.indexOf('let galleryActor='));
+ for(const actor of require('../src/constants').AVATARS) assert.match(section,new RegExp(`['\"]${actor.id}['\"]`));
+});
+test('Phase 3.4: character art is served locally and portrait alternatives exist without network dependencies',()=>{
+ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+ const dir=path.resolve(__dirname,'../public/art/avatars');
+ const ids=require('../src/constants').AVATARS.map(x=>x.id);
+ for(const id of ids){const seen=new Set();for(const era of ['steam','iron','electric'])for(const mood of ['neutral','smug','furious']){
+  const file=path.join(dir,`${id}_${era}_${mood}.png`);
+  assert.ok(fs.statSync(file).size>15000,`Corrupt or tiny portrait: ${file}`);
+  seen.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
+ }assert.equal(seen.size,9,`${id} should have 9 distinct PNG render treatments`);}
+});

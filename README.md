@@ -1,3 +1,7 @@
+## Phase 3 v1.4.0 — The eight tycoons
+
+The phone character picker now offers an eight-person premium portrait roster and private interactive dossiers. Each dossier previews all three eras and three mood asset paths, details the persona, and explains the Advanced-only perk. The host screen adds a **Meet the Tycoons** gallery accessible from the TV top bar. These changes are presentation-only and preserve the authoritative game rules. See `PHASE-3-V1.4-RELEASE-NOTES.md` for test evidence and the remaining independent-artwork caveat.
+
 # IRON CROWN
 
 A private, cross-device Victorian railway empire game. One browser window is the **shared TV board**; two to eight phones/tablets are **secret controllers**. The Node.js server validates all orders and owns the authoritative state.
