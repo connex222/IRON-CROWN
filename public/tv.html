@@ -254,6 +254,19 @@ function error(message){showNotice('MESSAGE',message,4000);}
 // Never erase or replace an old game without an explicit host choice.
 let hostRetry=null,hostRetryCount=0,hostAttempt=0,hostRecoveryBlocked=false,hostAuthenticated=false;
 function getHostSaved(){try{return JSON.parse(localStorage.getItem('ironHost')||'null');}catch{return null;}}
+function recoveryKey(roomCode){return 'ironCrownEncryptedRecovery:'+roomCode;}
+function savedRoomRecovery(roomCode){
+ if(!roomCode)return null;
+ try{const copy=JSON.parse(localStorage.getItem(recoveryKey(roomCode))||'null');
+  if(copy&&copy.v===1&&typeof copy.data==='string'&&copy.data.length<120000)return copy;
+ }catch{}
+ return null;
+}
+function keepRoomRecovery(roomCode,copy){
+ if(!roomCode||!copy||copy.v!==1)return;
+ try{localStorage.setItem(recoveryKey(roomCode),JSON.stringify(copy));}
+ catch(err){console.warn('Encrypted room recovery storage unavailable:',err.message);}
+}
 function showHostBanner(message,allowNew=false){
  const element=$('connection');
  element.replaceChildren();
@@ -263,7 +276,7 @@ function showHostBanner(message,allowNew=false){
   button.type='button';button.textContent='Start a new room';button.className='host-recover-btn';
   button.onclick=()=>{
    if(!window.confirm('Start a new Iron Crown room? Your previous room will not be restored on this TV.'))return;
-   localStorage.removeItem('ironHost');code=null;hostToken=null;publicState=null;
+   if(code)localStorage.removeItem(recoveryKey(code));localStorage.removeItem('ironHost');code=null;hostToken=null;publicState=null;
    hostRecoveryBlocked=false;hostRetryCount=0;hostAuthenticated=false;
    if(hostRetry){clearTimeout(hostRetry);hostRetry=null;}
    if(ws){try{ws.close();}catch{}}
@@ -288,7 +301,7 @@ function connect(){
  ws=socket;
  socket.onopen=()=>{
   if(attempt!==hostAttempt)return;
-  socket.send(JSON.stringify({type:'host',code:saved?.code||null,token:saved?.token||null}));
+  socket.send(JSON.stringify({type:'host',code:saved?.code||null,token:saved?.token||null,recovery:savedRoomRecovery(saved?.code)}));
  };
  socket.onmessage=e=>{
   if(attempt!==hostAttempt)return;
@@ -297,11 +310,11 @@ function connect(){
    if(m.type==='welcome'){
     code=m.code;hostToken=m.token;hostAuthenticated=true;hostRetryCount=0;
     localStorage.setItem('ironHost',JSON.stringify({code,token:hostToken}));
-    $('connection').classList.add('hidden');updateQR();
+    $('connection').classList.add('hidden');updateQR();if(m.recovered)console.info('Iron Crown: your original game was recovered from the encrypted host backup.');
    }else if(m.type==='state'){
-    if(hostAuthenticated){publicState=m.public;render();}
+    if(hostAuthenticated){if(m.recovery)keepRoomRecovery(code,m.recovery);publicState=m.public;render();}
    }else if(m.type==='error'){
-    if(/^Host room not found\.|^Host credentials rejected\./.test(m.message)){
+    if(/^Host room not found\.|^Host credentials rejected\.|^Recovery copy/.test(m.message)){
      hostRecoveryBlocked=true;
      showHostBanner('Could not recover your previous game. Check the server or start a new room.',true);
      try{socket.close();}catch{}

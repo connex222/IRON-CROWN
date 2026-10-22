@@ -6,6 +6,7 @@ const crypto=require('node:crypto');
 const WebSocket=require('ws');
 const game=require('./game');
 const {availableAudio,CUES}=require('./audio');
+const recovery=require('./recovery');
 const GAME_VERSION=require('../package.json').version;
 const PORT=Number(process.env.PORT)||3000;
 const ROOT=path.resolve(__dirname,'../public');
@@ -32,9 +33,23 @@ const httpServer=http.createServer((req,res)=>{
   res.writeHead(200,headers);if(req.method==='HEAD')res.end();else fs.createReadStream(file).pipe(res);
  });
 });
-const wss=new WebSocket.Server({server:httpServer,path:'/socket',maxPayload:16*1024,perMessageDeflate:false});
+const wss=new WebSocket.Server({server:httpServer,path:'/socket',maxPayload:160*1024,perMessageDeflate:false});
 const send=(ws,payload)=>{if(ws.readyState===WebSocket.OPEN)try{ws.send(JSON.stringify(payload));}catch{}};
-function broadcast(room){const data=game.publicView(room);for(const [ws,link] of links){if(link.code!==room.code)continue;const packet={type:'state',public:data};if(link.role==='player'){const p=room.players.find(x=>x.id===link.playerId);if(p)packet.private=game.privateView(room,p);}send(ws,packet);}save();}
+function broadcast(room){
+ const data=game.publicView(room);
+ let hostBackup=null;
+ if([...links.values()].some(link=>link.code===room.code&&link.role==='host')){
+  try{hostBackup=recovery.seal(room);}catch(err){console.warn('Browser recovery snapshot not ready:',err.message);}
+ }
+ for(const [ws,link] of links){
+  if(link.code!==room.code)continue;
+  const packet={type:'state',public:data};
+  if(link.role==='host'&&hostBackup)packet.recovery=hostBackup;
+  if(link.role==='player'){const p=room.players.find(x=>x.id===link.playerId);if(p)packet.private=game.privateView(room,p);}
+  send(ws,packet);
+ }
+ save();
+}
 function bad(ws,error){send(ws,{type:'error',message:String(error?.message||error).slice(0,160)});}
 function bind(ws,code,role,playerId=null){
  const prev=links.get(ws);
@@ -46,8 +61,14 @@ function host(ws,data){
  let room=null;
  if(isCode(data.code)&&rooms.has(data.code)){
   room=rooms.get(data.code);if(typeof data.token!=='string'||data.token!==room.hostToken)throw Error('Host credentials rejected.');
+ }else if(isCode(data.code)&&data.recovery){
+  // Recover only with the original 24-byte host credential. No copy is ever
+  // included in public state or sent to player controllers.
+  const recovered=recovery.unseal(data.recovery,data.code,data.token);
+  room=recovered.room;rooms.set(room.code,room);
+  console.log('Recovered room '+room.code+' from host browser ('+recovered.ageSeconds+' seconds old)');
  }else if(!data.code){room=game.createRoom(code4());rooms.set(room.code,room);}else throw Error('Host room not found.');
- bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken});broadcast(room);
+ bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken,recovered:!!(data.recovery&&isCode(data.code)&&room.code===data.code)});broadcast(room);
 }
 function join(ws,data){
  const code=String(data.code||'').trim().toUpperCase();const room=rooms.get(code);if(!room)throw Error('Room not found. Ask the host for the four-letter code.');
