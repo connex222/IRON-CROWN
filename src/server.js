@@ -81,7 +81,20 @@ function action(ws,data){
   }
   else if(kind==='restart'){
    if(room.status!=='finished')throw Error('You can only rematch after a completed game.');
-   const newRoom=game.createRoom(room.code);newRoom.hostToken=room.hostToken;newRoom.players=room.players.map(x=>({...x,resources:{},tickets:[],ticketChoices:[],upgrades:[],actions:[null,null],ai:x.ai,locked:false}));newRoom.mode=room.mode;newRoom.settings=require('./constants').MODE[room.mode];rooms.set(room.code,newRoom);
+   const newRoom=game.createRoom(room.code);
+   newRoom.hostToken=room.hostToken;
+   newRoom.mode=room.mode;newRoom.settings=require('./constants').MODE[room.mode];
+   // Preserve friends and their seat credentials, but never reuse last match's score,
+   // private contracts, troop orders, era drafts or active reaction animation.
+   newRoom.players=room.players.map((x,seat)=>({
+    ...x,seat,connected:!!x.ai||[...links].some(([,link])=>link.code===room.code&&link.role==='player'&&link.playerId===x.id),
+    resources:{},tickets:[],ticketChoices:[],upgrades:[],draftChoices:[],
+    draftDone:false,actions:[null,null],locked:false,telegraphUsed:false,smuggleUsed:false,
+    bankResource:'coal',bonusPrestige:0,prestige:0,breakdown:{},reaction:'neutral',
+    reactionReason:'',reactionUntil:0
+   }));
+   newRoom.seq=room.seq+1;
+   rooms.set(room.code,newRoom);
   }else throw Error('Unknown host command.');
  }else{
   if(!p||p.ai)throw Error('Seat unavailable.');
