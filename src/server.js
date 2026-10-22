@@ -36,7 +36,8 @@ const send=(ws,payload)=>{if(ws.readyState===WebSocket.OPEN)try{ws.send(JSON.str
 function broadcast(room){const data=game.publicView(room);for(const [ws,link] of links){if(link.code!==room.code)continue;const packet={type:'state',public:data};if(link.role==='player'){const p=room.players.find(x=>x.id===link.playerId);if(p)packet.private=game.privateView(room,p);}send(ws,packet);}save();}
 function bad(ws,error){send(ws,{type:'error',message:String(error?.message||error).slice(0,160)});}
 function bind(ws,code,role,playerId=null){
- const prev=links.get(ws);if(prev){const r=rooms.get(prev.code);if(r&&prev.role==='player'){const p=r.players.find(p=>p.id===prev.playerId);if(p)p.connected=false;}}
+ const prev=links.get(ws);
+ if(prev&&(prev.code!==code||prev.role!==role||prev.playerId!==playerId))throw Error('This connection already belongs to another seat. Open a new connection.');
  for(const [other,l] of links)if(other!==ws&&l.code===code&&l.role===role&&l.playerId===playerId){links.delete(other);try{other.close(4001,'Signed in elsewhere');}catch{}}
  links.set(ws,{code,role,playerId});
 }
@@ -65,13 +66,16 @@ function action(ws,data){
   else if(kind==='mode'){if(room.status!=='lobby'||!game)throw Error('Mode is locked.');if(!['quick','standard','advanced'].includes(data.mode))throw Error('Invalid mode.');room.mode=data.mode;room.settings=require('./constants').MODE[data.mode];}
   else if(kind==='addAI')game.addPlayer(room,`Iron Bot ${room.players.length+1}`,true);
   else if(kind==='remove'){
+   if(room.status!=='lobby')throw Error('Remove seats only in the lobby. Use AI takeover during a match.');
    const target=room.players.find(x=>x.id===data.playerId);if(!target)throw Error('Unknown player.');
-   if(room.status==='lobby'){room.players.splice(room.players.indexOf(target),1);room.players.forEach((p,i)=>p.seat=i);for(const [other,l] of links)if(l.code===room.code&&l.playerId===target.id){send(other,{type:'removed'});links.delete(other);try{other.close();}catch{}}}
-   else{target.ai=true;target.connected=true;game.autopilot(room);}
+   room.players.splice(room.players.indexOf(target),1);room.players.forEach((p,i)=>p.seat=i);
+   for(const [other,l] of links)if(l.code===room.code&&l.role==='player'&&l.playerId===target.id){send(other,{type:'removed'});links.delete(other);try{other.close();}catch{}}
   }
   else if(kind==='replaceAI'){
-   const target=room.players.find(x=>x.id===data.playerId);if(!target)throw Error('Unknown player.');target.ai=true;target.connected=true;
-   for(const [other,l] of links)if(l.code===room.code&&l.playerId===target.id){send(other,{type:'removed'});links.delete(other);try{other.close();}catch{}}
+   const target=room.players.find(x=>x.id===data.playerId);if(!target)throw Error('Unknown player.');
+   if(target.ai)throw Error('That seat is already controlled by the computer.');
+   target.ai=true;target.connected=true;
+   for(const [other,l] of links)if(l.code===room.code&&l.role==='player'&&l.playerId===target.id){send(other,{type:'removed'});links.delete(other);try{other.close();}catch{}}
    if(room.status==='lobby'&&!target.avatar){target.avatar=require('./constants').AVATARS.find(a=>!room.players.some(x=>x!==target&&x.avatar===a.id))?.id||null;}
    game.autopilot(room);
   }
