@@ -125,3 +125,7 @@ The accompanying `01-iron-crown.md` is the game's authoritative design bible. Tw
 All eight original human portrait files (`{id}_human.png`) now appear in every phone and TV screen, including dossiers, lobby, gallery, planning, trade, Reveal, results and the TV character stand-offs. Old era/mood variants are no longer referenced by live UI images. URLs use `?v=1.5.0` to avoid stale caches. The server remains authoritative for character reactions, now conveyed with framing and status text rather than falsely implying newly drawn facial poses. Bespoke outfits and expressions remain future illustration work.
 
 Quality: 28 Node tests passed and offline Chromium visual checks exercised all eight dossiers and major TV/phone character views using the bundled PNG artwork. Real multiplayer devices and deployment are not yet acceptance-tested.
+
+## Phase 4 — Gameplay reliability (v1.6.0)
+
+Planned orders now reserve soldiers across both slots. Duplicate attacks on one territory combine into one combatant and one die roll, Telegraph replacements are revalidated, trade payloads reject inherited keys, and computer opponents attempt all seven actions. Your phone shows the authoritative projected resource balance and current bank rates. See `PHASE-4-RELEASE-NOTES.md` for QA and limitations.

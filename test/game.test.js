@@ -224,3 +224,101 @@ test('Phase 3.5: eight original human portraits exist and are distinct PNG image
  }
  assert.equal(seen.size,8);
 });
+
+test('Phase 4: two attacks cannot double-book a source army',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
+ const home=g.owned(r,p)[0];home.soldiers=3;
+ const target=neighbours(home,new Map(r.tiles.map(t=>[t.id,t]))).find(t=>t.owner!==p.id&&t.type!=='lake'&&t.type!=='capital');
+ assert.ok(target);target.owner=q.id;target.soldiers=1;
+ g.setAction(r,p,0,{type:'attack',tile:target.id,sources:[{tile:home.id,count:2}]});
+ assert.throws(()=>g.setAction(r,p,1,{type:'attack',tile:target.id,sources:[{tile:home.id,count:2}]}),/cannot be committed/);
+ assert.equal(p.actions[1],null);
+ g.setAction(r,p,1,{type:'attack',tile:target.id,sources:[{tile:home.id,count:1}]});
+});
+test('Phase 4: second Depot cannot target the same tile',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const p=ps[0];
+ p.resources.timber=5;p.resources.grain=5;
+ const tile=g.legalTargets(r,p).build[0];assert.ok(tile);
+ g.setAction(r,p,0,{type:'build',tile});
+ assert.throws(()=>g.setAction(r,p,1,{type:'build',tile}),/different tile/);
+ assert.equal(p.actions[1],null);
+});
+test('Phase 4: combined double attack rolls once per player',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
+ const home=g.owned(r,p)[0];home.soldiers=6;
+ const target=neighbours(home,new Map(r.tiles.map(t=>[t.id,t]))).find(t=>t.owner!==p.id&&t.type!=='lake'&&t.type!=='capital');
+ assert.ok(target);target.owner=q.id;target.soldiers=0;
+ for(let i=0;i<2;i++)g.setAction(r,p,i,{type:'attack',tile:target.id,sources:[{tile:home.id,count:2}]});
+ g.lockIn(r,p);g.lockIn(r,q);
+ for(let i=0;i<5&&r.status==='reveal';i++)g.revealStep(r);
+ const clash=r.feed.find(x=>x.kind==='clash'&&x.tile===target.id);
+ assert.ok(clash);assert.equal(clash.results.length,2);
+ assert.equal(new Set(clash.results.map(x=>x.id)).size,2);
+ assert.ok(home.soldiers>=0&&home.soldiers<=6);
+});
+test('Phase 4: reject special or inherited trade resource names',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);
+ for(const bad of [{constructor:1,grain:1},{toString:1,grain:1},JSON.parse('{"__proto__":1,"grain":1}')]){
+  assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'player',to:ps[1].id,give:bad,want:{coal:1}}),/Invalid resource amount/);
+ }
+});
+test('Phase 4: bank trade can fund the second action',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
+ p.resources={coal:2,timber:5,grain:1,steel:1,gold:2};
+ g.setAction(r,p,0,{type:'trade',kind:'bank',give:'timber',want:'gold'});
+ g.setAction(r,p,1,{type:'research',kind:'ticket'});
+ g.lockIn(r,p);g.lockIn(r,q);
+ g.revealStep(r);assert.equal(p.resources.gold,3);
+ const tickets=p.tickets.length;g.revealStep(r);
+ assert.equal(p.resources.gold,0);assert.equal(p.resources.coal,1);assert.equal(p.tickets.length,tickets+1);
+});
+test('Phase 4: compulsory trade cannot force unavailable payment',()=>{
+ const {r,ps}=setup(2,'advanced');g.tick(r,r.deadline+1);const [p,q]=ps;
+ p.avatar='ezra';p.resources.grain=3;q.resources.steel=0;
+ g.setAction(r,p,0,{type:'trade',kind:'player',to:q.id,give:{grain:2},want:{steel:1}});
+ g.lockIn(r,p);g.lockIn(r,q);
+ const before=p.resources.grain;g.revealStep(r);
+ assert.equal(r.status,'reveal');assert.equal(p.resources.grain,before);
+});
+test('Phase 4: Telegraph change rejects a depleted budget',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
+ p.upgrades.push('telegraph');p.resources={coal:0,timber:0,grain:0,steel:0,gold:0};
+ g.setAction(r,p,0,{type:'skip'});g.setAction(r,p,1,{type:'skip'});
+ g.lockIn(r,p);g.lockIn(r,q);
+ assert.throws(()=>g.telegraph(r,p,1,{type:'research',kind:'ticket'}),/cannot afford/);
+ assert.equal(p.telegraphUsed,false);
+ g.telegraph(r,p,1,{type:'skip'});assert.equal(p.telegraphUsed,true);
+});
+test('Phase 4: invalid bank actions and deadline pass safely',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);
+ assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'bank',give:'coal',want:'coal'}),/different resources/);
+ assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'player',to:ps[1].id,give:{gold:100},want:{coal:1}}),/Invalid resource amount/);
+ g.tick(r,r.deadline+1);assert.equal(r.status,'reveal');
+ assert.ok(ps.every(p=>p.locked));assert.deepEqual(ps[0].actions,[{type:'skip'},{type:'skip'}]);
+});
+test('Phase 4: two, four and eight AI players finish all game modes with valid stock',()=>{
+ for(const mode of ['quick','standard','advanced'])for(const n of [2,4,8]){
+  const {r}=setup(n,mode,true);const steps=advance(r,220);assert.equal(r.status,'finished');
+  assert.ok(steps<220&&r.round<=r.settings.rounds);
+  for(const p of r.players)for(const val of Object.values(p.resources))assert.ok(Number.isInteger(val)&&val>=0);
+  for(const tile of r.tiles)assert.ok(Number.isInteger(tile.soldiers)&&tile.soldiers>=0);
+ }
+});
+test('Phase 4: projected costs and exchange rates are private and authoritative',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const p=ps[0];
+ p.resources={coal:1,timber:4,grain:2,steel:1,gold:4};
+ g.setAction(r,p,0,{type:'trade',kind:'bank',give:'timber',want:'steel'});
+ const v=g.privateView(r,p);
+ assert.deepEqual(v.planBalance,{coal:1,timber:1,grain:2,steel:2,gold:4});
+ assert.equal(v.bankRates.timber,3);
+ assert.ok(!JSON.stringify(g.publicView(r)).includes('planBalance'));
+ p.upgrades.push('corn');assert.equal(g.privateView(r,p).bankRates.grain,2);
+});
+test('Phase 4: Telegraph never allows a second Research after the first resolved',()=>{
+ const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
+ p.resources={coal:10,timber:10,grain:10,steel:10,gold:10};p.upgrades.push('telegraph');
+ g.setAction(r,p,0,{type:'research',kind:'ticket'});g.setAction(r,p,1,{type:'skip'});
+ g.lockIn(r,p);g.lockIn(r,q);g.revealStep(r);
+ assert.throws(()=>g.telegraph(r,p,1,{type:'research',kind:'ticket'}),/once per round/);
+ assert.equal(p.telegraphUsed,false);
+});
