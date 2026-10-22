@@ -159,7 +159,7 @@ function legalTargets(room,p){
 function cleanResources(raw){
  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw Error('Invalid resource offer.');
  const out=zero();for(const [k,v] of Object.entries(raw)){
-  if(!(k in out)||!Number.isInteger(v)||v<0||v>99)throw Error('Invalid resource amount.');out[k]=v;
+  if(!Object.hasOwn(out,k)||!Number.isInteger(v)||v<0||v>99)throw Error('Invalid resource amount.');out[k]=v;
  }return out;
 }
 function validateAction(room,p,a){
@@ -199,7 +199,18 @@ function sumCost(c){return Object.values(c).reduce((a,b)=>a+b,0);}
 function canPay(resources,c){return Object.keys(c).every(k=>resources[k]>=c[k]);}
 function calculatePlanBudget(room,p,actions){
  const left={...p.resources};let researchCount=0;
+ const soldierReservations=new Map();
+ const buildClaims=new Set();
  for(const a of actions){if(!a)continue;if(a.type==='research'&&++researchCount>1)throw Error('Research can only be chosen once per round.');
+  if(a.type==='build'){
+   if(buildClaims.has(a.tile))throw Error('Choose a different tile for your second Depot.');
+   buildClaims.add(a.tile);
+  }
+  if(a.type==='attack')for(const src of a.sources){
+   const count=(soldierReservations.get(src.tile)||0)+src.count;
+   if(count>byId(room,src.tile).soldiers)throw Error('Soldiers cannot be committed to two attacks at once.');
+   soldierReservations.set(src.tile,count);
+  }
   const cost=costOf(room,p,a);if(!canPay(left,cost))throw Error('You cannot afford both planned actions.');
   for(const k of Object.keys(cost))left[k]-=cost[k];
   if(a.type==='trade'&&a.kind==='bank')left[a.want]++;
@@ -294,6 +305,14 @@ function resolveClashes(room){
   }
  }
  if(!contestants.length)continue;
+ // A player using both action slots on one target rolls a single die.
+ const combined=new Map();
+ for(const c of contestants){
+  const prior=combined.get(c.player);
+  if(prior){prior.units+=c.units;prior.sources.push(...c.sources);}
+  else combined.set(c.player,{...c,sources:[...c.sources]});
+ }
+ contestants=[...combined.values()];
  const defense=tile.type==='hill'?1:0;
  for(const c of contestants){const p=room.players.find(x=>x.id===c.player);c.roll=die(room,p);c.bonus=c.defender?(defense+(tile.city?1:0)+(has(p,'fort')?1:0)):0;c.strength=c.roll+c.units+c.bonus;}
  contestants.sort((a,b)=>b.strength-a.strength||Number(b.defender)-Number(a.defender)||room.players.findIndex(p=>p.id===a.player)-room.players.findIndex(p=>p.id===b.player));
@@ -358,7 +377,12 @@ function telegraph(room,p,slot,raw){
  if(room.status!=='reveal'||!has(p,'telegraph')||p.telegraphUsed)throw Error('No Telegraph change available.');
  const idx=room.pending.findIndex((e,i)=>i>=room.revealCursor&&e.player===p.id&&e.slot===slot);
  if(idx<0)throw Error('That order has already been resolved.');
- const action=validateAction(room,p,raw);p.telegraphUsed=true;room.pending[idx].action=action;addFeed(room,`${p.name} intercepted an order by Telegraph!`,'upgrade');
+ const action=validateAction(room,p,raw);
+ const everyOrder=room.pending.filter(e=>e.player===p.id).map(e=>e===room.pending[idx]?action:e.action);
+ if(everyOrder.filter(a=>a.type==='research').length>1)throw Error('Research can only be chosen once per round.');
+ const outstanding=room.pending.filter((e,i)=>i>=room.revealCursor&&e.player===p.id).map(e=>e===room.pending[idx]?action:e.action);
+ calculatePlanBudget(room,p,outstanding);
+ p.telegraphUsed=true;room.pending[idx].action=action;addFeed(room,`${p.name} intercepted an order by Telegraph!`,'upgrade');
 }
 function autopilot(room){
  for(const p of room.players.filter(x=>x.ai)){
@@ -370,12 +394,24 @@ function autopilot(room){
  }
  if(room.status==='plan')for(const p of room.players.filter(x=>x.ai&&!x.locked)){
   for(let i=0;i<2;i++){
-   const legal=legalTargets(room,p),choices=[{type:'skip'}];
+   const legal=legalTargets(room,p),choices=[];
    if(legal.build.length)choices.push({type:'build',tile:shuffle([...legal.build])[0]});
-   if(legal.city.length)choices.push({type:'city',tile:legal.city[0]});
+   if(legal.city.length)choices.push({type:'city',tile:shuffle([...legal.city])[0]});
    if(legal.track.length)choices.push({type:'track',route:shuffle([...legal.track])[0]});
-   if(legal.recruit.length)choices.push({type:'recruit',tile:legal.recruit[0],count:1});
-   if(i===0)choices.push({type:'research',kind:'ticket'});
+   if(legal.recruit.length)choices.push({type:'recruit',tile:shuffle([...legal.recruit])[0],count:1});
+   if(legal.attack.length){const target=byId(room,shuffle([...legal.attack])[0]);
+    const source=tileNeighbours(room,target).find(t=>t.owner===p.id&&t.soldiers>0);
+    if(source)choices.push({type:'attack',tile:target.id,sources:[{tile:source.id,count:Math.min(2,source.soldiers)}]});
+   }
+   if(room.ticketDeck.length)choices.push({type:'research',kind:'ticket'});
+   const have=Object.entries(p.resources).filter(([,n])=>n>=3).map(([k])=>k);
+   const want=Object.entries(p.resources).filter(([k])=>!have.includes(k)).map(([k])=>k);
+   if(have.length){const give=have[0],receive=want[0]||Object.keys(p.resources).find(k=>k!==give);
+    if(receive)choices.push({type:'trade',kind:'bank',give,want:receive});
+   }
+   const other=room.players.find(x=>x.id!==p.id);
+   if(other&&p.resources.grain>0)choices.push({type:'trade',kind:'player',to:other.id,give:{grain:1},want:{timber:1}});
+   choices.push({type:'skip'});
    for(const a of shuffle(choices)){try{setAction(room,p,i,a);break;}catch{}}
   }lockIn(room,p);
  }
@@ -398,5 +434,5 @@ function tick(room,now=Date.now()){
  return false;
 }
 function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:p.breakdown,reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,offer:room.offer?{from:room.offer.from,to:room.offer.to,compelled:room.offer.compelled,deadline:room.offer.deadline}:null,winner:room.lastWinner,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length).map(p=>p.id):null};}
-function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offer:room.offer?.to===p.id?room.offer:null};}
+function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,planBalance:room.status==='plan'?calculatePlanBudget(room,p,p.actions):null,bankRates:Object.fromEntries(Object.keys(p.resources).map(k=>[k,tradeRate(room,p,k)])),legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offer:room.offer?.to===p.id?room.offer:null};}
 module.exports={createRoom,addPlayer,chooseAvatar,startGame,chooseTickets,placeDepot,chooseUpgrade,setAction,lockIn,replyOffer,telegraph,publicView,privateView,tick,autopilot,legalTargets,costOf,tradeRate,score,updatePrestige,beginIncome,beginPlan,revealStep,beginReveal,resolveClashes,owned,routeName,eraOf,avatar};
