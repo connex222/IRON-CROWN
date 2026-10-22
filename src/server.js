@@ -123,6 +123,11 @@ wss.on('connection',(ws,request)=>{
  ws.on('message',buffer=>{
   const now=Math.floor(Date.now()/1000);if(now!==lastSecond){lastSecond=now;requests=0;}if(++requests>20){bad(ws,'Too many requests.');return;}
   try{const data=JSON.parse(String(buffer));if(!data||Array.isArray(data)||typeof data!=='object')throw Error('Invalid command.');
+   // Prevent an already authenticated socket from minting a second room or
+   // secretly adding a new seat by switching its connection role.
+   const existing=links.get(ws);
+   if(existing&&data.type==='host'&&(existing.role!=='host'||data.code!==existing.code))throw Error('Open a new connection to host a different room.');
+   if(existing&&data.type==='join'&&(existing.role!=='player'||existing.code!==String(data.code||'').trim().toUpperCase()||existing.playerId!==data.playerId))throw Error('Open a new connection to join another seat.');
    if(data.type==='host')host(ws,data);else if(data.type==='join')join(ws,data);else if(data.type==='action')action(ws,data);else throw Error('Unknown message type.');
   }catch(err){bad(ws,err);}
  });
