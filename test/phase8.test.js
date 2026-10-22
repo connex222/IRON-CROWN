@@ -46,7 +46,7 @@ async function ephemeralPort(){return new Promise((resolve,reject)=>{
 });}
 function waitMessage(socket,pred,timeout=9000){
  return new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>{off();reject(new Error('Missing expected WebSocket message'));},timeout);
+  const timer=setTimeout(()=>{off();reject(new Error('Missing expected WebSocket message for '+pred.toString().replace(/\s+/g,' ').slice(0,130)));},timeout);
   function off(){clearTimeout(timer);socket.off('message',msg);socket.off('close',closed);}
   function closed(){off();reject(new Error('Socket closed before expected message'));}
   function msg(raw){let event;try{event=JSON.parse(String(raw));}catch{return;}
