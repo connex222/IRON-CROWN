@@ -95,6 +95,7 @@ function action(ws,data){
    }));
    newRoom.seq=room.seq+1;
    rooms.set(room.code,newRoom);
+   broadcast(newRoom);return; // Never send the retired, finished game snapshot.
   }else throw Error('Unknown host command.');
  }else{
   if(!p||p.ai)throw Error('Seat unavailable.');
