@@ -53,7 +53,7 @@ function join(ws,data){
  if(!p&&(data.playerId||data.token))throw Error('Rejoin credentials rejected. Clear your saved seat to join as a new player.');
  if(!p){if(room.status!=='lobby')throw Error('This game has started. Rejoin from your original phone.');p=game.addPlayer(room,data.name);}
  if(p.ai)throw Error('That seat is controlled by the computer.');
- p.connected=true;bind(ws,room.code,'player',p.id);send(ws,{type:'welcome',role:'player',code:room.code,playerId:p.id,token:p.token});broadcast(room);
+ bind(ws,room.code,'player',p.id);p.connected=true;send(ws,{type:'welcome',role:'player',code:room.code,playerId:p.id,token:p.token});broadcast(room);
 }
 function action(ws,data){
  const link=links.get(ws);if(!link)throw Error('Join or host a room first.');
@@ -99,6 +99,9 @@ wss.on('connection',(ws,request)=>{
  // Browsers always provide an Origin. Reject cross-site WebSocket commands.
  const origin=request.headers.origin;const hostHeader=request.headers.host;
  if(origin){try{if(new URL(origin).host!==hostHeader){ws.close(1008,'Origin rejected');return;}}catch{ws.close(1008,'Invalid origin');return;}}
+ ws.isAlive=true;
+ ws.on('pong',()=>{ws.isAlive=true;});
+ ws.on('error',err=>{console.warn('WebSocket connection error:',err.message);});
  let lastSecond=0,requests=0;
  ws.on('message',buffer=>{
   const now=Math.floor(Date.now()/1000);if(now!==lastSecond){lastSecond=now;requests=0;}if(++requests>20){bad(ws,'Too many requests.');return;}
@@ -108,6 +111,17 @@ wss.on('connection',(ws,request)=>{
  });
  ws.on('close',()=>{const link=links.get(ws);links.delete(ws);if(link?.role==='player'){const room=rooms.get(link.code);const p=room?.players.find(p=>p.id===link.playerId);if(p&&!p.ai){p.connected=false;broadcast(room);}}});
 });
+// Detect dead phone sockets so a dropped connection does not leave a ghost seat.
+// The client reconnects using the same authenticated seat and token.
+const heartbeats=setInterval(()=>{
+ for(const ws of wss.clients){
+  if(ws.readyState!==WebSocket.OPEN)continue;
+  if(ws.isAlive===false){ws.terminate();continue;}
+  ws.isAlive=false;
+  try{ws.ping();}catch{ws.terminate();}
+ }
+},30000);
+heartbeats.unref();
 let lastTick=0;
 setInterval(()=>{
  const now=Date.now();for(const room of rooms.values()){
