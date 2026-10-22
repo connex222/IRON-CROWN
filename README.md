@@ -151,3 +151,7 @@ Quality checks: `npm test` (59 cases), `python tools/phase6_browser_qa.py` (TV i
 ## Generated Sonilo + Mirelo sound pack (v1.8.1)
 
 17 optional local MP3 cues were generated specifically for Iron Crown: 16 Mirelo effects/ambience recordings and a 75-second Sonilo music theme. The audio importer runs once through GitHub Actions, checks all media with ffprobe, commits the binaries into `public/audio`, removes the temporary download URL list, and writes `public/audio/GENERATED-ASSETS.json`. After that, sound files are loaded exclusively from the local game server through the existing `/audio/manifest.json`; playback remains opt-in and volume-controlled. See `public/audio/README.md` for filenames and `AUDIO-LICENCES.md` for provenance. Check the Actions run before claiming all assets are installed.
+
+## Phase 6.2 — Sound balancing (v1.8.2)
+
+The TV mixer now has Quiet, Balanced and Cinematic profiles with independent effects, music and railway ambience sliders. Balanced is tuned for a games night with conversation. Strong events briefly and smoothly duck the background; no more than three short effects play together, with important scenes taking priority over incidental clicks. Settings persist locally, while sound remains off until explicitly enabled. Missing media uses synthesised fallback, and all 17 Sonilo/Mirelo recordings are retained as local assets. See PHASE-6-MIX-RELEASE-NOTES.md.

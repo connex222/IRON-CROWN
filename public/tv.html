@@ -495,8 +495,8 @@ function playCue(key){
 }
 function applyLoopVolume(){
  const visible=document.visibilityState!=='hidden'&&!muted;
- const target=Date.now()<duckUntil?.26:1;
- smoothedDuck+=((target-smoothedDuck)*(target<smoothedDuck?.38:.12));
+ const target=Date.now()<duckUntil ? .26 : 1;
+ smoothedDuck+=((target-smoothedDuck)*(target<smoothedDuck ? .38 : .12));
  if(Math.abs(target-smoothedDuck)<.002)smoothedDuck=target;
  if(railLoop)railLoop.volume=trimGain((visible?1:0)*ambienceVolume*SOUND_GAIN['ambience-railway'].gain*smoothedDuck);
  if(parlourLoop)parlourLoop.volume=trimGain((visible?1:0)*musicVolume*SOUND_GAIN['music-parlour'].gain*smoothedDuck);
