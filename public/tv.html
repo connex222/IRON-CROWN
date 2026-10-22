@@ -414,7 +414,7 @@ try{
  masterVolume=trimGain(cfg.fx??cfg.master??.50);
  musicVolume=trimGain(cfg.music??.22);
  ambienceVolume=trimGain(cfg.ambience??.25);
- mixProfile=Object.hasOwn(MIX_PRESETS,cfg.profile)?cfg.profile:'custom';
+ mixProfile=Object.hasOwn(MIX_PRESETS,cfg.profile)?cfg.profile:(Object.keys(cfg).length?'custom':'balanced');
  if(cfg.lessMotion)document.body.classList.add('minimal-motion');
 }catch{}
 function saveAudio(){try{localStorage.setItem('ironCrownAudio',JSON.stringify({
@@ -540,7 +540,7 @@ document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='hidden')stopEffects();
  applyLoopVolume();
 });
-async function toggleAudio(){
+async function toggleAudio(skipWelcome=false){
  if(!muted){
   muted=true;stopEffects();stopAudioLoops();updateAudioButton();saveAudio();return;
  }
@@ -548,7 +548,7 @@ async function toggleAudio(){
  await scanBundledAudio();
  if(muted)return;
  startAudioLoops();
- playCue('train-whistle');
+ if(!skipWelcome)playCue('train-whistle');
 }
 $('soundBtn').onclick=async()=>{await toggleAudio();};
 $('audioSettingsBtn').onclick=()=>{
@@ -566,6 +566,8 @@ $('audioSettingsBtn').onclick=()=>{
  '</div><div class="footer-actions"><button class="btn" id="previewAudio">Play selected sound</button><button class="btn alt" id="closeMixer">Back to the game</button></div>'
  ].join('');
  $('modalShade').classList.remove('hidden');
+ // Read the local inventory without starting audio or bypassing autoplay settings.
+ if(!soundManifestReady)scanBundledAudio().then(()=>{const status=$('soundInventory');if(status)status.textContent=soundManifest.size+'/17 local sound recordings detected.';});
  const updateInputs=()=>{
   for(const [id,value] of [['masterVol',masterVolume],['musicVol',musicVolume],['ambienceVol',ambienceVolume]]){
    $(id).value=String(Math.round(value*100));$(id+'Val').textContent=Math.round(value*100)+'%';
@@ -588,7 +590,7 @@ $('audioSettingsBtn').onclick=()=>{
  }
  $('motionChoice').onchange=e=>{document.body.classList.toggle('minimal-motion',e.target.checked);saveAudio();};
  $('previewAudio').onclick=async()=>{
-  if(muted){await toggleAudio();}else if(!soundManifestReady){await scanBundledAudio();}
+  if(muted){await toggleAudio(true);}else if(!soundManifestReady){await scanBundledAudio();}
   playCue($('previewCue').value);
   $('soundInventory').textContent=soundManifest.size+'/17 local sound recordings detected.';
  };

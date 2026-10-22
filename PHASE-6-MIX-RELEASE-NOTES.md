@@ -9,5 +9,5 @@
 - A preview selector tests whistle, dice, clashes, coins, era and victory fanfares and the selection click.
 - No new runtime dependencies, third-party media URLs, gameplay-rule changes or server-protocol changes.
 
-Verification: 7 new audio policy/UX tests added to the existing suite; use GitHub Actions to confirm.
+Verification: 8 new audio policy/UX tests added; confirm the successful complete GitHub Actions run (70 total). The sound mixer now defaults to Balanced on fresh installs, auditions without an additional whistle, and inventories installed files without playing audio.
 Outstanding: physical television speaker balancing and Render deployment verification.

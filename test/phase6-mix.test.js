@@ -60,3 +60,11 @@ test('Audio mix: playback is same-origin and retains fallback on load failure',(
  assert.match(script,/audio\.play\(\)\.catch\(\(\)=>\{releaseEffect\(effect\);if\(!muted\)synthCue\(key\)/);
  assert.ok(!/new Audio\('https?:/.test(script));
 });
+
+test('Audio mix: fresh install has Balanced selected, audition plays only selected cue and inventory can scan silently',()=>{
+ assert.match(script,/Object\.keys\(cfg\)\.length\?'custom':'balanced'/);
+ assert.match(script,/async function toggleAudio\(skipWelcome=false\)/);
+ assert.match(script,/if\(!skipWelcome\)playCue\('train-whistle'\)/);
+ assert.match(script,/if\(muted\)\{await toggleAudio\(true\)\}/);
+ assert.match(script,/if\(!soundManifestReady\)scanBundledAudio\(\)\.then\(/);
+});
