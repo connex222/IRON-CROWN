@@ -92,9 +92,25 @@ img[data-mood="furious"]{box-shadow:0 0 0 3px #d26351,0 0 24px #e55b5b70;transit
 .profile-copy strong{display:block;margin-bottom:5px}
 @media(max-width:360px){.avatar-gallery{gap:8px}.actor-card .actor-actions{padding:7px}.actor-card .actor-actions button{font-size:16px}}
 @media(prefers-reduced-motion:reduce){.actor-card,.profile-cover{transition:none}}
+
+/* Phase 7 — minimum touch target and readable contrast rules. */
+.target-button,.stepper button,.offer-grid .stepper button{min-height:56px}
+.stepper button{min-width:56px;width:56px;height:56px}
+.offer-grid .stepper button{width:56px;height:56px}
+.offer-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.offer-grid .stepper{flex-wrap:wrap;gap:6px}
+.offer-grid .stepper output{font-size:24px;min-width:30px}
+.draft-card small,.slot small,label,.actor-card .actor-title,.actor-card .taken{font-size:16px}
+button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px solid #f4bc41;outline-offset:3px}
+.minimap .legal:focus{stroke:#fff!important;stroke-width:5px!important}
+.guide-panel{border:2px solid var(--brass);background:var(--panel);border-radius:14px;padding:16px;margin:12px 0}
+.guide-panel p{line-height:1.5}.guide-actions{display:flex;gap:8px;flex-wrap:wrap}
+.guide-actions button{min-height:56px;flex:1}
+.banner[role="status"]{position:sticky;top:73px;z-index:11}
+@media(prefers-reduced-motion:reduce){.animated,.actor-card,.btn:active{animation:none;transition:none;transform:none}}
 </style></head><body>
 <header><div><div><img src="/art/iron-crown-premium.png" class="phone-logo" alt="Iron Crown"></div><div class="status" id="status">PRIVATE CONTROLLER</div></div><button id="rules" class="btn alt tiny" style="width:auto;color:#f4e7cb">Rules</button></header>
-<div id="connection" class="banner hidden">Reconnecting… Your seat is safe.</div><main class="wrap" id="app"></main><div id="toast" class="toast hidden"></div><div id="rulesOverlay" class="rule-overlay hidden"></div>
+<div id="connection" class="banner hidden" role="status" aria-live="polite">Reconnecting… Your seat is safe.</div><main class="wrap" id="app"></main><div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div><div id="rulesOverlay" class="rule-overlay hidden" role="dialog" aria-modal="true" aria-label="Iron Crown information" tabindex="-1"></div>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -132,7 +148,7 @@ function showProfile(actor){if(!ids.includes(actor))return;profileEra='steam';pr
 const resourceIcons={coal:'⚒',timber:'♠',grain:'❀',steel:'⚙',gold:'◉'},actionNames={build:'Build Depot',city:'Upgrade City',track:'Lay Track',recruit:'Recruit',trade:'Trade',research:'Research',attack:'Attack',skip:'Pass'},actionIcons={build:'⌂',city:'♜',track:'🚂',recruit:'⚔',trade:'⇄',research:'⚙',attack:'♞',skip:'·'},typeNames={coal:'Coalfield',forest:'Forest',farm:'Farmland',steel:'Steelworks',town:'Market Town',hill:'Hills',lake:'Lake',capital:'Capital'};
 const saved=()=>{try{return JSON.parse(localStorage.getItem('ironPhone')||'null');}catch{return null;}};
 let ws,room=new URLSearchParams(location.search).get('room')?.toUpperCase()||saved()?.room||'',pid=null,token=null,publicS=null,privateS=null,view='join',actionSlot=0,editor=null,editType='',lastRenderKey='',seenSeq=0,toastTimer=null,spectateTickets=false,manualName='',requestedJoin=false,activeTab='plan',telegraphMode=false;
-let tutorial=localStorage.getItem('ironTutorialDone')!=='true',tutorialDismissed=false;
+let tutorial=localStorage.getItem('ironTutorialDone')!=='true',tutorialDismissed=false,tutorialTip=0;
 const current=()=>publicS?.players.find(p=>p.id===pid);
 const moodFor=id=>{const p=publicS?.players.find(p=>p.avatar===id);return p?.reactionUntil>Date.now()&&['smug','furious'].includes(p.reaction)?p.reaction:'neutral';};
 const avatar=(id,mood)=>dossierPortrait(id);
@@ -142,22 +158,81 @@ document.addEventListener('error',ev=>{const img=ev.target;if(!(img instanceof H
 const reactionLabel=p=>moodFor(p?.avatar)==='smug'?`★ ${p?.reactionReason||'A railway triumph'}`:moodFor(p?.avatar)==='furious'?`⚔ ${p?.reactionReason||'A setback'}`:people.find(a=>a[0]===p?.avatar)?.[2]||'RAILWAY TYCOON';
 function send(kind,data={}){if(!ws||ws.readyState!==1){notify('Disconnected. Trying to reconnect.');return;}ws.send(JSON.stringify({type:'action',kind,...data}));}
 function notify(message){$('toast').textContent=message;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3400);}
-function connect(){const old=saved();if(old&&(!room||room===old.room)){room=old.room;pid=old.playerId;token=old.token;}
- ws=new WebSocket(`${location.protocol==='https:'?'wss':'ws'}://${location.host}/socket`);
- ws.onopen=()=>{$('connection').classList.add('hidden');if(pid&&token)ws.send(JSON.stringify({type:'join',code:room,playerId:pid,token}));else if(requestedJoin&&manualName)ws.send(JSON.stringify({type:'join',code:room,name:manualName}));};
- ws.onmessage=e=>{try{const m=JSON.parse(e.data);
-  if(m.type==='welcome'){room=m.code;pid=m.playerId;token=m.token;localStorage.setItem('ironPhone',JSON.stringify({room,playerId:pid,token}));$('connection').classList.add('hidden');}
-  if(m.type==='state'){const prior=publicS?.status;publicS=m.public;privateS=m.private||null;const newFx=publicS.feed.filter(x=>x.seq>seenSeq);if(newFx.some(x=>x.kind==='clash'&&x.message.includes(current()?.name||'∅'))||m.public.offer?.to===pid)navigator.vibrate?.([90,60,90]);seenSeq=publicS.seq;
-   const key=JSON.stringify({phase:publicS.status,round:publicS.round,seq:publicS.seq,me:pid,actions:privateS?.actions,locked:privateS?.locked,upgrades:privateS?.upgrades,choices:privateS?.ticketChoices,offer:privateS?.offer,avatars:publicS.players.map(p=>p.avatar),resources:privateS?.resources,turn:publicS.placementTurn});
-   if(key!==lastRenderKey){lastRenderKey=key;render();}
-   if(tutorial&&publicS.round>=2&&publicS.status!=='lobby'){tutorial=false;localStorage.setItem('ironTutorialDone','true');}
-  }
-  if(m.type==='error'){notify(m.message);if(m.message.includes('Room not found')||m.message.includes('Rejoin from your original')){localStorage.removeItem('ironPhone');pid=null;token=null;view='join';render();}}
-  if(m.type==='removed'){localStorage.removeItem('ironPhone');pid=null;token=null;room='';requestedJoin=false;publicS=null;privateS=null;ws.close();view='join';notify('You have been removed by the host.');}
- }catch(err){console.error(err);}};
- ws.onclose=()=>{$('connection').classList.remove('hidden');setTimeout(connect,1500);};ws.onerror=()=>{};
+// One active socket per phone. Saved credentials always rejoin the same seat.
+let reconnectTimer=null,reconnectAttempt=0,connectionEpoch=0,removedByHost=false;
+function connectionBanner(message){$('connection').textContent=message;$('connection').classList.remove('hidden');}
+function clearConnectionBanner(){$('connection').classList.add('hidden');}
+function scheduleReconnect(){
+ if(removedByHost||reconnectTimer)return;
+ const delay=Math.min(12000,1250*Math.pow(1.65,Math.min(reconnectAttempt++,6)));
+ reconnectTimer=setTimeout(()=>{reconnectTimer=null;connect();},delay);
 }
-function joinNow(){room=$('joinCode').value.trim().toUpperCase();manualName=$('joinName').value.trim();if(!/^[A-Z]{4}$/.test(room)||!manualName){notify('Enter your four-letter room code and name.');return;}requestedJoin=true;if(ws?.readyState===1)ws.send(JSON.stringify({type:'join',code:room,name:manualName}));else connect();}
+function connect(){
+ if(removedByHost)return;
+ if(ws&&(ws.readyState===WebSocket.OPEN||ws.readyState===WebSocket.CONNECTING))return;
+ const old=saved();
+ if(old&&(!room||room===old.room)){room=old.room;pid=old.playerId;token=old.token;}
+ const epoch=++connectionEpoch;
+ if(pid&&token)connectionBanner(navigator.onLine===false?'Offline — reconnecting to your saved seat…':'Reconnecting… Your saved seat is safe.');
+ let socket;
+ try{socket=new WebSocket((location.protocol==='https:'?'wss':'ws')+'://'+location.host+'/socket');}
+ catch{scheduleReconnect();return;}
+ ws=socket;
+ socket.onopen=()=>{
+  if(epoch!==connectionEpoch)return;
+  // Server welcome, not transport-open, confirms a successful authenticated join.
+  if(pid&&token)socket.send(JSON.stringify({type:'join',code:room,playerId:pid,token}));
+  else if(requestedJoin&&manualName)socket.send(JSON.stringify({type:'join',code:room,name:manualName}));
+ };
+ socket.onmessage=e=>{
+  if(epoch!==connectionEpoch)return;
+  try{const m=JSON.parse(e.data);
+   if(m.type==='welcome'){
+    room=m.code;pid=m.playerId;token=m.token;requestedJoin=false;reconnectAttempt=0;
+    localStorage.setItem('ironPhone',JSON.stringify({room,playerId:pid,token}));
+    clearConnectionBanner();
+   }
+   if(m.type==='state'){
+    publicS=m.public;privateS=m.private||null;
+    const newFx=publicS.feed.filter(x=>x.seq>seenSeq);
+    if(newFx.some(x=>x.kind==='clash'&&x.message.includes(current()?.name||'∅'))||privateS?.offer)navigator.vibrate?.([90,60,90]);
+    seenSeq=publicS.seq;
+    const key=JSON.stringify({phase:publicS.status,round:publicS.round,seq:publicS.seq,me:pid,actions:privateS?.actions,locked:privateS?.locked,upgrades:privateS?.upgrades,choices:privateS?.ticketChoices,offer:privateS?.offer,avatars:publicS.players.map(p=>p.avatar),resources:privateS?.resources,turn:publicS.placementTurn});
+    if(key!==lastRenderKey){lastRenderKey=key;render();}
+    if(tutorial&&publicS.round>=2&&publicS.status!=='lobby'){tutorial=false;localStorage.setItem('ironTutorialDone','true');}
+   }
+   if(m.type==='error'){
+    notify(m.message);
+    if(/Room not found|Rejoin credentials rejected|controlled by the computer|Seat unavailable|Rejoin from your original/i.test(m.message)){
+     localStorage.removeItem('ironPhone');pid=null;token=null;publicS=null;privateS=null;requestedJoin=false;lastRenderKey='';
+     clearConnectionBanner();render();socket.close();
+    }
+   }
+   if(m.type==='removed'){
+    removedByHost=true;clearTimeout(reconnectTimer);reconnectTimer=null;
+    localStorage.removeItem('ironPhone');pid=null;token=null;room='';requestedJoin=false;
+    publicS=null;privateS=null;lastRenderKey='';socket.close();render();
+    notify('The host removed this seat. Automatic reconnection is disabled.');
+   }
+  }catch(err){console.error(err);}
+ };
+ socket.onclose=()=>{
+  if(epoch!==connectionEpoch||removedByHost)return;
+  if(pid&&token)connectionBanner(navigator.onLine===false?'Offline — waiting for your connection…':'Reconnecting… Your saved seat is safe.');
+  scheduleReconnect();
+ };
+ socket.onerror=()=>{};
+}
+function joinNow(){
+ room=$('joinCode').value.trim().toUpperCase();manualName=$('joinName').value.trim();
+ if(!/^[A-Z]{4}$/.test(room)||!manualName){notify('Enter your four-letter room code and name.');return;}
+ if(removedByHost){removedByHost=false;reconnectAttempt=0;}
+ requestedJoin=true;
+ if(ws?.readyState===WebSocket.OPEN)ws.send(JSON.stringify({type:'join',code:room,name:manualName}));
+ else connect();
+}
+window.addEventListener('online',()=>{if(!removedByHost&&(!ws||ws.readyState===WebSocket.CLOSED)){clearTimeout(reconnectTimer);reconnectTimer=null;reconnectAttempt=0;connect();}});
+window.addEventListener('offline',()=>{if(pid&&token)connectionBanner('Offline — your saved seat will reconnect automatically.');});
 const h=(title,tagline='')=>`<div class="eyebrow">${esc(tagline)}</div><h1>${esc(title)}</h1>`;
 function render(){const s=publicS,p=privateS;document.body.dataset.era=s?.era||'steam';
  $('status').textContent=s?`${s.code} · ${s.era.toUpperCase()} · ${s.round?`ROUND ${s.round}/${s.totalRounds}`:'LOBBY'}`:'PRIVATE CONTROLLER';
