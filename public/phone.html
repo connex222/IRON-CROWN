@@ -123,9 +123,20 @@ let ws,room=new URLSearchParams(location.search).get('room')?.toUpperCase()||sav
 let tutorial=localStorage.getItem('ironTutorialDone')!=='true',tutorialDismissed=false;
 const current=()=>publicS?.players.find(p=>p.id===pid);
 const moodFor=id=>{const p=publicS?.players.find(p=>p.avatar===id);return p?.reactionUntil>Date.now()&&['smug','furious'].includes(p.reaction)?p.reaction:'neutral';};
-const avatar=(id,mood)=>`/art/avatars/${id||'augusta'}_${publicS?.era||'steam'}_${mood||moodFor(id)}.png`;
+const avatar=(id,mood)=>`/art/avatars/${id||'augusta'}_${publicS?.era||'steam'}_${mood||moodFor(id)}.png?v=1.4.1`;
+const selectionPortrait=id=>id==='augusta'?'/art/avatars/augusta_human.png?v=1.4.1':avatar(id);
 function fallbackAvatar(id){const colour=people.find(p=>p[0]===id)?.[3]||'#574a35',letters=String(id||'IC').slice(0,2).toUpperCase();return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="150" height="150" rx="12" fill="${colour}"/><circle cx="75" cy="75" r="62" fill="#111" opacity=".2"/><text x="75" y="90" fill="#fff1d7" text-anchor="middle" font-family="Georgia,serif" font-size="45" font-weight="bold">${letters}</text></svg>`);}
-document.addEventListener('error',ev=>{const img=ev.target;if(!(img instanceof HTMLImageElement)||!img.getAttribute('src')?.includes('/art/avatars/'))return;const id=img.getAttribute('src').match(/avatars\/([a-z]+)_/)?.[1];img.src=fallbackAvatar(id);},true);
+document.addEventListener('error',ev=>{
+ const img=ev.target;
+ if(!(img instanceof HTMLImageElement)||!img.getAttribute('src')?.includes('/art/avatars/'))return;
+ const id=img.getAttribute('src').match(/avatars\/([a-z]+)_/)?.[1];
+ const attempt=Number(img.dataset.portraitFallback||0);
+ img.dataset.portraitFallback=String(attempt+1);
+ if(attempt===0){
+  const src=img.getAttribute('src')||'';
+  img.src=src.includes('_human.png')?`/art/avatars/${id}_steam_neutral.png?v=1.4.1`:`/art/avatars/${id}_human.png?v=1.4.1`;
+ }else img.src=fallbackAvatar(id);
+},true);
 const reactionLabel=p=>moodFor(p?.avatar)==='smug'?`★ ${p?.reactionReason||'A railway triumph'}`:moodFor(p?.avatar)==='furious'?`⚔ ${p?.reactionReason||'A setback'}`:people.find(a=>a[0]===p?.avatar)?.[2]||'RAILWAY TYCOON';
 function send(kind,data={}){if(!ws||ws.readyState!==1){notify('Disconnected. Trying to reconnect.');return;}ws.send(JSON.stringify({type:'action',kind,...data}));}
 function notify(message){$('toast').textContent=message;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3400);}
@@ -161,7 +172,7 @@ function render(){const s=publicS,p=privateS;document.body.dataset.era=s?.era||'
  renderWatch();
 }
 function renderAvatar(){const taken=new Set(publicS.players.filter(x=>x.id!==pid).map(x=>x.avatar));
- $('app').innerHTML=`<section class="tycoon-intro"><div class="eyebrow">THE TYCOONS OF IRON CROWN</div><h1>Choose your tycoon.</h1><p>Eight rivals. One crown. View each dossier before taking your seat. Character abilities apply in Advanced mode only.</p></section><section class="avatar-gallery">${people.map(([id,name,title,colour])=>`<article class="actor-card" style="--actor:${colour}"><img class="portrait-cover" src="${avatar(id)}" alt="Portrait of ${esc(name)}"><span class="actor-title">${esc(title)}</span><h2 class="actor-name">${esc(name)}</h2>${taken.has(id)?'<span class="taken">TAKEN</span>':''}<div class="actor-actions"><button class="choose" data-avatar="${id}" ${taken.has(id)?'disabled':''}>${taken.has(id)?'Unavailable':'Choose'}</button><button class="details" data-profile="${id}">View dossier</button></div></article>`).join('')}</section>`;
+ $('app').innerHTML=`<section class="tycoon-intro"><div class="eyebrow">THE TYCOONS OF IRON CROWN</div><h1>Choose your tycoon.</h1><p>Eight rivals. One crown. View each dossier before taking your seat. Character abilities apply in Advanced mode only.</p></section><section class="avatar-gallery">${people.map(([id,name,title,colour])=>`<article class="actor-card" style="--actor:${colour}"><img class="portrait-cover" src="${selectionPortrait(id)}" data-avatar-id="${id}" alt="Portrait of ${esc(name)}"><span class="actor-title">${esc(title)}</span><h2 class="actor-name">${esc(name)}</h2>${taken.has(id)?'<span class="taken">TAKEN</span>':''}<div class="actor-actions"><button class="choose" data-avatar="${id}" ${taken.has(id)?'disabled':''}>${taken.has(id)?'Unavailable':'Choose'}</button><button class="details" data-profile="${id}">View dossier</button></div></article>`).join('')}</section>`;
  $('app').querySelectorAll('[data-avatar]').forEach(b=>b.onclick=()=>send('avatar',{avatar:b.dataset.avatar}));$('app').querySelectorAll('[data-profile]').forEach(b=>b.onclick=()=>showProfile(b.dataset.profile));
 }
 function renderLobby(){const me=current(),a=people.find(x=>x[0]===me.avatar);
