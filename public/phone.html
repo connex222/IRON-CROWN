@@ -144,6 +144,21 @@ header{flex-wrap:wrap;row-gap:8px}
 }
 @media(max-width:365px){.phone-help-actions button{font-size:13px}.pocket-tabs button{font-size:14px}}
 @media(prefers-reduced-motion:reduce){.pocket-tabs button,.phone-help-actions button{transition:none!important;animation:none!important}}
+/* QA 1.12.1 — gold button surfaces must not disappear on light/dark themes. */
+.btn.alt{
+ background:#e4c278;
+ background-image:linear-gradient(145deg,#fae8b6 0%,#dfbd71 65%,#c49c4d 100%);
+ color:#291b0e;
+ border:2px solid #e7bd6f;
+ box-shadow:0 3px 0 #765422;
+ text-shadow:none;
+}
+.btn.alt:hover:not(:disabled){background-image:linear-gradient(145deg,#fff0c7,#e8c983 65%,#d2a95c)}
+/* Keep warning/danger states distinct and muted button labels readable. */
+.btn:disabled{opacity:.76;filter:saturate(.65);box-shadow:none}
+.btn.red{background:transparent;background-image:none;border-color:var(--bad);color:var(--bad);box-shadow:none}
+.phone-help-actions .btn.alt{background-image:linear-gradient(145deg,#f7df9c,#cfa55a);color:#281a0d;border-color:#e8bf75}
+.pocket-tabs .btn.alt[aria-pressed="true"]{background:#e2b652;background-image:linear-gradient(145deg,#f9df99,#d9ad53);color:#231709;border-color:#a77c2a}
 </style></head><body>
 <header><div><div><img src="/art/iron-crown-premium.png" class="phone-logo" alt="Iron Crown"></div><div class="status" id="status">PRIVATE CONTROLLER</div></div><div class="phone-help-actions"><button id="rules" class="btn tiny phone-help-btn" type="button" aria-label="How to Play Iron Crown">? How to Play</button><button id="storyBtn" class="btn alt tiny" type="button">Story</button><button id="phoneSoundBtn" class="btn alt tiny" type="button" aria-pressed="false" aria-label="Enable phone sound effects">♪ Off</button></div></header>
 <div id="connection" class="banner hidden" role="status" aria-live="polite">Reconnecting… Your seat is safe.</div><main class="wrap" id="app"></main><div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div><div id="rulesOverlay" class="rule-overlay hidden" role="dialog" aria-modal="true" aria-label="Iron Crown information" tabindex="-1"></div>

@@ -208,6 +208,27 @@ body.minimal-motion #map .moving-train{display:none!important}
  .hero-grid{padding:12px!important}
 }
 @media(prefers-reduced-motion:reduce){.guide-modal,.guide-launch *{animation:none!important;transition:none!important}}
+/* QA 1.12.1 — consistently visible gold controls across TV, PC and phone. */
+.btn.alt{
+ background:#e2bd72;
+ background-image:linear-gradient(155deg,#f7e1a5 0%,#d6ae59 62%,#bf9243 100%);
+ color:#281d0d;
+ border:2px solid #f1d48d;
+ box-shadow:0 3px 0 #77551f;
+ text-shadow:none;
+}
+.btn.alt:hover:not(:disabled){background-image:linear-gradient(155deg,#ffeab9,#e1bd73 60%,#cba052)}
+.bar .btn.alt,.join-premium .btn.alt{
+ background:#e2bd72;
+ background-image:linear-gradient(155deg,#f7e1a5,#d6ae59 62%,#bf9243);
+ color:#281d0d;
+ border-color:#f1d48d;
+ box-shadow:0 3px 0 #77551f;
+}
+.bar .btn.alt:hover:not(:disabled){background-image:linear-gradient(155deg,#ffeab9,#e1bd73,#cba052)}
+/* Preserve intentional danger styling, but don't wash out gold when disabled. */
+.btn:disabled{opacity:.76;filter:saturate(.65);box-shadow:none}
+.btn.danger{background:transparent;background-image:none;color:var(--bad);border-color:var(--bad);box-shadow:none}
 </style></head><body>
 <header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn help-primary" id="rulesBtn" aria-label="How to Play Iron Crown">? How to Play</button><button class="btn alt small" id="chronicleBtn">History &amp; Lore</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
 <div id="connection" class="hidden" role="status" aria-live="polite">Reconnecting…</div>
