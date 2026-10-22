@@ -229,6 +229,17 @@ body.minimal-motion #map .moving-train{display:none!important}
 /* Preserve intentional danger styling, but don't wash out gold when disabled. */
 .btn:disabled{opacity:.76;filter:saturate(.65);box-shadow:none}
 .btn.danger{background:transparent;background-image:none;color:var(--bad);border-color:var(--bad);box-shadow:none}
+
+/* QA responsive fix: preserve the entire join QR on narrow TV / PC windows. */
+.guide-launch-btn{white-space:nowrap;font-size:clamp(14px,1.12vw,17px)}
+@media(max-width:600px){
+ .join-code-grid{grid-template-columns:minmax(0,1fr);justify-items:center;gap:13px;padding:12px}
+ .join-code-grid>div:first-child{width:100%;min-width:0;text-align:center}
+ .join-code-grid .room-code{font-size:clamp(42px,12vw,60px);letter-spacing:.065em}
+ .join-code-grid .qr-box{display:block;width:min(222px,100%);min-width:0;max-width:100%;padding:9px;margin:0 auto}
+ .join-code-grid canvas{display:block;width:100%;max-width:204px;height:auto}
+ .guide-launch-btn{white-space:normal}
+}
 </style></head><body>
 <header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn help-primary" id="rulesBtn" aria-label="How to Play Iron Crown">? How to Play</button><button class="btn alt small" id="chronicleBtn">History &amp; Lore</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
 <div id="connection" class="hidden" role="status" aria-live="polite">Reconnecting…</div>

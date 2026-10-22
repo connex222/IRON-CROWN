@@ -39,10 +39,15 @@ async function main(){
    await page.waitForTimeout(400);
    return {page,context};
   }
-  for(const [label,w,h,theme] of [['tv-large',1920,1080,'light'],['tv-pc',1280,800,'light'],['tv-tablet',768,1024,'light'],['tv-narrow',390,844,'light'],['tv-dark',1280,800,'dark']]){
+  for(const [label,w,h,theme] of [['tv-large',1920,1080,'light'],['tv-pc',1280,800,'light'],['tv-tablet',768,1024,'light'],['tv-narrow',390,844,'light'],['tv-mini',320,700,'light'],['tv-dark',1280,800,'dark']]){
    const {page,context}=await open(label,'/',w,h,theme);
    await page.locator('#roomCode').waitFor({state:'visible'});
    await inspect(page,label,[['tycoons','#galleryBtn'],['lore','#chronicleBtn'],['TV sound','#soundBtn'],['audio settings','#audioSettingsBtn'],['How to Play','#rulesBtn'],['hero lore','#heroLore'],['add AI','#botBtn'],['disabled start','#startBtn']]);
+   const qr=await page.locator('#qr').evaluate(el=>{
+    const q=el.getBoundingClientRect(),container=el.closest('.join-code-grid').getBoundingClientRect();
+    return {left:q.left,right:q.right,top:q.top,bottom:q.bottom,frameLeft:container.left,frameRight:container.right,frameTop:container.top,frameBottom:container.bottom};
+   });
+   check(label+' QR code fully visible',qr.left>=qr.frameLeft-2&&qr.right<=qr.frameRight+2&&qr.top>=qr.frameTop-2&&qr.bottom<=qr.frameBottom+2,JSON.stringify(qr));
    await snap(page,label+'-lobby');
    await page.locator('#rulesBtn').click();
    await page.locator('#guidePage').waitFor({state:'visible'});
