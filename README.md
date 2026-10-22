@@ -119,3 +119,9 @@ The accompanying `01-iron-crown.md` is the game's authoritative design bible. Tw
 **Font limitation:** Browser-offline system fonts are used for the deliverable (`Georgia`/system sans-serif). The requested Playfair Display and Inter binary font files are not distributed in this package. Use appropriately licensed versions as local assets in a future art integration pass if exact font matching is required. No external font service is contacted.
 
 **Verification scope:** The engine suite passes locally. The current build environment cannot fetch the required `ws` npm package from the registry, so a full browser-to-server WebSocket acceptance run has **not** been performed here. `npm install` on a network-connected developer machine or Render should install the declared dependency normally; verify it there before treating the build as release-approved.
+
+## Phase 3.5 — Approved human portraits throughout (v1.5.0)
+
+All eight original human portrait files (`{id}_human.png`) now appear in every phone and TV screen, including dossiers, lobby, gallery, planning, trade, Reveal, results and the TV character stand-offs. Old era/mood variants are no longer referenced by live UI images. URLs use `?v=1.5.0` to avoid stale caches. The server remains authoritative for character reactions, now conveyed with framing and status text rather than falsely implying newly drawn facial poses. Bespoke outfits and expressions remain future illustration work.
+
+Quality: 28 Node tests passed and offline Chromium visual checks exercised all eight dossiers and major TV/phone character views using the bundled PNG artwork. Real multiplayer devices and deployment are not yet acceptance-tested.

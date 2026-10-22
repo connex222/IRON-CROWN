@@ -117,7 +117,7 @@ test('Phase 3 embeds premium working lobby, human actor selection and event reac
  const tv=fs.readFileSync(path.resolve(__dirname,'../public/tv.html'),'utf8');
  const phone=fs.readFileSync(path.resolve(__dirname,'../public/phone.html'),'utf8');
  for(const id of ['roomCode','qr','mode','players','startBtn','botBtn','map','roster','rulesBtn'])assert.ok(tv.includes(`id="${id}"`),id);
- for(const id of ['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'])assert.ok(tv.includes(`/art/avatars/${id}_steam_neutral.png`),id);
+ for(const id of ['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'])assert.ok(tv.includes(`/art/avatars/${id}_human.png`),id);
  for(const fragment of ['hero-premium','iron-crown-premium.png','actor-notice','showActorNotice','victorian-terminal.jpg'])assert.ok(tv.includes(fragment),fragment);
  for(const fragment of ['tycoon-intro','avatar-gallery','actor-perk','player-showcase','watch-mood','phone-join-scene'])assert.ok(phone.includes(fragment),fragment);
  for (const html of [tv,phone])assert.doesNotMatch(html,/<script\s+src=|https:\/\/fonts\.|https:\/\/cdnjs\./);
@@ -201,4 +201,26 @@ test('Phase 3.4: character art is served locally and portrait alternatives exist
   assert.ok(fs.statSync(file).size>15000,`Corrupt or tiny portrait: ${file}`);
   seen.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
  }assert.equal(seen.size,9,`${id} should have 9 distinct PNG render treatments`);}
+});
+
+test('Phase 3.5: game UIs use human portraits, not previous era derivatives',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ for(const name of ['phone.html','tv.html']){
+  const html=fs.readFileSync(path.resolve(__dirname,'../public',name),'utf8');
+  assert.ok(html.includes('_human.png?v=1.5.0'));
+  assert.ok(!html.includes('_steam_neutral.png'));
+  assert.ok(!html.includes('${galleryEra}_neutral.png'));
+  assert.ok(!html.includes('profilePath('));
+  assert.match(html,/data-mood|dataset\.mood/);
+ }
+});
+test('Phase 3.5: eight original human portraits exist and are distinct PNG images',()=>{
+ const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+ const seen=new Set();
+ for(const {id} of require('../src/constants').AVATARS){
+  const b=fs.readFileSync(path.resolve(__dirname,'../public/art/avatars',id+'_human.png'));
+  assert.ok(b.length>20000,id);assert.equal(b.toString('hex',0,8),'89504e470d0a1a0a');
+  seen.add(crypto.createHash('sha256').update(b).digest('hex'));
+ }
+ assert.equal(seen.size,8);
 });
