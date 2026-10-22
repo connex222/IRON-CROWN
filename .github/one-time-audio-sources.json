@@ -1,0 +1,127 @@
+{
+  "schema": 1,
+  "project": "Iron Crown",
+  "release": "1.8.1",
+  "generation_date": "2026-10-22",
+  "items": [
+    {
+      "name": "train-whistle",
+      "provider": "Mirelo",
+      "task_id": "e804d1297bdacafbc019750cc4719a64",
+      "expected_duration_seconds": 3,
+      "url": "https://mirelo.ai/dl/qx7b6ren1yym1pjr1j9dmv5h7x8grsf1/0?k=l5kNqIBWS6t3jmN0"
+    },
+    {
+      "name": "train-chug",
+      "provider": "Mirelo",
+      "task_id": "94cff0d12783225304dffe341215c27e",
+      "expected_duration_seconds": 8,
+      "url": "https://mirelo.ai/dl/qx79csg6m6bw453h37hsmv120h8gr4ws/0?k=PIYXk4fem1LlOX33"
+    },
+    {
+      "name": "steam-release",
+      "provider": "Mirelo",
+      "task_id": "4edc70c8ad63f0450b80d71564aa7d8d",
+      "expected_duration_seconds": 2.6,
+      "url": "https://mirelo.ai/dl/qx74qmt9q1d15nkv4eecsry1js8gr2xk/0?k=6Ha60B3x4ENPF0YQ"
+    },
+    {
+      "name": "track-lay",
+      "provider": "Mirelo",
+      "task_id": "8839b764829da4b69963794c1746f9fd",
+      "expected_duration_seconds": 1.8,
+      "url": "https://mirelo.ai/dl/qx7f7cezgkdgdephjxgnzbryp18gscbe/0?k=ySWa3SqpSlc428hi"
+    },
+    {
+      "name": "depot-build",
+      "provider": "Mirelo",
+      "task_id": "e45a573ed734c2d4e84f42162b0dd3b7",
+      "expected_duration_seconds": 1.9,
+      "url": "https://mirelo.ai/dl/qx71jrrfee55bh66eya7v1pt1x8gsj7j/0?k=m3Nyax511IK0OxTS"
+    },
+    {
+      "name": "city-build",
+      "provider": "Mirelo",
+      "task_id": "9c9aee6998054c3c790a1cb3fe5940e8",
+      "expected_duration_seconds": 3.3,
+      "url": "https://mirelo.ai/dl/qx7ehd495kqsjjcsgkepyweghd8gsgfd/0?k=SSKPzowTDQofmhGp"
+    },
+    {
+      "name": "coin-clink",
+      "provider": "Mirelo",
+      "task_id": "1b01feabb0c68616ad370e8d119ff0d8",
+      "expected_duration_seconds": 1.2,
+      "url": "https://mirelo.ai/dl/qx74ynqryqs0eteb56q6t8ns698gryq3/0?k=hL7UhiDeb-ZId3rb"
+    },
+    {
+      "name": "dice-roll",
+      "provider": "Mirelo",
+      "task_id": "5cd03f58013e5781aa439141e05453b1",
+      "expected_duration_seconds": 2.2,
+      "url": "https://mirelo.ai/dl/qx78ewyx8gt3q8zc9ks9s3haws8gsyva/0?k=R0VWU_fZM61Y2SI1"
+    },
+    {
+      "name": "clash-impact",
+      "provider": "Mirelo",
+      "task_id": "38eb8fac2bf6e2c1ca09d59a97635001",
+      "expected_duration_seconds": 2.5,
+      "url": "https://mirelo.ai/dl/qx74e5g8ej8qhg8n28ywz5jrws8gr558/0?k=vw28_3mFUDSLoEaj"
+    },
+    {
+      "name": "crowd-gasp",
+      "provider": "Mirelo",
+      "task_id": "dc841907e942f5aa2dc9e1212b9d4da3",
+      "expected_duration_seconds": 2,
+      "url": "https://mirelo.ai/dl/qx740ty8ca3nsm7390qg6xxwcx8gstff/0?k=_1RFkQsFNwcjabjh"
+    },
+    {
+      "name": "crowd-cheer",
+      "provider": "Mirelo",
+      "task_id": "32e1729a0ee920817dc61f6d88f9810e",
+      "expected_duration_seconds": 3.2,
+      "url": "https://mirelo.ai/dl/qx77nfbfcqg0cfqbb4dh6kfgn98gswpq/0?k=HYuNkOBWW1pd9ard"
+    },
+    {
+      "name": "era-fanfare",
+      "provider": "Mirelo",
+      "task_id": "19aa8bdaea15e2442d7524c0de44b57d",
+      "expected_duration_seconds": 4.7,
+      "url": "https://mirelo.ai/dl/qx715zp2yfdngxkk9ba5payced8grbmg/0?k=rGYEIoC9qZ5yVi0R"
+    },
+    {
+      "name": "victory-fanfare",
+      "provider": "Mirelo",
+      "task_id": "b39d76fcd83c3e725ad1ccd530ee4691",
+      "expected_duration_seconds": 7.5,
+      "url": "https://mirelo.ai/dl/qx7b029m1t3wc0te14ra0sadn58grdwh/0?k=iAwh92wL6-gqO_X8"
+    },
+    {
+      "name": "ui-select",
+      "provider": "Mirelo",
+      "task_id": "ab6cc1690e866d0f7bdff4a1e8b6e4f2",
+      "expected_duration_seconds": 0.65,
+      "url": "https://mirelo.ai/dl/qx7be2kcnk6z9zr3y3zbqz3vh58gsbv4/0?k=r-VKskMvLPtIn_rL"
+    },
+    {
+      "name": "ui-confirm",
+      "provider": "Mirelo",
+      "task_id": "fcff650d5ce229bb7779d91c037f44c8",
+      "expected_duration_seconds": 1.1,
+      "url": "https://mirelo.ai/dl/qx7bbp32jfakxgw35s1g5wyzjn8gr7sz/0?k=-b38FCYU-ztTqwML"
+    },
+    {
+      "name": "ambience-railway",
+      "provider": "Mirelo",
+      "task_id": "6bc8578adc7dc5f8f2428a532986b0c4",
+      "expected_duration_seconds": 30,
+      "url": "https://mirelo.ai/dl/qx7d7yzvm2epxq8yz1rwt3rbjn8gsfna/0?k=xxQwtGQQ3AVWIvdJ"
+    },
+    {
+      "name": "music-parlour",
+      "provider": "Sonilo",
+      "task_id": "a7159966-cccb-4379-8688-134504b940f1",
+      "expected_duration_seconds": 75,
+      "url": "https://api.sonilo.com/files/bXVzaWMtcmVzdWx0cy9hNzE1OTk2Ni1jY2NiLTQzNzktODY4OC0xMzQ1MDRiOTQwZjEvYXVkaW9fMC5tcDM.JNE8wNN3WWFT6-ioMpHPtZbf5k15vGbSdi3Jb-l715E/audio_0.mp3"
+    }
+  ]
+}

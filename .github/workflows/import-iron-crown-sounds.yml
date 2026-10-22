@@ -1,0 +1,47 @@
+name: One-time Iron Crown sound-pack import
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/one-time-audio-sources.json
+      - .github/workflows/import-iron-crown-sounds.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: iron-crown-sound-import
+  cancel-in-progress: false
+
+jobs:
+  import-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Identify pending generated recordings
+        id: found
+        shell: bash
+        run: |
+          if test -f .github/one-time-audio-sources.json; then
+            echo "pending=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "pending=false" >> "$GITHUB_OUTPUT"
+            echo "Already imported: no temporary download list."
+          fi
+      - name: Download and check all 17 recordings
+        if: steps.found.outputs.pending == 'true'
+        run: python3 scripts/import-generated-audio.py
+      - name: Commit local audio and remove temporary links
+        if: steps.found.outputs.pending == 'true'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/audio/*.mp3 public/audio/GENERATED-ASSETS.json
+          git rm .github/one-time-audio-sources.json
+          git commit -m "Bundle all 17 Sonilo and Mirelo sound assets for offline gameplay"
+          git push origin HEAD:main

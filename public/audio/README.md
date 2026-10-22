@@ -1,44 +1,36 @@
-# Iron Crown — Optional Licensed Audio
+# Iron Crown — generated sound pack (v1.8.1)
 
-The game works without any of these files. It uses quiet, local synthesised
-sound effects when professional sounds are unavailable; optional music is
-similarly synthesised. Nothing is streamed from a third-party site.
+17 audio cues are being generated and installed from Mirelo (16 sound/ambience recordings)
+and Sonilo (1 instrumental parlour theme). The existing server dynamically discovers
+the files by basename; its JSON manifest points every TV client to locally served MP3s.
 
-Copy legally redistributable audio into this directory, named **exactly** as
-follows. The audio scanner automatically detects `.ogg`, `.wav` or `.mp3` (in
-that priority), with no configuration or redeploy-time manifest editing.
-The server will discover files after they are uploaded and deployed.
+The one-time GitHub Actions job imports files into this directory, validates actual MP3
+codec, reasonable duration and max size with ffprobe, commits the generated files,
+and removes the temporary signed download URL list.
 
-| Filename stem | Suggested recording | Duration | Category |
-| --- | --- | --- | --- |
-| train-whistle | Period steam locomotive whistle | 2–4 s | SFX |
-| train-chug | Steam wheels and piston rhythm, seamless loop | 4–8 s | Ambience |
-| steam-release | Pressure hiss from a valve | 1–3 s | SFX |
-| track-lay | Heavy metal railway construction impact | 1–2 s | SFX |
-| depot-build | Hammer striking wood, construction hit | 1–2 s | SFX |
-| city-build | Industrial construction, final flourish | 2–4 s | SFX |
-| coin-clink | Gold sovereign coin fall | 0.5–1.5 s | SFX |
-| dice-roll | Heavy dice tumble on varnished wood | 1–2 s | SFX |
-| clash-impact | Quick battle/industrial impact | 1–2 s | SFX |
-| crowd-gasp | Victorian theatre-style gasps | 1–2 s | SFX |
-| crowd-cheer | Restrained triumphant crowd | 2–4 s | SFX |
-| era-fanfare | Brass fanfare for new age | 3–6 s | SFX |
-| victory-fanfare | Coronation brass/orchestral finale | 5–10 s | SFX |
-| ui-select | Small refined brass/mechanical click | <1 s | SFX |
-| ui-confirm | Two-note confirmation chime | <1 s | SFX |
-| ambience-railway | Distant railway station, steam, soft rain | 30–60 s | Loop |
-| music-parlour | Gentle music-hall strings/piano, no vocals | 60–120 s | Loop |
+Open the game's TV Audio Settings and enable Sound. Audio is muted until the host
+deliberately enables it; master SFX and music have separate controls. The synthesised
+fallback remains for missing files, slow connections or blocked playback.
 
-**Licensing:** only use assets with a commercial game redistribution licence,
-keep receipts/attribution where required, and avoid uncleared music or recordings.
-Record their creator, license, URL, and proof of permission in
-`AUDIO-LICENCES.md` (an example table is provided at the project root).
+Required files:
+- train-whistle.mp3
+- train-chug.mp3 (loop)
+- steam-release.mp3
+- track-lay.mp3
+- depot-build.mp3
+- city-build.mp3
+- coin-clink.mp3
+- dice-roll.mp3
+- clash-impact.mp3
+- crowd-gasp.mp3
+- crowd-cheer.mp3
+- era-fanfare.mp3
+- victory-fanfare.mp3
+- ui-select.mp3
+- ui-confirm.mp3
+- ambience-railway.mp3 (loop)
+- music-parlour.mp3 (loop)
 
-**Production:** OGG Vorbis at 44.1/48 kHz is convenient for small files;
-WAV and MP3 work too. Trim leading silence, avoid heavy clipping and
-normalize effects consistently at sensible headroom. Mono short SFX is fine;
-ambience and music should be stereo. Loop tracks need seamless starts/ends.
-
-**Implementation:** UI *Sound on* checks the locally generated manifest,
-then uses a supplied sound where available. The sound-off default respects
-browser autoplay rules. Host can control effects and music volumes separately.
+After installation, generated file metadata with SHA-256 checksums is in
+GENERATED-ASSETS.json. Provenance and licence verification notes are at root:
+AUDIO-LICENCES.md. External runtime CDNs are not used.
