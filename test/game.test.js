@@ -64,3 +64,61 @@ test('no elimination: a player with no territory is restored free at Income',()=
 });
 test('phone and TV scripts are self-contained and parse without runtime imports',()=>{const fs=require('node:fs');for(const f of ['tv.html','phone.html']){const html=fs.readFileSync(require('node:path').resolve(__dirname,'../public/'+f),'utf8');assert.match(html,/<script>/);assert.doesNotThrow(()=>new Function(html.split('<script>')[1].split('</script>')[0]));assert.ok(!/<script[^>]+src=/i.test(html));}}
 );
+
+// PHASE 2 — Repeatable country generation and network coverage checks.
+const seedRandom=seed=>()=>{seed=(Math.imul(1664525,seed)+1013904223)>>>0;return seed/4294967296;};
+test('seeded countries reproduce the same towns, topography, railway paths and ticket deck',()=>{
+ for(let seed=0;seed<25;seed++){
+  const a=generateMap(seedRandom(seed)),b=generateMap(seedRandom(seed));
+  assert.deepEqual(a,b,`Seed ${seed} must be replayable`);
+ }
+});
+test('every generated town is connected to the capital by the complete prospective network',()=>{
+ let longer=0;
+ for(let seed=30;seed<130;seed++){
+  const m=generateMap(seedRandom(seed)),stations=m.tiles.filter(t=>t.type==='town'||t.type==='capital');
+  const links=new Map(stations.map(t=>[t.id,new Set()]));
+  for(const r of m.routes){links.get(r.a).add(r.b);links.get(r.b).add(r.a);if(r.segments>=4)longer++;}
+  const visited=new Set(['0,0']),pending=['0,0'];
+  while(pending.length)for(const dest of links.get(pending.shift()))if(!visited.has(dest)){visited.add(dest);pending.push(dest);}
+  assert.equal(visited.size,7,`Seed ${seed} contains a stranded station`);
+  assert.ok(links.get('0,0').size>=3,'The Capital must have meaningful railway access');
+  for(const t of m.deck){assert.ok(links.has(t.a)&&links.has(t.b));assert.notEqual(t.a,t.b);}
+ }
+ assert.ok(longer>=300,'Map selection should preserve enough four- and five-segment journeys');
+});
+test('Phase 2 presentation ships painted TV terrain, accessible phone target highlighting and map controls',()=>{
+ const fs=require('node:fs'),path=require('node:path');
+ const tv=fs.readFileSync(path.resolve(__dirname,'../public/tv.html'),'utf8');
+ const phone=fs.readFileSync(path.resolve(__dirname,'../public/phone.html'),'utf8');
+ for(const name of ['coal','forest','farm','steel','town','hill','lake','capital'])assert.match(tv,new RegExp(`case '${name}':`));
+ assert.match(tv,/id="zoomReset"/);assert.match(tv,/id="mapLegend"/);assert.match(tv,/function focusAction\(/);
+ assert.match(phone,/function miniMap\(/);assert.match(phone,/data-tile=.*legal/);assert.match(phone,/data-route=.*legal/);
+});
+
+test('Phase 3 ships all eight approved realistic human tycoon portraits across eras and moods', () => {
+ const fs = require('node:fs'); const path = require('node:path');
+ const root = path.resolve(__dirname,'../public/art');
+ const ids = ['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'];
+ for (const actor of ids) {
+  const original=path.join(root,'avatars',`${actor}_human.png`);
+  assert.ok(fs.existsSync(original), `Missing approved human portrait: ${actor}`);
+  for (const era of ['steam','iron','electric'])for(const mood of ['neutral','smug','furious']) {
+   const image=path.join(root,'avatars',`${actor}_${era}_${mood}.png`);
+   assert.ok(fs.existsSync(image), `Missing ${actor} ${era}/${mood}`);
+   assert.equal(fs.readFileSync(image).toString('hex',0,8),'89504e470d0a1a0a');
+  }
+ }
+ for(const file of ['iron-crown-premium.png','victorian-terminal.jpg'])assert.ok(fs.existsSync(path.join(root,file)),file);
+});
+
+test('Phase 3 embeds premium working lobby, human actor selection and event reactions without a CDN', () => {
+ const fs=require('node:fs'); const path=require('node:path');
+ const tv=fs.readFileSync(path.resolve(__dirname,'../public/tv.html'),'utf8');
+ const phone=fs.readFileSync(path.resolve(__dirname,'../public/phone.html'),'utf8');
+ for(const id of ['roomCode','qr','mode','players','startBtn','botBtn','map','roster','rulesBtn'])assert.ok(tv.includes(`id="${id}"`),id);
+ for(const id of ['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'])assert.ok(tv.includes(`/art/avatars/${id}_steam_neutral.png`),id);
+ for(const fragment of ['hero-premium','iron-crown-premium.png','actor-notice','showActorNotice','victorian-terminal.jpg'])assert.ok(tv.includes(fragment),fragment);
+ for(const fragment of ['tycoon-intro','avatar-gallery','actor-perk','player-showcase','watch-mood','phone-join-scene'])assert.ok(phone.includes(fragment),fragment);
+ for (const html of [tv,phone])assert.doesNotMatch(html,/<script\s+src=|https:\/\/fonts\.|https:\/\/cdnjs\./);
+});

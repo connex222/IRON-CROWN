@@ -36,6 +36,30 @@ For development: `npm run dev`. To run the automated rules suite: `npm test`.
 
 On a first visit, the phone offers contextual guidance through the first round: avatar selection, secret tickets, starting Depots, era Upgrade, planning and watching Reveal. The guidance accompanies real, interactive actions rather than a simulated game; it dismisses automatically after the first round and can be hidden. Players may open **Rules** on either screen at any time.
 
+## Phase 2 — The Living Country (v1.1.0)
+
+The country board is now a layered, illustrated isometric miniature rather than a flat resource-symbol chart. **All art is inline SVG**, so the map has no additional runtime or network dependency.
+
+- Eight visually distinct terrains: coalfields with pit winding gear, pine forests, grain fields and windmills, foundries, Victorian towns, defensive hills, water-filled lakes and the central Capital.
+- Raised hex sides, subtle lighting and personalised ownership borders, flags, depot soldiers and City buildings.
+- The server still generates **37 hexes**, **18 distinct 2–5-segment railway routes** and **24 Destination Tickets**. Route selection now balances town and Capital coverage, with a broader mix of track lengths. A supplied seeded RNG now reproduces routes and ticket shuffling for debugging.
+- Unbuilt routes are shown as dotted proposals; completed railways gain coloured rails, sleepers and animated trains during Income. Closed routes use a warning colour.
+- The TV offers +/− zoom, reset, town-label toggle, map key, hover descriptions of production/ownership, and short action-focused camera movement during Reveal.
+- The private phone map uses the same terrain colours, thick colour-coded ownership, and **gold dashed legal-target outlines**. Railway selection has a larger touch hitbox and a full text list for precision.
+- Local preview images of the TV board and phone target picker are supplied separately with the release archive, not used as game assets.
+
+**Phase 2 checks:** 16 automated tests pass. Browser rendering checks also verified 37 hexes, 18 railways, tooltips, zoom/labels, and legal target filtering on both screen types without JavaScript runtime exceptions in the test harness. These are synthetic-browser checks; **they do not replace real TV/phone networking tests**.
+
+## Phase 3 — The Tycoons Arrive (v1.2.0, first integration)
+
+**Working premium UI:** the TV lobby now uses the approved gold/brass Iron Crown logo, a Victorian terminal atmosphere, a real, scannable local QR encoder, room management, a playable host interface and an eight-character portrait parade. The phone joining page, character chooser, player identity and Reveal screens now use the same art direction. No generated screenshot is presented as a fake clickable menu: all controls are HTML wired to the original socket protocol.
+
+**Eight realistic human portraits:** Augusta, Silas, Jack, Ada, Rupert, Nell, Ottoline and Ezra are all bundled from the approved artwork. The 72 paths required by the game bible still exist (eight people × three eras × three moods), with eight extra transparent master portraits. These are *graded lighting and decorative-frame variations of the same human faces*: they do **not** yet contain 72 independently posed facial expressions or the nine distinct period costumes per character. That remaining illustration task belongs to later Phase 3 art production.
+
+**Character personality:** the character picker includes their titles and Advanced-only perks; the phone lobby features a large portrait and biography line. The TV uses the actual authoritative clash results to show the winner's and losers' faces with success/defeat framing, while the phone identifies the player during planning, trading and Reveal. Original rules, scores, room messages and saved game format are unchanged.
+
+**QA:** `npm test` passes 18 offline checks, including asset coverage and premium UI wiring. Extracted inline scripts pass `node --check`. This environment still has no installed `ws` dependency, so the actual server-to-phones WebSocket system and real-device visuals remain to be tested after `npm install`. A headless screenshot smoke test was attempted but Chromium could not initialise in this environment; do not treat it as a verified visual acceptance test.
+
 ## Architecture
 
 - `src/server.js` — built-in HTTP server + one runtime package, **ws**, for WebSockets; room identity and reconnect authentication, timers, broadcast, and optional on-disk snapshots.
@@ -44,9 +68,9 @@ On a first visit, the phone offers contextual guidance through the first round: 
 - `src/constants.js` — authoritative modes, avatars, upgrades, events, map counts.
 - `public/tv.html` — self-contained host interface with built-in QR encoder, painted SVG map, animated locomotives, player roster, Prestige board, trophy panels and browser-synthesised sound.
 - `public/phone.html` — self-contained one-thumb controller, reconnection, target map, plan slots, trading, tickets, era draft, tutorial and results.
-- `public/art/avatars` — **72 original local PNGs**: eight tycoons × three eras × three expressions; fallback colour portraits if a specific image fails to load.
+- `public/art/avatars` — **72 locally bundled realistic portrait variants**: eight tycoons × three eras × three mood treatments, plus eight approved transparent human masters. Era and mood variants are colour/frame treatments and do not yet provide different photographic outfits or facial expressions; fallback colours if an image fails to load.
 - `public/art/iron-crown-crest.svg` — original locally bundled crest.
-- `test/game.test.js` — Node's built-in test runner, with procedural map and rules tests.
+- `test/game.test.js` — Node's built-in test runner, with procedural map, game rules and Phase 3 image/interface integrity tests.
 
 No external image services, JavaScript CDNs, external style sheets, or sound hosts are required. TV sound effects and the optional music-hall-style background melody are synthesised in the browser when enabled by a user gesture.
 
@@ -69,7 +93,7 @@ Render assigns its own `PORT` environment variable. The server honours it and bi
 
 ## Tests and release verification
 
-`npm test` includes checks for 120 procedural maps (distribution, non-touching Lakes, path lengths and adjacency), private ticket selection, resource budgeting, clash progression, scoring, trade rejection, Advanced costs, automatic re-entry, self-contained browser scripts and a complete simulated Quick game with AI.
+`npm test` includes 18 checks, including seeded map reproducibility, Capital-to-town route connectivity, balanced route lengths, and checks for 120 procedural maps (distribution, non-touching Lakes, path lengths and adjacency), private ticket selection, resource budgeting, clash progression, scoring, trade rejection, Advanced costs, automatic re-entry, self-contained browser scripts and a complete simulated Quick game with AI.
 
 **Run real-device acceptance tests before a public launch.** In particular: connect at least two real phones and a TV simultaneously; lock plans from both phones; offer/decline a trade; leave and rejoin during an active round; switch networks; try all eight tycoons; verify Quick/Advanced and all 12 events; test the Telegraph timing; inspect the interface on low-end phones; and verify Render restart/recovery.
 

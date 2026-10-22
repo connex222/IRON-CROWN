@@ -8,7 +8,7 @@ const game=require('./game');
 const PORT=Number(process.env.PORT)||3000;
 const ROOT=path.resolve(__dirname,'../public');
 const rooms=new Map(), links=new Map();
-const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.wav':'audio/wav','.json':'application/json','.ico':'image/x-icon'};
+const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.woff2':'font/woff2','.wav':'audio/wav','.json':'application/json','.ico':'image/x-icon'};
 const stateFile=process.env.STATE_FILE===undefined?path.resolve(__dirname,'../.data/rooms.json'):process.env.STATE_FILE;
 const isCode=code=>/^[A-Z]{4}$/.test(String(code||''));
 function restore(){if(!stateFile)return;try{const data=JSON.parse(fs.readFileSync(stateFile,'utf8'));for(const r of data){if(r&&isCode(r.code)&&r.hostToken&&r.players){r.players.forEach(p=>p.connected=!!p.ai);rooms.set(r.code,r);}}console.log(`Restored ${rooms.size} games`);}catch(e){if(e.code!=='ENOENT')console.warn('Could not restore game state:',e.message);}}

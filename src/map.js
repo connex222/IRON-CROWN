@@ -5,12 +5,12 @@ const key=(q,r)=>`${q},${r}`;
 const distance=(a,b)=>Math.max(Math.abs(a.q-b.q),Math.abs(a.r-b.r),Math.abs(a.q+a.r-b.q-b.r));
 function neighbours(tile,map){return DIRS.map(([dq,dr])=>map.get(key(tile.q+dq,tile.r+dr))).filter(Boolean);}
 function shuffle(arr,rng=Math.random){for(let i=arr.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}return arr;}
-function pathfind(start,end,lookup,banShort=false){
+function pathfind(start,end,lookup,banShort=false,rng=Math.random){
  const queue=[[start.id]]; const seen=new Set([start.id]);
  while(queue.length){const p=queue.shift();const cur=lookup.get(p[p.length-1]);
    if(cur.id===end.id && (!banShort||p.length>=3)) return p;
    if(p.length>=6)continue;
-   for(const next of shuffle(neighbours(cur,new Map([...lookup.values()].map(t=>[key(t.q,t.r),t]))).filter(x=>x.type!=='lake'))){
+   for(const next of shuffle(neighbours(cur,new Map([...lookup.values()].map(t=>[key(t.q,t.r),t]))).filter(x=>x.type!=='lake'),rng)){
     if(p.includes(next.id))continue;
     if(banShort && cur.id===start.id && next.id===end.id)continue;
     if(next.id!==end.id && seen.has(next.id))continue;
@@ -34,16 +34,31 @@ function generateMap(rng=Math.random){
    const nodes=[tiles[0],...towns], byId=new Map(tiles.map(t=>[t.id,t]));
    const possible=[];
    for(let i=0;i<nodes.length;i++)for(let j=i+1;j<nodes.length;j++){
-     let p=pathfind(nodes[i],nodes[j],byId);
-     if(p?.length===2)p=pathfind(nodes[i],nodes[j],byId,true);
+     let p=pathfind(nodes[i],nodes[j],byId,false,rng);
+     if(p?.length===2)p=pathfind(nodes[i],nodes[j],byId,true,rng);
      if(p&&p.length>=3&&p.length<=6)possible.push({a:nodes[i].id,b:nodes[j].id,path:p,segments:p.length-1});
    }
    if(!best || possible.length>best.possible.length)best={tiles,possible};
    if(possible.length>=18)break;
  }
  if(!best||best.possible.length<18)throw Error('Could not generate 18 valid routes; retry map generation');
- const popularity=new Map();
- const routes=shuffle(best.possible,rng).sort((a,b)=>a.segments-b.segments).slice(0,18).map((r,i)=>({id:`R${i+1}`, ...r,owner:null,blocked:false}));
+ // Balance coverage of town stations and the Capital. When possible prefer
+ // different-length journeys instead of always selecting the 18 shortest.
+ const pool=shuffle([...best.possible],rng),degrees=new Map(),usedTracks=new Map(),selected=[];
+ while(selected.length<18){
+   let bestIndex=0,bestScore=-Infinity;
+   for(let i=0;i<pool.length;i++){
+     const r=pool[i],da=degrees.get(r.a)||0,db=degrees.get(r.b)||0;
+     const scarce=n=>n===0?7:n===1?3:n===2?1:0;
+     const overlaps=r.path.slice(1).reduce((n,id,k)=>n+(usedTracks.get([r.path[k],id].sort().join('|'))||0),0);
+     const score=scarce(da)+scarce(db)+(r.segments>=4?1.8:0)-overlaps*.18+rng()*.35;
+     if(score>bestScore){bestScore=score;bestIndex=i;}
+   }
+   const [r]=pool.splice(bestIndex,1);selected.push(r);
+   degrees.set(r.a,(degrees.get(r.a)||0)+1);degrees.set(r.b,(degrees.get(r.b)||0)+1);
+   for(let i=1;i<r.path.length;i++){const k=[r.path[i-1],r.path[i]].sort().join('|');usedTracks.set(k,(usedTracks.get(k)||0)+1);}
+ }
+ const routes=selected.map((r,i)=>({id:`R${i+1}`,...r,owner:null,blocked:false}));
  // A ticket deck has 24 physical cards; some town pairs intentionally occur twice.
  const nodes=best.tiles.filter(t=>t.type==='town'||t.type==='capital');
  const pairs=[];
