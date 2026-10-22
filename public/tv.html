@@ -379,84 +379,222 @@ $('modalShade').onclick=e=>{if(e.target===$('modalShade'))closeModal();};$('botB
 /* Only same-origin bundled audio is used. An optional local file replaces the
    synthesised cue automatically; no audio asset means the playable fallback remains. */
 const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour'];
-let soundManifest=new Map(),soundManifestReady=false,masterVolume=.55,musicVolume=.18,railLoop=null,parlourLoop=null,engineLoop=null,lastCueAt=new Map();
-try{const cfg=JSON.parse(localStorage.getItem('ironCrownAudio')||'{}');muted=true;masterVolume=Math.max(0,Math.min(1,Number(cfg.master??.55)));musicVolume=Math.max(0,Math.min(1,Number(cfg.music??.18)));if(cfg.lessMotion)document.body.classList.add('minimal-motion');}catch{}
-function saveAudio(){try{localStorage.setItem('ironCrownAudio',JSON.stringify({enabled:!muted,master:masterVolume,music:musicVolume,lessMotion:document.body.classList.contains('minimal-motion')}));}catch{}}
+// Phase 6.2: TV-first audio mix — effects, music and ambience are independent.
+const SOUND_GAIN=Object.freeze({
+ 'train-whistle':{gain:.47,gap:1800,priority:3,duck:1900},
+ 'train-chug':{gain:.20,gap:0,priority:0},
+ 'steam-release':{gain:.21,gap:500,priority:1},
+ 'track-lay':{gain:.32,gap:450,priority:2},
+ 'depot-build':{gain:.31,gap:450,priority:2},
+ 'city-build':{gain:.38,gap:1000,priority:2,duck:1200},
+ 'coin-clink':{gain:.27,gap:400,priority:1},
+ 'dice-roll':{gain:.38,gap:1100,priority:3,duck:1300},
+ 'clash-impact':{gain:.52,gap:1100,priority:4,duck:2200},
+ 'crowd-gasp':{gain:.24,gap:850,priority:2},
+ 'crowd-cheer':{gain:.34,gap:1100,priority:3,duck:2600},
+ 'era-fanfare':{gain:.48,gap:4000,priority:5,duck:4700},
+ 'victory-fanfare':{gain:.58,gap:7500,priority:6,duck:7600},
+ 'ui-select':{gain:.15,gap:100,priority:0},
+ 'ui-confirm':{gain:.21,gap:220,priority:1},
+ 'ambience-railway':{gain:.22,gap:0,priority:0},
+ 'music-parlour':{gain:.32,gap:0,priority:0}
+});
+const MIX_PRESETS=Object.freeze({
+ quiet:{fx:.31,music:.13,ambience:.12},
+ balanced:{fx:.50,music:.22,ambience:.25},
+ cinematic:{fx:.68,music:.31,ambience:.32}
+});
+const trimGain=v=>Math.max(0,Math.min(1,Number.isFinite(Number(v))?Number(v):0));
+let soundManifest=new Map(),soundManifestReady=false,masterVolume=.50,musicVolume=.22,ambienceVolume=.25,mixProfile='balanced';
+let railLoop=null,parlourLoop=null,engineLoop=null,duckUntil=0,smoothedDuck=1,mixClock=null;
+const lastCueAt=new Map(),activeEffects=new Set();
+try{
+ const cfg=JSON.parse(localStorage.getItem('ironCrownAudio')||'{}');
+ muted=true; // Browsers require an explicit host gesture; never auto-play on refresh.
+ masterVolume=trimGain(cfg.fx??cfg.master??.50);
+ musicVolume=trimGain(cfg.music??.22);
+ ambienceVolume=trimGain(cfg.ambience??.25);
+ mixProfile=Object.hasOwn(MIX_PRESETS,cfg.profile)?cfg.profile:'custom';
+ if(cfg.lessMotion)document.body.classList.add('minimal-motion');
+}catch{}
+function saveAudio(){try{localStorage.setItem('ironCrownAudio',JSON.stringify({
+ enabled:!muted,fx:masterVolume,music:musicVolume,ambience:ambienceVolume,
+ profile:mixProfile,lessMotion:document.body.classList.contains('minimal-motion')
+}));}catch{}}
 function updateAudioButton(){$('soundBtn').textContent=muted?'♫ Sound off':'♫ Sound on';$('soundBtn').setAttribute('aria-pressed',String(!muted));}
 async function scanBundledAudio(){
- try{const r=await fetch('/audio/manifest.json',{cache:'no-store'});if(!r.ok)throw Error('No audio manifest');const data=await r.json();
-  soundManifest=new Map((data.files||[]).filter(f=>SOUND_KEYS.includes(f.replace(/\.(ogg|wav|mp3)$/,''))).map(f=>[f.replace(/\.(ogg|wav|mp3)$/,''),f]));
+ try{
+  const r=await fetch('/audio/manifest.json',{cache:'no-store'});
+  if(!r.ok)throw Error('No local audio manifest');
+  const data=await r.json();
+  soundManifest=new Map((data.files||[]).filter(f=>typeof f==='string'&&/^[a-z-]+\.(ogg|wav|mp3)$/.test(f)&&SOUND_KEYS.includes(f.replace(/\.(ogg|wav|mp3)$/,''))).map(f=>[f.replace(/\.(ogg|wav|mp3)$/,''),f]));
   soundManifestReady=true;
  }catch{soundManifest=new Map();soundManifestReady=false;}
 }
-function context(){if(!audioCtx){const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return null;audioCtx=new AudioCtor();}if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});return audioCtx;}
+function context(){
+ if(!audioCtx){const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return null;audioCtx=new AudioCtor();}
+ if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});
+ return audioCtx;
+}
 function synthCue(key){
+ if(muted)return;
  const ctx=context();if(!ctx)return;
  const notes={
- 'train-whistle':[[440,.48],[554,.42]],'train-chug':[[115,.12],[103,.15]],'steam-release':[[180,.3]],
- 'track-lay':[[320,.11],[210,.14],[415,.13]],'depot-build':[[240,.14],[360,.18]],
- 'city-build':[[262,.12],[330,.14],[392,.2],[523,.2]],'coin-clink':[[1050,.10],[1360,.15]],
- 'dice-roll':[[130,.10],[178,.09],[140,.13]],'clash-impact':[[100,.28],[77,.36]],
- 'crowd-gasp':[[440,.14],[390,.13]],'crowd-cheer':[[440,.13],[660,.18],[780,.22]],
- 'era-fanfare':[[262,.2],[349,.2],[523,.3]],'victory-fanfare':[[392,.2],[523,.2],[659,.25],[784,.48]],
- 'ui-select':[[740,.08]],'ui-confirm':[[622,.10],[880,.14]],'music-parlour':[[262,.22],[330,.22],[392,.22],[440,.22],[392,.22],[330,.22],[294,.22],[262,.35]]
+  'train-whistle':[[440,.48],[554,.42]],'train-chug':[[115,.12],[103,.15]],'steam-release':[[180,.3]],
+  'track-lay':[[320,.11],[210,.14],[415,.13]],'depot-build':[[240,.14],[360,.18]],
+  'city-build':[[262,.12],[330,.14],[392,.2],[523,.2]],'coin-clink':[[1050,.10],[1360,.15]],
+  'dice-roll':[[130,.10],[178,.09],[140,.13]],'clash-impact':[[100,.28],[77,.36]],
+  'crowd-gasp':[[440,.14],[390,.13]],'crowd-cheer':[[440,.13],[660,.18],[780,.22]],
+  'era-fanfare':[[262,.2],[349,.2],[523,.3]],'victory-fanfare':[[392,.2],[523,.2],[659,.25],[784,.48]],
+  'ui-select':[[740,.08]],'ui-confirm':[[622,.10],[880,.14]],'music-parlour':[[262,.22],[330,.22],[392,.22],[440,.22]]
  };
  let offset=0,now=ctx.currentTime+.005;
  for(const [freq,duration] of notes[key]||[]){
-  const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=key==='clash-impact'||key==='train-chug'?'sawtooth':'triangle';
+  const osc=ctx.createOscillator(),gain=ctx.createGain();
+  osc.type=key==='clash-impact'||key==='train-chug'?'sawtooth':'triangle';
   osc.frequency.setValueAtTime(freq,now+offset);gain.gain.setValueAtTime(.0001,now+offset);
-  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,.055*masterVolume*(key==='music-parlour'?musicVolume*.42:1)),now+offset+.016);
+  const volume=(key==='music-parlour'?musicVolume:masterVolume)*(SOUND_GAIN[key]?.gain||.2);
+  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,.13*volume),now+offset+.016);
   gain.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);
   osc.connect(gain);gain.connect(ctx.destination);osc.start(now+offset);osc.stop(now+offset+duration+.02);
   offset+=duration*.78;
  }
 }
-function playCue(key){
- if(muted||!SOUND_KEYS.includes(key))return;
- const now=Date.now();if(now-(lastCueAt.get(key)||0)<180)return;lastCueAt.set(key,now);
- const filename=soundManifest.get(key);
- if(filename){
-  const audio=new Audio('/audio/'+filename);audio.volume=Math.min(1,masterVolume*(key==='coin-clink'?.72:.9));
-  audio.addEventListener('error',()=>synthCue(key),{once:true});audio.play().catch(()=>synthCue(key));
- }else synthCue(key);
+function releaseEffect(item){
+ activeEffects.delete(item);
 }
-function stopAudioLoops(){if(musicTick){clearInterval(musicTick);musicTick=null;}for(const sound of [railLoop,parlourLoop,engineLoop]){if(sound){sound.pause();sound.currentTime=0;}}railLoop=null;parlourLoop=null;engineLoop=null;}
+function stopEffects(){
+ for(const effect of activeEffects){effect.audio.pause();effect.audio.removeAttribute('src');effect.audio.load();}
+ activeEffects.clear();
+}
+function duckMusic(ms){
+ duckUntil=Math.max(duckUntil,Date.now()+ms);
+ applyLoopVolume();
+}
+function playCue(key){
+ if(muted||document.visibilityState==='hidden'||!SOUND_KEYS.includes(key))return;
+ const cue=SOUND_GAIN[key];if(!cue)return;
+ const now=Date.now();if(now-(lastCueAt.get(key)||0)<cue.gap)return;
+ // Avoid low-priority clicks interrupting important reveals.
+ if(activeEffects.size>=3){
+  const weakest=[...activeEffects].sort((a,b)=>a.priority-b.priority)[0];
+  if(!weakest||weakest.priority>=cue.priority)return;
+  weakest.audio.pause();activeEffects.delete(weakest);
+ }
+ lastCueAt.set(key,now);
+ if(cue.duck)duckMusic(cue.duck);
+ const filename=soundManifest.get(key);
+ if(!filename){synthCue(key);return;}
+ const audio=new Audio('/audio/'+filename),effect={audio,priority:cue.priority,key};
+ audio.preload='auto';
+ audio.volume=trimGain(masterVolume*cue.gain);
+ activeEffects.add(effect);
+ audio.addEventListener('ended',()=>releaseEffect(effect),{once:true});
+ audio.addEventListener('error',()=>{releaseEffect(effect);if(!muted)synthCue(key);},{once:true});
+ audio.play().catch(()=>{releaseEffect(effect);if(!muted)synthCue(key);});
+}
+function applyLoopVolume(){
+ const visible=document.visibilityState!=='hidden'&&!muted;
+ const target=Date.now()<duckUntil?.26:1;
+ smoothedDuck+=((target-smoothedDuck)*(target<smoothedDuck?.38:.12));
+ if(Math.abs(target-smoothedDuck)<.002)smoothedDuck=target;
+ if(railLoop)railLoop.volume=trimGain((visible?1:0)*ambienceVolume*SOUND_GAIN['ambience-railway'].gain*smoothedDuck);
+ if(parlourLoop)parlourLoop.volume=trimGain((visible?1:0)*musicVolume*SOUND_GAIN['music-parlour'].gain*smoothedDuck);
+ if(engineLoop)engineLoop.volume=trimGain((visible?1:0)*ambienceVolume*SOUND_GAIN['train-chug'].gain*smoothedDuck);
+ for(const item of activeEffects)item.audio.volume=trimGain((visible?1:0)*masterVolume*SOUND_GAIN[item.key].gain);
+}
+function stopAudioLoops(){
+ if(musicTick){clearInterval(musicTick);musicTick=null;}
+ if(mixClock){clearInterval(mixClock);mixClock=null;}
+ for(const audio of [railLoop,parlourLoop,engineLoop]){if(audio){audio.pause();audio.currentTime=0;}}
+ railLoop=null;parlourLoop=null;engineLoop=null;duckUntil=0;smoothedDuck=1;
+}
 function startAudioLoops(){
  stopAudioLoops();if(muted)return;
- for(const [name,setting] of [['ambience-railway','rail'],['music-parlour','music']]){
+ for(const [name,slot] of [['ambience-railway','rail'],['music-parlour','music']]){
   const file=soundManifest.get(name);if(!file)continue;
-  const audio=new Audio('/audio/'+file);audio.loop=true;audio.preload='auto';audio.volume=Math.min(1,masterVolume*(setting==='rail'?.25:musicVolume));
-  audio.play().catch(()=>{});if(setting==='rail')railLoop=audio;else parlourLoop=audio;
+  const audio=new Audio('/audio/'+file);
+  audio.loop=true;audio.preload='auto';audio.volume=0;
+  audio.play().catch(()=>{});if(slot==='rail')railLoop=audio;else parlourLoop=audio;
  }
- if(!soundManifest.has('music-parlour')&&musicVolume>0)musicTick=setInterval(()=>{if(!muted&&document.visibilityState==='visible')synthCue('music-parlour');},4900);
+ if(!soundManifest.has('music-parlour'))musicTick=setInterval(()=>{
+  if(!muted&&musicVolume>0&&document.visibilityState==='visible'&&Date.now()>=duckUntil)synthCue('music-parlour');
+ },5500);
  syncEngineAudio(publicState?.status);
+ mixClock=setInterval(applyLoopVolume,90);
+ applyLoopVolume();
 }
 function syncEngineAudio(status){
  if(engineLoop){engineLoop.pause();engineLoop.currentTime=0;engineLoop=null;}
  if(muted||status!=='income'||!soundManifest.get('train-chug'))return;
- engineLoop=new Audio('/audio/'+soundManifest.get('train-chug'));engineLoop.loop=true;engineLoop.volume=Math.min(1,masterVolume*.28);engineLoop.play().catch(()=>{});
+ engineLoop=new Audio('/audio/'+soundManifest.get('train-chug'));
+ engineLoop.loop=true;engineLoop.volume=0;engineLoop.play().catch(()=>{});
+ applyLoopVolume();
 }
-function applyLoopVolume(){if(railLoop)railLoop.volume=Math.min(1,masterVolume*.25);if(parlourLoop)parlourLoop.volume=Math.min(1,masterVolume*musicVolume);if(engineLoop)engineLoop.volume=Math.min(1,masterVolume*.28);}
-$('soundBtn').onclick=async()=>{
- muted=!muted;context();updateAudioButton();saveAudio();
- if(!muted){await scanBundledAudio();playCue('train-whistle');}
+document.addEventListener('visibilitychange',()=>{
+ for(const sound of [railLoop,parlourLoop,engineLoop]){
+  if(!sound)continue;
+  if(document.visibilityState==='hidden')sound.pause();
+  else if(!muted)sound.play().catch(()=>{});
+ }
+ if(document.visibilityState==='hidden')stopEffects();
+ applyLoopVolume();
+});
+async function toggleAudio(){
+ if(!muted){
+  muted=true;stopEffects();stopAudioLoops();updateAudioButton();saveAudio();return;
+ }
+ muted=false;context();updateAudioButton();saveAudio();
+ await scanBundledAudio();
+ if(muted)return;
  startAudioLoops();
-};
+ playCue('train-whistle');
+}
+$('soundBtn').onclick=async()=>{await toggleAudio();};
 $('audioSettingsBtn').onclick=()=>{
- $('modal').innerHTML=`<div class="eyebrow">The railway parlour · Audio controls</div><h2>Sound &amp; motion</h2><div class="audio-mixer">
- <div><label for="masterVol">Sound effects <span id="masterVal">${Math.round(masterVolume*100)}%</span></label><input id="masterVol" aria-label="Master sound volume" type="range" min="0" max="100" value="${Math.round(masterVolume*100)}"></div>
- <div><label for="musicVol">Background music <span id="musicVal">${Math.round(musicVolume*100)}%</span></label><input id="musicVol" aria-label="Music volume" type="range" min="0" max="100" value="${Math.round(musicVolume*100)}"></div>
- <div><label for="motionChoice">Reduce cinematic movement <input id="motionChoice" type="checkbox" ${motionOff()?'checked':''}></label><p class="audio-detail">Also follows your device's reduced-motion setting. The game remains fully playable without animations.</p></div>
- <div id="soundInventory" class="audio-status" role="status">${soundManifest.size} professional audio files installed. Missing cues use discreet synthesised sound.</div>
- <p class="audio-detail">Sound starts off by default; the TV host chooses when to enable it. All music and effects are loaded from this game, never external sites.</p>
- </div><div class="footer-actions"><button class="btn" id="previewAudio">Preview whistle</button><button class="btn alt" id="closeMixer">Back to the game</button></div>`;
+ const profiles=Object.keys(MIX_PRESETS);
+ const demo=['train-whistle','dice-roll','clash-impact','coin-clink','era-fanfare','victory-fanfare','ui-select'];
+ const slider=(id,title,value)=>'<div><label for="'+id+'">'+title+' <span id="'+id+'Val">'+Math.round(value*100)+'%</span></label><input id="'+id+'" type="range" min="0" max="100" step="1" aria-label="'+title+'" value="'+Math.round(value*100)+'"></div>';
+ $('modal').innerHTML=[
+ '<div class="eyebrow">The railway parlour · Audio controls</div><h2>Sound &amp; motion</h2><div class="audio-mixer">',
+ '<div><label for="mixPreset">Sound profile</label><select id="mixPreset" aria-label="Sound profile">'+profiles.map(p=>'<option value="'+p+'" '+(mixProfile===p?'selected':'')+'>'+p[0].toUpperCase()+p.slice(1)+'</option>').join('')+'<option value="custom" '+(mixProfile==='custom'?'selected':'')+'>Custom</option></select></div>',
+ slider('masterVol','Sound effects',masterVolume),slider('musicVol','Music',musicVolume),slider('ambienceVol','Railway ambience',ambienceVolume),
+ '<div><label for="motionChoice">Reduce cinematic movement <input id="motionChoice" type="checkbox" '+(motionOff()?'checked':'')+'></label><p class="audio-detail">Also follows the device reduced-motion setting.</p></div>',
+ '<div id="soundInventory" class="audio-status" role="status">'+soundManifest.size+'/17 local sound recordings detected. Missing recordings use synthesised fallback.</div>',
+ '<div><label for="previewCue">Preview a sound</label><select id="previewCue" aria-label="Choose a sound to preview">'+demo.map(k=>'<option value="'+k+'">'+k.replace(/-/g,' ')+'</option>').join('')+'</select></div>',
+ '<p class="audio-detail">The Balanced profile is tuned for conversation around a television. Dramatic reveals gently lower the music and railway ambience. Sound remains off until you enable it.</p>',
+ '</div><div class="footer-actions"><button class="btn" id="previewAudio">Play selected sound</button><button class="btn alt" id="closeMixer">Back to the game</button></div>'
+ ].join('');
  $('modalShade').classList.remove('hidden');
- $('masterVol').oninput=e=>{masterVolume=Number(e.target.value)/100;$('masterVal').textContent=e.target.value+'%';applyLoopVolume();saveAudio();};
- $('musicVol').oninput=e=>{musicVolume=Number(e.target.value)/100;$('musicVal').textContent=e.target.value+'%';startAudioLoops();saveAudio();};
+ const updateInputs=()=>{
+  for(const [id,value] of [['masterVol',masterVolume],['musicVol',musicVolume],['ambienceVol',ambienceVolume]]){
+   $(id).value=String(Math.round(value*100));$(id+'Val').textContent=Math.round(value*100)+'%';
+  }
+  $('mixPreset').value=mixProfile;applyLoopVolume();saveAudio();
+ };
+ $('mixPreset').onchange=e=>{
+  mixProfile=e.target.value;
+  if(Object.hasOwn(MIX_PRESETS,mixProfile)){
+   const cfg=MIX_PRESETS[mixProfile];masterVolume=cfg.fx;musicVolume=cfg.music;ambienceVolume=cfg.ambience;
+  }
+  updateInputs();
+ };
+ for(const [id,key] of [['masterVol','fx'],['musicVol','music'],['ambienceVol','ambience']]){
+  $(id).oninput=e=>{
+   const value=trimGain(Number(e.target.value)/100);
+   if(key==='fx')masterVolume=value;else if(key==='music')musicVolume=value;else ambienceVolume=value;
+   mixProfile='custom';updateInputs();
+  };
+ }
  $('motionChoice').onchange=e=>{document.body.classList.toggle('minimal-motion',e.target.checked);saveAudio();};
- $('previewAudio').onclick=async()=>{if(muted){muted=false;context();updateAudioButton();await scanBundledAudio();startAudioLoops();}playCue('train-whistle');saveAudio();$('soundInventory').textContent=soundManifest.size+' optional audio files installed; everything else is synthesised.';};
+ $('previewAudio').onclick=async()=>{
+  if(muted){await toggleAudio();}else if(!soundManifestReady){await scanBundledAudio();}
+  playCue($('previewCue').value);
+  $('soundInventory').textContent=soundManifest.size+'/17 local sound recordings detected.';
+ };
  $('closeMixer').onclick=closeModal;
 };
+
 updateAudioButton();
 // Small self-contained QR Model 2 byte-mode encoder: Reed–Solomon ECC L, auto version 5–12.
 // No external calls, image services or QR runtime packages.
