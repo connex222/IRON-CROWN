@@ -129,3 +129,9 @@ Quality: 28 Node tests passed and offline Chromium visual checks exercised all e
 ## Phase 4 — Gameplay reliability (v1.6.0)
 
 Planned orders now reserve soldiers across both slots. Duplicate attacks on one territory combine into one combatant and one die roll, Telegraph replacements are revalidated, trade payloads reject inherited keys, and computer opponents attempt all seven actions. Your phone shows the authoritative projected resource balance and current bank rates. See `PHASE-4-RELEASE-NOTES.md` for QA and limitations.
+
+## Phase 5 — Railway Empire (v1.7.0)
+
+Iron Crown now derives secret Destination Ticket completion on the server and shares a private progress summary only with the ticket owner. The TV does not reveal the hidden Ticket IDs. Longest Railway trophy lengths count physical track sections once, and the Advanced Market Crash event enforces its 4:1 exchange rate for that round. Research, era drafts, Prestige, trophies and tie-breaking have an additional 14 regression tests.
+
+Run `npm test` (53 cases); for the offline phone contract review run `python tools/phase5_browser_qa.py` with Playwright/Chromium installed. See `PHASE-5-RELEASE-NOTES.md` for complete scope and outstanding acceptance checks.

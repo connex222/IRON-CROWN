@@ -139,8 +139,9 @@ function costOf(room,p,action){
  return c;
 }
 function tradeRate(room,p,resource){
- if(perk(room,p,'ada')&&p.bankResource===resource)return 2;
+ // An economy-wide Market Crash temporarily supersedes individual discounts.
  if(eventIs(room,'crash'))return 4;
+ if(perk(room,p,'ada')&&p.bankResource===resource)return 2;
  if(resource==='grain'&&has(p,'corn'))return 2;
  return 3;
 }
@@ -335,6 +336,7 @@ function resolveClashes(room){
 function score(room,p){
  const depot=owned(room,p).filter(t=>t.type==='town'&&!t.city).length;
  const city=owned(room,p).filter(t=>t.city).length*2;
+ // Completion is derived only from owned rail connections, never client assertions.
  const completed=p.tickets.filter(t=>ownsConnection(room.tiles,room.routes,p.id,t.a,t.b));
  const tickets=completed.reduce((acc,t)=>acc+t.value+(has(p,'directors')?1:0),0);
  const unfinished=advanced(room)?p.tickets.length-completed.length:0;
@@ -433,6 +435,6 @@ function tick(room,now=Date.now()){
  if(room.status==='reveal'){revealStep(room);return true;}
  return false;
 }
-function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:p.breakdown,reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,offer:room.offer?{from:room.offer.from,to:room.offer.to,compelled:room.offer.compelled,deadline:room.offer.deadline}:null,winner:room.lastWinner,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length).map(p=>p.id):null};}
-function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,planBalance:room.status==='plan'?calculatePlanBudget(room,p,p.actions):null,bankRates:Object.fromEntries(Object.keys(p.resources).map(k=>[k,tradeRate(room,p,k)])),legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offer:room.offer?.to===p.id?room.offer:null};}
+function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:Object.fromEntries(Object.entries(p.breakdown||{}).filter(([key])=>key!=='completed')),reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,offer:room.offer?{from:room.offer.from,to:room.offer.to,compelled:room.offer.compelled,deadline:room.offer.deadline}:null,winner:room.lastWinner,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>b.prestige-a.prestige||b.resources.gold-a.resources.gold||room.routes.filter(r=>r.owner===b.id).length-room.routes.filter(r=>r.owner===a.id).length).map(p=>p.id):null};}
+function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketProgress:p.tickets.map(t=>({id:t.id,complete:ownsConnection(room.tiles,room.routes,p.id,t.a,t.b),prestige:t.value+(has(p,'directors')?1:0)})),ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,planBalance:room.status==='plan'?calculatePlanBudget(room,p,p.actions):null,bankRates:Object.fromEntries(Object.keys(p.resources).map(k=>[k,tradeRate(room,p,k)])),legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offer:room.offer?.to===p.id?room.offer:null};}
 module.exports={createRoom,addPlayer,chooseAvatar,startGame,chooseTickets,placeDepot,chooseUpgrade,setAction,lockIn,replyOffer,telegraph,publicView,privateView,tick,autopilot,legalTargets,costOf,tradeRate,score,updatePrestige,beginIncome,beginPlan,revealStep,beginReveal,resolveClashes,owned,routeName,eraOf,avatar};

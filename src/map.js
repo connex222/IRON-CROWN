@@ -76,13 +76,18 @@ function ownsConnection(tiles,routes,playerId,a,b){
  return false;
 }
 function longestRail(owned){
- let longest=0; const found=new Set();
+ // Connected railway groups count physical track segments only once, even
+ // where separately claimed routes share the same hex-to-hex track section.
+ let longest=0;const found=new Set();
  for(const route of owned){if(found.has(route.id))continue;
-  let segmentCount=0, pending=[route];found.add(route.id);
-  while(pending.length){const next=pending.pop();segmentCount+=next.segments;
-    for(const other of owned){if(found.has(other.id))continue;if(other.path.some(x=>next.path.includes(x))){found.add(other.id);pending.push(other);}}
+  const edges=new Set(),pending=[route];found.add(route.id);
+  while(pending.length){const next=pending.pop();
+   for(let i=1;i<next.path.length;i++)edges.add([next.path[i-1],next.path[i]].sort().join('|'));
+   for(const other of owned){if(found.has(other.id))continue;
+    if(other.path.some(x=>next.path.includes(x))){found.add(other.id);pending.push(other);}
+   }
   }
-  longest=Math.max(longest,segmentCount);
+  longest=Math.max(longest,edges.size);
  }
  return longest;
 }
