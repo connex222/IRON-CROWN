@@ -58,17 +58,17 @@ function bind(ws,code,role,playerId=null){
  links.set(ws,{code,role,playerId});
 }
 function host(ws,data){
- let room=null;
+ let room=null,restoredFromBrowser=false;
  if(isCode(data.code)&&rooms.has(data.code)){
   room=rooms.get(data.code);if(typeof data.token!=='string'||data.token!==room.hostToken)throw Error('Host credentials rejected.');
  }else if(isCode(data.code)&&data.recovery){
   // Recover only with the original 24-byte host credential. No copy is ever
   // included in public state or sent to player controllers.
   const recovered=recovery.unseal(data.recovery,data.code,data.token);
-  room=recovered.room;rooms.set(room.code,room);
+  room=recovered.room;rooms.set(room.code,room);restoredFromBrowser=true;
   console.log('Recovered room '+room.code+' from host browser ('+recovered.ageSeconds+' seconds old)');
  }else if(!data.code){room=game.createRoom(code4());rooms.set(room.code,room);}else throw Error('Host room not found.');
- bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken,recovered:!!(data.recovery&&isCode(data.code)&&room.code===data.code)});broadcast(room);
+ bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken,recovered:restoredFromBrowser});broadcast(room);
 }
 function join(ws,data){
  const code=String(data.code||'').trim().toUpperCase();const room=rooms.get(code);if(!room)throw Error('Room not found. Ask the host for the four-letter code.');

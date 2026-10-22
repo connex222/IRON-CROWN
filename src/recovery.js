@@ -43,7 +43,7 @@ function unseal(backup,code,token,now=Date.now()){
   const room=saved.room;
   if(!room||room.code!==code||room.hostToken!==token||!Object.hasOwn(MODE,room.mode))
    throw Error('Recovered room does not match the original.');
-  if(!['lobby','tickets','placement','draft','income','plan','reveal','finished'].includes(room.status)
+  if(!['lobby','tickets','placement','draft','income','plan','offer','reveal','finished'].includes(room.status)
     ||!Array.isArray(room.players)||room.players.length>8||!Array.isArray(room.tiles)||room.tiles.length>100
     ||!Array.isArray(room.routes)||room.routes.length>100||!Array.isArray(room.ticketDeck)
     ||!Array.isArray(room.pending)||!Array.isArray(room.feed))
