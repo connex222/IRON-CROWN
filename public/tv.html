@@ -149,8 +149,67 @@ body.minimal-motion .era-curtain,body.minimal-motion .cinema-flash{display:none!
 body.minimal-motion .cinema-die,body.minimal-motion #map .engine-smoke circle,body.minimal-motion #map .cinema-highlight{animation:none!important}
 body.minimal-motion #map .moving-train{display:none!important}
 
+
+/* Phase 8.1 — TV, desktop, tablet and small-screen shared-display layout */
+.bar{height:auto;min-height:78px;flex-wrap:wrap;column-gap:clamp(8px,1.8vw,22px);row-gap:8px}
+.bar>.controls{margin:0;justify-content:flex-end;flex-wrap:wrap}
+.bar .small{font-size:clamp(13px,1.02vw,17px);min-height:46px;padding:8px 12px}
+.help-primary,.guide-launch-btn{background:linear-gradient(135deg,#f9e29c,#c79e39)!important;color:#20160b!important;border-color:#ffebac!important;box-shadow:0 3px 0 #49371a}
+.guide-launch{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px;align-items:center;padding:15px;border:1px solid #caa85e88;border-radius:15px;background:#12100ca6;color:#fff3d7}
+.guide-launch>strong{font:700 clamp(18px,1.7vw,24px) Georgia,serif}
+.guide-launch>span{font-size:clamp(15px,1.3vw,18px);line-height:1.45;flex-basis:100%}
+.guide-launch button{flex:1 1 210px;min-height:54px;font-size:clamp(15px,1.3vw,18px)}
+.guide-modal{width:min(1060px,calc(100vw - 28px));max-width:1060px;padding:clamp(16px,3vw,36px)}
+.guide-modal h2{font-size:clamp(26px,3vw,41px);line-height:1.15}
+.guide-tabs{display:flex;flex-wrap:wrap;gap:8px;margin:15px 0}
+.guide-tabs button{min-height:48px;flex:1 1 140px;font-size:clamp(14px,1.15vw,17px)}
+.guide-tabs [aria-pressed=true]{background:#e8c36c;color:#231707;border-color:#9c7728;font-weight:800}
+.guide-page{overflow:auto;max-height:min(59vh,660px);padding:5px 3px;overscroll-behavior:contain;font-size:clamp(16px,1.15vw,20px);line-height:1.55}
+.guide-lead{font-size:clamp(17px,1.4vw,22px);font-weight:550}
+.guide-three,.guide-history{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0}
+.guide-three article,.guide-history article,.chronicle-chapter,.guide-tycoons article{border:1px solid var(--line);border-radius:13px;padding:15px;background:var(--surface)}
+.guide-three article>span,.guide-history article>span{display:inline-flex;min-width:42px;height:42px;align-items:center;justify-content:center;background:#e6c06b;color:#271607;border-radius:50%;font-weight:800;margin-bottom:9px}
+.guide-three h3,.guide-history h3,.chronicle-chapter h3{font-size:clamp(19px,1.6vw,25px)}
+.guide-page p{margin:7px 0 14px}
+.guide-takeaway{padding:17px;border:2px solid #a47f29;border-radius:14px;background:var(--surface)}
+.guide-takeaway strong{font:700 23px Georgia,serif}
+.guide-note{font-size:clamp(15px,1.1vw,18px);color:var(--muted)}
+.guide-action-table{display:grid;gap:7px;margin:14px 0}
+.guide-action-row{display:grid;grid-template-columns:minmax(130px,1fr) minmax(165px,1.3fr) minmax(190px,2.2fr);gap:14px;align-items:center;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.guide-action-row strong{color:var(--gold)}
+.guide-tycoons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.guide-tycoons article small{display:block;color:var(--muted);font-weight:700}
+@media(min-width:1600px){
+ .bar{padding-inline:clamp(20px,2vw,48px)}
+ .bar .pill,.top-status{font-size:clamp(16px,1.12vw,24px)}
+ .game-layout{grid-template-columns:clamp(240px,18vw,340px) minmax(0,1fr)}
+ .ticker{font-size:clamp(16px,1.2vw,23px)}
+}
+@media(max-width:1050px){
+ .bar{justify-content:center;text-align:center;padding:9px 12px}
+ .bar .controls{justify-content:center}
+ .bar .pill{max-width:100%}
+ .hero-grid{grid-template-columns:minmax(0,1fr)!important;padding:20px!important;min-height:0}
+ .game-layout{height:auto;min-height:70vh}
+ .guide-three,.guide-history{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+ .bar{gap:8px}
+ .bar .controls{width:100%;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .bar .controls button{width:100%;font-size:14px;min-height:48px}
+ .game-layout{display:flex;flex-direction:column;height:auto;min-height:0}
+ .game-layout>aside{width:100%;max-height:none;overflow:visible}
+ .ticker{flex-wrap:wrap;padding:12px}
+ .guide-action-row{grid-template-columns:1fr;gap:4px}
+ .guide-tycoons{grid-template-columns:1fr}
+ .guide-modal{max-height:95dvh;padding:15px}
+ .guide-page{max-height:50dvh}
+ .guide-tabs button{flex:1 1 calc(50% - 8px)}
+ .hero-grid{padding:12px!important}
+}
+@media(prefers-reduced-motion:reduce){.guide-modal,.guide-launch *{animation:none!important;transition:none!important}}
 </style></head><body>
-<header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn alt small" id="rulesBtn">Rules</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
+<header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn help-primary" id="rulesBtn" aria-label="How to Play Iron Crown">? How to Play</button><button class="btn alt small" id="chronicleBtn">History &amp; Lore</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
 <div id="connection" class="hidden" role="status" aria-live="polite">Reconnecting…</div>
 <section class="hero-premium" id="lobby" aria-label="Iron Crown railway parlour">
   <div class="hero-haze" aria-hidden="true"></div>
@@ -160,7 +219,7 @@ body.minimal-motion #map .moving-train{display:none!important}
       <img class="hero-logo" src="/art/iron-crown-premium.png" alt="IRON CROWN — The railway empire game">
       <div class="hero-tagline">BUILD THE LINES. CLAIM THE CROWN.</div>
       <p class="hero-intro">The old king is gone. Eight rival tycoons will build the railways, forge their fortunes and decide who inherits his kingdom.</p>
-      <div class="hero-chips"><span>2–8 TYCOONS</span><span>3 INDUSTRIAL ERAS</span><span>30–60 MINUTES</span></div>
+      <div class="hero-chips"><span>2–8 TYCOONS</span><span>3 INDUSTRIAL ERAS</span><span>30–60 MINUTES</span></div><div class="guide-launch"><strong>First time playing?</strong><span>Discover the rules in a minute, then scan the QR code with your phone.</span><button type="button" class="btn guide-launch-btn" id="heroHowTo">Learn to Play — 60 seconds →</button><button type="button" class="btn alt guide-story-btn" id="heroLore">Discover the Kingdom</button></div>
       <div class="hero-story-footer">STEAM <i>◆</i> IRON <i>◆</i> ELECTRIC</div>
     </div>
     <div class="join-premium panel">
@@ -446,10 +505,85 @@ function showTycoons(){const shade=$('modalShade');shade.classList.remove('hidde
 function showResults(){const s=publicState;const ranking=[...s.players].sort((a,b)=>s.finalRanking.indexOf(a.id)-s.finalRanking.indexOf(b.id));
  $('modal').innerHTML=`<div class="eyebrow">The final reckoning</div><h2>♛ The Iron Crown</h2><p>${escapeHTML(ranking[0].name)} has won the contest of railways and power.</p><div class="winner-list">${ranking.map((p,i)=>`<div class="winner-row"><b>${i+1}.</b>${avatarImage(p,55)}<div><b>${escapeHTML(p.name)}</b><div class="minor">Cities ${p.breakdown?.city||0} · Tickets ${p.breakdown?.tickets||0} · Rails ${p.breakdown?.rail||0}</div></div><strong>★ ${p.prestige}</strong></div>`).join('')}</div><div class="footer-actions"><button class="btn" onclick="if(window.confirm('Play another Iron Crown game with the same invited players?')){say('restart',{});closeModal();}">Play again</button><button class="btn alt" onclick="closeModal()">View the board</button></div>`;
  $('modalShade').classList.remove('hidden');}
-function closeModal(){$('modalShade').classList.add('hidden');}
-const rules=[['The objective','Earn 15 Prestige in Standard or Advanced, or 10 in Quick. Build cities, fulfil Destination Tickets and win railway or army trophies.'],['Your rounds','Every round: Income pays automatically; all tycoons secretly plan two actions; the TV reveals their moves in rotating order.'],['Your resources','Coal, Timber, Grain and Steel build the empire. Gold pays for Soldiers and research. Bank trades normally exchange 3 of one resource for 1 of another.'],['The seven actions','Build Depot, Upgrade City, Lay Track, Recruit, Trade, Research and Attack. You can repeat an action except Research.'],['Battles','Roll one six-sided die plus Soldiers and defensive bonuses. Ties favour the defender. Losing forces lose half, rounded up.'],['Eras and secrets','Steam becomes Iron, then Electric. Choose one free era Upgrade. Only your phone reveals your tickets and plans. No one is eliminated.']];
-$('galleryBtn').onclick=showTycoons;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
-$('rulesBtn').onclick=()=>{$('modal').innerHTML=`<div class="eyebrow">How to play</div><h2>The Iron Crown Rulebook</h2><div class="rules-grid">${rules.map(([a,b])=>`<article><h3>${a}</h3><p>${b}</p></article>`).join('')}</div><div class="footer-actions"><button class="btn" onclick="closeModal()">Return to the kingdom</button></div>`;$('modalShade').classList.remove('hidden');};
+function closeModal(){$('modalShade').classList.add('hidden');$('modal').classList.remove('guide-modal');if(guideFocusReturn?.isConnected)guideFocusReturn.focus();guideFocusReturn=null;}
+// Phase 8.1 — classroom-clear rules, rich fictional setting and verified railway history.
+const guideActions=[
+ ['Build Depot','1 Timber + 1 Grain','Claim a legal neighbouring tile.'],
+ ['Upgrade to City','2 Grain + 2 Steel + 1 Coal','Turn your own Market Town into a City.'],
+ ['Lay Track','1 Timber + 1 Steel per segment','Claim an entire marked railway route.'],
+ ['Recruit','2 Gold per Soldier','Add up to 3 Soldiers to owned land.'],
+ ['Trade','No action cost','Exchange 3:1 with the bank or offer another tycoon a deal.'],
+ ['Research','3 Gold + 1 Coal','Draw a secret Destination Ticket or buy an available era Upgrade; only once a round.'],
+ ['Attack','No resources; commits Soldiers','Attack an adjacent rival, using Soldiers plus one die. Ties favour the defender.']
+];
+const guideTycoons=[
+ ['Lady Augusta Blackwood','The Duchess','She regards the railway as her family's last chance to retain influence.'],
+ ['Silas Brunel-Crane','The Engineer','For Silas, bridges and engines should decide the future, not birthright.'],
+ ['"Lucky" Jack Hartigan','The Gambler','A wagerer who sees every incomplete railway as an opportunity.'],
+ ['Mrs Ada Pennyworth','The Banker','She reads the kingdom in ledger columns, dividends and railway bonds.'],
+ ['Colonel Rupert Fairfax','The Colonel','He is determined that the new railway map will never weaken the Crown.'],
+ ['Nell Thackery','The Union Boss','She built her reputation among navvies and railway workers.'],
+ ['Professor Ottoline Vex','The Inventor','She believes the newest machines belong at the heart of government.'],
+ ['Mr Ezra Coldwell','The Smuggler','He knows the ports, back roads and unofficial trade routes.']
+];
+const guideSections={
+ quick:[
+  '<p class="guide-lead">An easy, one-minute introduction. The TV shows the shared railway map; your phone keeps your plans and tickets private.</p>',
+  '<div class="guide-three"><article><span>1</span><h3>Join &amp; claim</h3><p>Use the TV room code or QR. Pick a tycoon, keep at least 2 secret Destination Tickets and place 2 starting Depots.</p></article><article><span>2</span><h3>Plan two orders</h3><p>Each round you earn resources, secretly choose <b>two actions</b> on your phone, then press <b>Lock In</b>.</p></article><article><span>3</span><h3>Watch the reveal</h3><p>The TV resolves the orders. Build towns and railway links, fulfil tickets and claim trophies to win Prestige.</p></article></div>',
+  '<div class="guide-takeaway"><strong>Win the Crown</strong><p>First to <b>10 Prestige</b> in Quick or <b>15</b> in Standard/Advanced after a Reveal; otherwise highest at the end. Nobody gets eliminated.</p></div>',
+  '<p class="guide-note"><b>Three eras:</b> Steam → Iron → Electric. At each new era, choose one free Upgrade. Advanced mode adds events and tycoon abilities.</p>'
+ ].join(''),
+ actions:[
+  '<p class="guide-lead">Every round has three phases: <b>Income → Plan → Reveal</b>. Choose any two actions; Research may only be chosen once.</p>',
+  '<div class="guide-action-table" role="table" aria-label="Seven actions and their costs">',
+  ...guideActions.map(a=>'<div class="guide-action-row" role="row"><strong role="cell">'+a[0]+'</strong><span role="cell">'+a[1]+'</span><span role="cell">'+a[2]+'</span></div>'),
+  '</div><div class="guide-takeaway"><strong>What earns Prestige?</strong><p>Market Town Depot +1 · City +2 · Completed ticket +2–4 · Longest Railway +2 · Largest Army +2 · Grand Station +2.</p></div>',
+  '<p class="guide-note">When a planned action becomes impossible, resources are returned and the player gets +1 Gold. An attack adds one six-sided die to Soldiers and bonuses; ties favour the defender.</p>'
+ ].join(''),
+ lore:[
+  '<p class="guide-lead"><b>Fictional kingdom · Original Iron Crown lore.</b> This realm, its succession crisis and these eight rivals are invented for the game.</p>',
+  '<div class="chronicle-chapter"><h3>The Crown Without a King</h3><p>The old king is dead. His heirs agree on almost nothing, except that the isolated towns, mills and ports cannot remain divided. They decree that whoever binds the realm together by rail shall inherit the Iron Crown.</p><p>A railway charter becomes a weapon. Each Depot is a foothold, each City a promise and each train a claim to the throne. Parliament watches. Investors speculate. Workers lay the rails on which fortunes rise and fall.</p></div>',
+  '<div class="chronicle-chapter"><h3>The Three Ages</h3><p><b>Steam:</b> First contracts, smoky engines and a fever for new depots. <b>Iron:</b> Stronger steel, faster trains, emboldened rivals. <b>Electric:</b> Telegraphs, glittering stations and the last race for legitimacy.</p></div>',
+  '<h3>Meet the Eight Claimants</h3><div class="guide-tycoons">'+guideTycoons.map(a=>'<article><b>'+a[0]+'</b><small>'+a[1]+'</small><p>'+a[2]+'</p></article>').join('')+'</div>',
+  '<p class="guide-note">The tale is an alternate-history fiction inspired by Britain’s nineteenth-century railway age; it does not describe a real historical succession.</p>'
+ ].join(''),
+ history:[
+  '<p class="guide-lead"><b>Real history, clearly separate from Iron Crown’s fiction.</b> These milestones inspired the atmosphere, not the fictional kingdom or characters.</p>',
+  '<div class="guide-history"><article><span>1830</span><h3>Railway fever begins</h3><p>The Liverpool and Manchester Railway opened on 15 September 1830, pioneering a steam-powered intercity railway for passengers and freight.</p></article>',
+  '<article><span>1856</span><h3>The Bessemer process</h3><p>Henry Bessemer patented his steel-making process. Cheaper steel helped the growth of railways, bridges and industrial building.</p></article>',
+  '<article><span>1880s</span><h3>The electric age</h3><p>Railways adopted telegraph signalling; electric light began appearing in public spaces and stations. Widespread household electrification came much later.</p></article></div>',
+  '<p class="guide-note">Historical reference: Science Museum Group (Liverpool &amp; Manchester Railway and Henry Bessemer), London Museum (the arrival of electricity). The game condenses decades of change into three playable eras.</p>'
+ ].join('')
+};
+let guideFocusReturn=null,guideSelected='quick';
+function openGuide(section='quick'){
+ guideFocusReturn=document.activeElement;
+ guideSelected=Object.hasOwn(guideSections,section)?section:'quick';
+ const tabs=[['quick','Start here'],['actions','Actions & scoring'],['lore','Kingdom lore'],['history','Real history']];
+ $('modal').classList.add('guide-modal');
+ $('modal').innerHTML='<div class="eyebrow">THE IRON CROWN HANDBOOK</div><h2 id="guideTitle">How to Play &amp; The Chronicle</h2>'+
+  '<nav class="guide-tabs" aria-label="Choose handbook chapter">'+tabs.map(t=>'<button class="btn alt" type="button" data-guide="'+t[0]+'" aria-pressed="'+(guideSelected===t[0])+'">'+t[1]+'</button>').join('')+'</nav>'+
+  '<div id="guidePage" class="guide-page" tabindex="0">'+guideSections[guideSelected]+'</div>'+
+  '<div class="footer-actions"><button type="button" class="btn" id="guideClose">Return to the game</button></div>';
+ $('modalShade').classList.remove('hidden');
+ $('modal').querySelectorAll('[data-guide]').forEach(button=>button.onclick=()=>{
+  guideSelected=button.dataset.guide;
+  $('guidePage').innerHTML=guideSections[guideSelected];
+  $('guidePage').scrollTop=0;
+  $('modal').querySelectorAll('[data-guide]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.guide===guideSelected)));
+ });
+ $('guideClose').onclick=closeModal;
+ $('modal').querySelector('[data-guide="'+guideSelected+'"]').focus();
+}
+$('galleryBtn').onclick=showTycoons;
+$('rulesBtn').onclick=()=>openGuide('quick');
+$('chronicleBtn').onclick=()=>openGuide('lore');
+$('heroHowTo').onclick=()=>openGuide('quick');
+$('heroLore').onclick=()=>openGuide('lore');
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'&&!$('modalShade').classList.contains('hidden'))closeModal();
+ if(e.key==='?'&&$('modalShade').classList.contains('hidden')&&!/INPUT|TEXTAREA|SELECT/.test(document.activeElement?.tagName||''))openGuide('quick');
+});
 $('modalShade').onclick=e=>{if(e.target===$('modalShade'))closeModal();};$('botBtn').onclick=()=>say('addAI',{});$('mode').onchange=e=>say('mode',{mode:e.target.value});$('startBtn').onclick=()=>say('start',{mode:$('mode').value});
 /* Only same-origin bundled audio is used. An optional local file replaces the
    synthesised cue automatically; no audio asset means the playable fallback remains. */
