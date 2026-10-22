@@ -85,6 +85,7 @@ test('Phase 5: Largest Army trophy requires five soldiers and has no holder on t
 });
 test('Phase 5: Market Crash overrides 2:1 bank trading discounts for this round',()=>{
  const {r,ps:[p]}=room('advanced');
+ r.event=null; // Isolate the bank-rate baseline from random Advanced starting events.
  p.avatar='ada';p.bankResource='grain';p.upgrades.push('corn');
  assert.equal(g.tradeRate(r,p,'grain'),2);
  r.event={id:'crash'};
