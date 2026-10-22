@@ -1,0 +1,194 @@
+{
+  "schema": 1,
+  "created_utc": "2026-10-22T15:09:55.964740+00:00",
+  "files": [
+    {
+      "file": "train-whistle.mp3",
+      "provider": "Mirelo",
+      "generation_task": "e804d1297bdacafbc019750cc4719a64",
+      "duration_seconds": 3.024,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 73197,
+      "sha256": "b10aa9067db3aed458013be3ecfe6a25ebc7d8b60645cb487b8c1b72cedb95fa"
+    },
+    {
+      "file": "train-chug.mp3",
+      "provider": "Mirelo",
+      "generation_task": "94cff0d12783225304dffe341215c27e",
+      "duration_seconds": 8.046,
+      "codec": "mp3",
+      "sample_rate": 44100,
+      "channels": 1,
+      "size_bytes": 193768,
+      "sha256": "ce52607c1db87611144fe712c31b87b5a98078e1b8cddc90631af4ca8a19ca5b"
+    },
+    {
+      "file": "steam-release.mp3",
+      "provider": "Mirelo",
+      "generation_task": "4edc70c8ad63f0450b80d71564aa7d8d",
+      "duration_seconds": 2.64,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 63981,
+      "sha256": "206cbe6e1658c7f70a1ed2c5e1f1cceac985a94fc9279d99b50fa75827e7cb3b"
+    },
+    {
+      "file": "track-lay.mp3",
+      "provider": "Mirelo",
+      "generation_task": "8839b764829da4b69963794c1746f9fd",
+      "duration_seconds": 1.824,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 44397,
+      "sha256": "e047520d8b511658a6bb794e59502e95ac1d4e328bfa151d9967d1b62481d804"
+    },
+    {
+      "file": "depot-build.mp3",
+      "provider": "Mirelo",
+      "generation_task": "e45a573ed734c2d4e84f42162b0dd3b7",
+      "duration_seconds": 1.944,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 47277,
+      "sha256": "fa587c990437da870ac3cf8f93bbed63dc9a6345e5c499c4605dd1316f86ac79"
+    },
+    {
+      "file": "city-build.mp3",
+      "provider": "Mirelo",
+      "generation_task": "9c9aee6998054c3c790a1cb3fe5940e8",
+      "duration_seconds": 3.336,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 80685,
+      "sha256": "cfa2eb34db8e9504eef509c34e67310204b7bdbbff5c4a4eb9e0888229cadeb3"
+    },
+    {
+      "file": "coin-clink.mp3",
+      "provider": "Mirelo",
+      "generation_task": "1b01feabb0c68616ad370e8d119ff0d8",
+      "duration_seconds": 1.224,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 29997,
+      "sha256": "a3111d664e68b06958d4f97c38d5794dd95fc8d5680c4723be0d4ca383773411"
+    },
+    {
+      "file": "dice-roll.mp3",
+      "provider": "Mirelo",
+      "generation_task": "5cd03f58013e5781aa439141e05453b1",
+      "duration_seconds": 2.232,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 54189,
+      "sha256": "305c0db9d8cb3cc7a4be1a12547f8bb2c6162a7ee41531ef054688d250d44ccf"
+    },
+    {
+      "file": "clash-impact.mp3",
+      "provider": "Mirelo",
+      "generation_task": "38eb8fac2bf6e2c1ca09d59a97635001",
+      "duration_seconds": 2.544,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 61677,
+      "sha256": "2c1318e152024b76432ec0b6cbf22874f642d20963219128c2d3983cb38063d5"
+    },
+    {
+      "file": "crowd-gasp.mp3",
+      "provider": "Mirelo",
+      "generation_task": "dc841907e942f5aa2dc9e1212b9d4da3",
+      "duration_seconds": 2.04,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 49581,
+      "sha256": "695d03f2d12ba1af31dabf305292680c5b018d0b2c5de522151ef1fd8cbc2ec0"
+    },
+    {
+      "file": "crowd-cheer.mp3",
+      "provider": "Mirelo",
+      "generation_task": "32e1729a0ee920817dc61f6d88f9810e",
+      "duration_seconds": 3.24,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 78381,
+      "sha256": "d553cfe2ff6eaea6d0537a429c92943681c2221fb54b4761d81716e6fa2233a0"
+    },
+    {
+      "file": "era-fanfare.mp3",
+      "provider": "Mirelo",
+      "generation_task": "19aa8bdaea15e2442d7524c0de44b57d",
+      "duration_seconds": 4.728,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 114093,
+      "sha256": "6589bacd2b90849ab35d9d0d214357078488f3bdb4336acc1b7e6b7ff38e2cc5"
+    },
+    {
+      "file": "victory-fanfare.mp3",
+      "provider": "Mirelo",
+      "generation_task": "b39d76fcd83c3e725ad1ccd530ee4691",
+      "duration_seconds": 7.536,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 181485,
+      "sha256": "df224389c91cf0d55a08b6671b6b1e32387813f91b9aba502e4aa16c7b341bc0"
+    },
+    {
+      "file": "ui-select.mp3",
+      "provider": "Mirelo",
+      "generation_task": "ab6cc1690e866d0f7bdff4a1e8b6e4f2",
+      "duration_seconds": 0.696,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 17325,
+      "sha256": "d4a7c6e09b090023206faca6bc3333daea511d9328969adf68c721e650ae8e15"
+    },
+    {
+      "file": "ui-confirm.mp3",
+      "provider": "Mirelo",
+      "generation_task": "fcff650d5ce229bb7779d91c037f44c8",
+      "duration_seconds": 1.128,
+      "codec": "mp3",
+      "sample_rate": 48000,
+      "channels": 1,
+      "size_bytes": 27693,
+      "sha256": "14c8a1192469dc2c2cd9ceafa5730242be2031f1c153b3fe6fb0f06070dd13e5"
+    },
+    {
+      "file": "ambience-railway.mp3",
+      "provider": "Mirelo",
+      "generation_task": "6bc8578adc7dc5f8f2428a532986b0c4",
+      "duration_seconds": 30.041,
+      "codec": "mp3",
+      "sample_rate": 44100,
+      "channels": 1,
+      "size_bytes": 721650,
+      "sha256": "ff01687c95e0e3903b53cb8d87ddf0bc241d55574739d570809d26aaa7445943"
+    },
+    {
+      "file": "music-parlour.mp3",
+      "provider": "Sonilo",
+      "generation_task": "a7159966-cccb-4379-8688-134504b940f1",
+      "duration_seconds": 75.102,
+      "codec": "mp3",
+      "sample_rate": 44100,
+      "channels": 2,
+      "size_bytes": 3005268,
+      "sha256": "dfc71e101cdb640f598b0f7d95901bba7741df176ec929ca9573a0f161eff9ff"
+    }
+  ],
+  "note": "Sound recordings generated by Mirelo and music by Sonilo; provenance in AUDIO-LICENCES.md."
+}
