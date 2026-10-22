@@ -206,7 +206,7 @@ test('Server serves a healthy room endpoint and local inventory of all 17 audio 
  try{
   const health=await getJson(b.port,'/health'),audio=await getJson(b.port,'/audio/manifest.json');
   assert.equal(health.status,200);assert.equal(health.json.status,'ok');
-  assert.equal(health.json.version,'1.10.0');assert.equal(health.json.installedSounds,17);assert.equal(health.json.expectedSounds,17);
+  assert.equal(health.json.version,require('../package.json').version);assert.equal(health.json.installedSounds,17);assert.equal(health.json.expectedSounds,17);
   assert.equal(audio.status,200);assert.equal(audio.json.files.length,17);
   assert.ok(audio.json.files.every(f=>f.endsWith('.mp3')));
  }finally{await b.stop();}
