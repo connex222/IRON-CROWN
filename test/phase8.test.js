@@ -180,6 +180,13 @@ test('Live game-night: restored completed match rematches cleanly; old phone can
   const restored=waitMessage(socket,m=>m.type==='welcome');
   socket.send(JSON.stringify({type:'join',code:r.code,playerId:a.id,token:a.token}));
   assert.equal((await restored).playerId,a.id);
+  const notReady=waitMessage(host.ws,m=>m.type==='error');
+  host.ws.send(JSON.stringify({type:'action',kind:'start',mode:'standard'}));
+  assert.match((await notReady).message,/must be online/);
+  const other=await connect(b.port);b.sockets.push(other);
+  const otherReady=waitMessage(other,m=>m.type==='welcome');
+  other.send(JSON.stringify({type:'join',code:r.code,playerId:c.id,token:c.token}));
+  assert.equal((await otherReady).playerId,c.id);
   const started=waitMessage(host.ws,m=>m.type==='state'&&m.public.status==='tickets');
   host.ws.send(JSON.stringify({type:'action',kind:'start',mode:'standard'}));
   await started;
@@ -202,4 +209,13 @@ test('Server serves a healthy room endpoint and local inventory of all 17 audio 
   assert.equal(audio.status,200);assert.equal(audio.json.files.length,17);
   assert.ok(audio.json.files.every(f=>f.endsWith('.mp3')));
  }finally{await b.stop();}
+});
+
+test('Phase 8: lobby readiness and versioned health checks are visible to the host',()=>{
+ assert.match(tv,/const away=s\.players\.filter\(p=>!p\.ai&&!p\.connected\)/);
+ assert.match(tv,/unready\.length>0\|\|away\.length>0/);
+ assert.match(tv,/Waiting for \$\{away\.map\(p=>p\.name\)\.join\(', '\)\} to reconnect or switch to AI/);
+ assert.match(serverSource,/All human players must be online/);
+ assert.match(serverSource,/expectedSounds:CUES\.length/);
+ assert.match(serverSource,/version:GAME_VERSION/);
 });
