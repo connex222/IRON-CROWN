@@ -155,3 +155,9 @@ Quality checks: `npm test` (59 cases), `python tools/phase6_browser_qa.py` (TV i
 ## Phase 6.2 — Sound balancing (v1.8.2)
 
 The TV mixer now has Quiet, Balanced and Cinematic profiles with independent effects, music and railway ambience sliders. Balanced is tuned for a games night with conversation. Strong events briefly and smoothly duck the background; no more than three short effects play together, with important scenes taking priority over incidental clicks. Settings persist locally, while sound remains off until explicitly enabled. Missing media uses synthesised fallback, and all 17 Sonilo/Mirelo recordings are retained as local assets. See PHASE-6-MIX-RELEASE-NOTES.md.
+
+## Phase 7 — Accessible game-night play (v1.9.0)
+
+Phone reconnects now wait for an authenticated server welcome before clearing the warning. Dead WebSockets are detected by a server heartbeat, while reconnection uses the same saved room, player ID and token and cannot create duplicate seats. Hosts can still replace disconnected seats with AI. Controller polish includes an optional three-step first-round tutorial, 56-pixel touch targets, keyboard-selectable legal map targets, explicit selected states, live error/status regions, a focus-managed rulebook and character dossiers, and a single vibration per trade offer. Game rules and the server's authoritative action engine are unchanged.
+
+Run `npm test`: 78 tests passed on GitHub Actions, including an actual disconnect/reconnect/token-rejection integration test. Real phone/TV acceptance, full WCAG contrast measurement, and Render deployment verification are still outstanding. See `PHASE-7-RELEASE-NOTES.md`.
