@@ -1,4 +1,4 @@
-<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"><meta name="theme-color" content="#16130f"><title>Iron Crown · Private Controller</title>
+<!doctype html><html lang="en-GB"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#16130f"><title>Iron Crown · Private Controller</title>
 <style>
 :root{--bg:#f3e9d2;--panel:#fff5e2;--wood:#5a3a22;--text:#1c1712;--muted:#5e5246;--brass:#95701c;--line:#c9b693;--good:#2e7d32;--bad:#b3261e;--glow:#fff2c6}
 @media(prefers-color-scheme:dark){:root{--bg:#16130f;--panel:#292219;--wood:#2a1d13;--text:#f5ebd5;--muted:#b9ac95;--brass:#e2bc3b;--line:#5f503b;--good:#5cc163;--bad:#ff6b5e;--glow:#39311f}}
@@ -108,8 +108,44 @@ button:focus-visible,a:focus-visible,[role="button"]:focus-visible{outline:3px s
 .guide-actions button{min-height:56px;flex:1}
 .banner[role="status"]{position:sticky;top:73px;z-index:11}
 @media(prefers-reduced-motion:reduce){.animated,.actor-card,.btn:active{animation:none;transition:none;transform:none}}
+
+/* Phase 8.1 — high-legibility controls on phone, tablet and computer */
+header{flex-wrap:wrap;row-gap:8px}
+.phone-help-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;align-items:center;gap:6px}
+.phone-help-actions button{min-height:48px;padding:8px 11px;margin:0;white-space:nowrap}
+.phone-help-btn{background:linear-gradient(140deg,#f6dda0,#c69942)!important;border-color:#ffe9a8!important;color:#211708!important}
+.start-guide{width:100%;color:var(--text);font-weight:800}
+.pocket-handbook{width:min(760px,100%);margin:auto;max-height:calc(100dvh - 35px);overflow:auto}
+.pocket-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0}
+.pocket-tabs button{margin:0;min-height:54px;padding:8px;font-size:16px;box-shadow:none}
+.pocket-tabs [aria-pressed=true]{border:2px solid var(--brass);background:#eed385;color:#241709;font-weight:800}
+.pocket-guide-body{max-height:48dvh;overflow:auto;overscroll-behavior:contain}
+.pocket-lead{font-size:17px;line-height:1.5;padding:14px;background:var(--glow);border-radius:11px;color:var(--text)}
+.pocket-flow{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;margin:13px 0}
+.pocket-flow span{background:#294437;color:#ffe6ad;border-radius:8px;padding:10px;font-weight:800;font-size:14px}
+.pocket-guide-step{border:1px solid var(--line);border-radius:11px;padding:14px;margin:9px 0;background:var(--panel)}
+.pocket-guide-step h2{font-size:clamp(19px,4.5vw,24px);line-height:1.25;margin:0 0 7px}
+.pocket-guide-step p{font-size:16px;line-height:1.52;margin:0}
+.pocket-footnote{font-size:16px;line-height:1.5;font-weight:700}
+@media(min-width:820px){
+ .wrap{max-width:830px;padding:28px 28px 60px}
+ .avatar-gallery{grid-template-columns:repeat(4,minmax(0,1fr))}
+ .resource-strip{gap:10px}
+ .pocket-handbook{max-height:88dvh}
+}
+@media(max-width:500px){
+ header{padding:9px 11px;gap:5px}
+ .phone-help-actions{width:100%;display:grid;grid-template-columns:1.3fr .75fr .65fr;gap:6px}
+ .phone-help-actions button{font-size:14px;padding:8px 5px;min-width:0}
+ .brand{font-size:clamp(16px,4.7vw,21px)}
+ .status{font-size:13px}
+ .wrap{padding:13px 11px 56px}
+ .pocket-guide-body{max-height:48dvh}
+}
+@media(max-width:365px){.phone-help-actions button{font-size:13px}.pocket-tabs button{font-size:14px}}
+@media(prefers-reduced-motion:reduce){.pocket-tabs button,.phone-help-actions button{transition:none!important;animation:none!important}}
 </style></head><body>
-<header><div><div><img src="/art/iron-crown-premium.png" class="phone-logo" alt="Iron Crown"></div><div class="status" id="status">PRIVATE CONTROLLER</div></div><button id="rules" class="btn alt tiny" style="width:auto;color:#f4e7cb">Rules</button></header>
+<header><div><div><img src="/art/iron-crown-premium.png" class="phone-logo" alt="Iron Crown"></div><div class="status" id="status">PRIVATE CONTROLLER</div></div><div class="phone-help-actions"><button id="rules" class="btn tiny phone-help-btn" type="button" aria-label="How to Play Iron Crown">? How to Play</button><button id="storyBtn" class="btn alt tiny" type="button">Story</button><button id="phoneSoundBtn" class="btn alt tiny" type="button" aria-pressed="false" aria-label="Enable phone sound effects">♪ Off</button></div></header>
 <div id="connection" class="banner hidden" role="status" aria-live="polite">Reconnecting… Your seat is safe.</div><main class="wrap" id="app"></main><div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div><div id="rulesOverlay" class="rule-overlay hidden" role="dialog" aria-modal="true" aria-label="Iron Crown information" tabindex="-1"></div>
 <script>
 'use strict';
@@ -156,7 +192,7 @@ const selectionPortrait=id=>dossierPortrait(id);
 function fallbackAvatar(id){const colour=people.find(p=>p[0]===id)?.[3]||'#574a35',letters=String(id||'IC').slice(0,2).toUpperCase();return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="150" height="150"><rect width="150" height="150" rx="12" fill="${colour}"/><circle cx="75" cy="75" r="62" fill="#111" opacity=".2"/><text x="75" y="90" fill="#fff1d7" text-anchor="middle" font-family="Georgia,serif" font-size="45" font-weight="bold">${letters}</text></svg>`);}
 document.addEventListener('error',ev=>{const img=ev.target;if(!(img instanceof HTMLImageElement)||!img.getAttribute('src')?.includes('/art/avatars/'))return;const id=img.getAttribute('src').match(/avatars\/([a-z]+)_/)?.[1];img.src=fallbackAvatar(id);},true);
 const reactionLabel=p=>moodFor(p?.avatar)==='smug'?`★ ${p?.reactionReason||'A railway triumph'}`:moodFor(p?.avatar)==='furious'?`⚔ ${p?.reactionReason||'A setback'}`:people.find(a=>a[0]===p?.avatar)?.[2]||'RAILWAY TYCOON';
-function send(kind,data={}){if(!ws||ws.readyState!==1){notify('Disconnected. Trying to reconnect.');return;}ws.send(JSON.stringify({type:'action',kind,...data}));}
+function send(kind,data={}){if(!ws||ws.readyState!==1){notify('Disconnected. Trying to reconnect.');return;}ws.send(JSON.stringify({type:'action',kind,...data}));playPhoneCue(kind==='lock'||kind==='upgrade'||kind==='tickets'?'ui-confirm':'ui-select');}
 function notify(message){$('toast').textContent=message;$('toast').classList.remove('hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>$('toast').classList.add('hidden'),3400);}
 // One active socket per phone. Saved credentials always rejoin the same seat.
 let reconnectTimer=null,reconnectAttempt=0,connectionEpoch=0,removedByHost=false,lastOfferAlert=null;
@@ -195,8 +231,10 @@ function connect(){
    if(m.type==='state'){
     publicS=m.public;privateS=m.private||null;
     const newFx=publicS.feed.filter(x=>x.seq>seenSeq);
+    if(newFx.some(x=>x.kind==='clash'))playPhoneCue('dice-roll');
     const offerKey=privateS?.offer?String(privateS.offer.from)+'/'+String(privateS.offer.deadline):null;
     if(newFx.some(x=>x.kind==='clash'&&x.message.includes(current()?.name||'∅'))||(offerKey&&offerKey!==lastOfferAlert))navigator.vibrate?.([90,60,90]);
+    if(offerKey&&offerKey!==lastOfferAlert)playPhoneCue('ui-confirm');
     lastOfferAlert=offerKey;
     seenSeq=publicS.seq;
     const key=JSON.stringify({phase:publicS.status,round:publicS.round,seq:publicS.seq,me:pid,actions:privateS?.actions,locked:privateS?.locked,upgrades:privateS?.upgrades,choices:privateS?.ticketChoices,offer:privateS?.offer,avatars:publicS.players.map(p=>p.avatar),resources:privateS?.resources,turn:publicS.placementTurn});
@@ -238,7 +276,7 @@ window.addEventListener('offline',()=>{if(pid&&token)connectionBanner('Offline �
 const h=(title,tagline='')=>`<div class="eyebrow">${esc(tagline)}</div><h1>${esc(title)}</h1>`;
 function render(){const s=publicS,p=privateS;document.body.dataset.era=s?.era||'steam';
  $('status').textContent=s?`${s.code} · ${s.era.toUpperCase()} · ${s.round?`ROUND ${s.round}/${s.totalRounds}`:'LOBBY'}`:'PRIVATE CONTROLLER';
- if(!s||!p){$('app').innerHTML=`<section class="phone-join-scene"><img src="/art/iron-crown-premium.png" alt="Iron Crown"><div class="eyebrow">PRIVATE RAILWAY CONTROLLER</div><p>BUILD THE LINES. CLAIM THE CROWN.</p></section><section class="card gold animated join-form">${h('Join the Empire','The Crown awaits')}<p class="caption">Scan the code on the TV or enter the room code to join the game.</p><label for="joinCode">Four-letter room code</label><input id="joinCode" value="${esc(room)}" maxlength="4" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="ABCD" style="text-align:center;font-size:27px;letter-spacing:.18em;text-transform:uppercase"><label for="joinName">Your name</label><input id="joinName" maxlength="22" placeholder="Your tycoon name" autocomplete="nickname" value="${esc(manualName)}"><button class="btn" id="joinBtn">Join the Empire →</button></section>`;$('joinBtn').onclick=joinNow;return;}
+ if(!s||!p){$('app').innerHTML=`<section class="phone-join-scene"><img src="/art/iron-crown-premium.png" alt="Iron Crown"><div class="eyebrow">PRIVATE RAILWAY CONTROLLER</div><p>BUILD THE LINES. CLAIM THE CROWN.</p></section><section class="card gold animated join-form">${h('Join the Empire','The Crown awaits')}<p class="caption">Scan the code on the TV or enter the room code to join the game. You can use this controller on a phone, tablet or PC.</p><button class="btn alt inline start-guide" id="joinHelp" type="button">New? Learn the rules in 60 seconds →</button><label for="joinCode">Four-letter room code</label><input id="joinCode" value="${esc(room)}" maxlength="4" inputmode="text" autocapitalize="characters" autocomplete="off" placeholder="ABCD" style="text-align:center;font-size:27px;letter-spacing:.18em;text-transform:uppercase"><label for="joinName">Your name</label><input id="joinName" maxlength="22" placeholder="Your tycoon name" autocomplete="nickname" value="${esc(manualName)}"><button class="btn" id="joinBtn">Join the Empire →</button></section>`;$('joinBtn').onclick=joinNow;$('joinHelp').onclick=()=>openPocketGuide('start');return;}
  if(!p.avatar){renderAvatar();return;}
  if(s.status==='lobby'){renderLobby();return;}
  if(s.status==='tickets'&&p.ticketChoices.length){renderTicketPick();return;}
@@ -386,7 +424,89 @@ function renderResults(){const ranking=[...publicS.players].sort((a,b)=>publicS.
 }
 let overlayFocusReturn=null;
 function closeOverlay(){const el=$('rulesOverlay');el.classList.add('hidden');if(overlayFocusReturn?.isConnected)overlayFocusReturn.focus();overlayFocusReturn=null;}
-const ruleCopy=[['1. Earn the crown','First to 15 Prestige (10 in Quick), or highest at the end, wins. Market Town depots, cities, tickets and trophies score points.'],['2. Place two Depots','Choose free production tiles in snake order. Each starting Depot gets one Soldier. Your phone keeps your tickets hidden.'],['3. Income and orders','Your holdings produce every round. Secretly choose two actions (Research at most once), then Lock In. Unused actions pass at the deadline.'],['4. Build and trade','New Depots cost Timber and Grain. Cities cost Grain, Steel and Coal. Whole routes cost Timber and Steel per segment. Trade with the bank or offer to another tycoon.'],['5. Clash for territory','Attack adjacent enemy tiles with Soldiers. Add a die (1–6), with Hills/City bonuses for the defender. Ties go to the defender. No player is ever eliminated.'],['6. Progress through eras','Steam, Iron, then Electric. Each era offers an Upgrade. Advanced mode adds events, character perks and unfinished-ticket penalties.']];
+// Four pages of plain-English help, optional real railway history and fictional lore.
+const pocketPages={
+ start:[
+  ['1 · Join','Scan the QR on the TV or type the four-letter code. Choose a tycoon and keep 2 or 3 private Destination Tickets.'],
+  ['2 · Claim your Depots','Place 2 starting Depots on unclaimed production tiles when your phone says it is your turn.'],
+  ['3 · Take your income','Every round, land and railways pay resources and Gold automatically.'],
+  ['4 · Plan two actions','Choose two secret orders on your phone. You can repeat an action except Research. Tap Lock In.'],
+  ['5 · Watch the TV','Orders are revealed in turn order. The TV shows clashes, new railway lines and the current Prestige leader.']
+ ],
+ actions:[
+  ['Build Depot · 1 Timber + 1 Grain','Claim a legal neighbouring tile, extending your territory.'],
+  ['Upgrade City · 2 Grain + 2 Steel + 1 Coal','Upgrade your own Market Town, earning more Gold and Prestige.'],
+  ['Lay Track · Timber + Steel per segment','Claim a complete railway route; connect two towns for a secret Destination Ticket.'],
+  ['Recruit · 2 Gold per Soldier','Place up to 3 Soldiers on a tile you own.'],
+  ['Trade · No action cost','Swap 3:1 with the bank, or send a 20-second offer to another player.'],
+  ['Research · 3 Gold + 1 Coal','Gain a secret ticket or available era Upgrade; once each round.'],
+  ['Attack · Soldiers + one die','Attack an adjacent rival. Hills and Cities help defend. Ties favour the defender.']
+ ],
+ story:[
+  ['The Crown Without a King','This kingdom and its eight tycoons are fictional. The king has died and the rival claimants agree that the next sovereign must link the divided towns, ports and mines by rail.'],
+  ['Steam · The first wagers','The kingdom’s new railway charter creates fortunes almost overnight. Augusta courts the nobility, Silas lays ingenious track, and the working gangs demand a share of prosperity.'],
+  ['Iron · Power changes hands','Heavy factories and fast routes draw bankers, soldiers and gamblers into the struggle. Every City becomes an argument about who deserves the throne.'],
+  ['Electric · The final reckoning','Signals race along the wires, illuminated stations appear and the railway race reaches its climax. A connected realm needs a ruler: you.'],
+  ['Eight rivals','Lady Augusta Blackwood · Silas Brunel-Crane · “Lucky” Jack Hartigan · Mrs Ada Pennyworth · Colonel Rupert Fairfax · Nell Thackery · Professor Ottoline Vex · Mr Ezra Coldwell.']
+ ],
+ history:[
+  ['1830 · A real turning point','The Liverpool and Manchester Railway opened on 15 September 1830, helping to demonstrate regular intercity steam railway travel and freight.'],
+  ['1856 · Stronger steel','Henry Bessemer patented a process for making steel much more cheaply, helping fuel railway and bridge building.'],
+  ['1880s · Signals and electric light','Telegraph systems spread along railways. Electric lighting appeared in some public buildings, but most homes were not electrified until decades later.'],
+  ['Where history ends','These milestones are historical; the succession, kingdom, railway titles and characters in Iron Crown are original fiction. Historical background: Science Museum Group and London Museum.']
+ ]
+};
+const pocketOverview='<p class="pocket-lead">First to <strong>10 Prestige in Quick</strong> or <strong>15 in Standard/Advanced</strong> after Reveal wins. Otherwise the highest Prestige at the end takes the Crown. Nobody is eliminated.</p><div class="pocket-flow"><span>INCOME</span><b>→</b><span>2 ORDERS</span><b>→</b><span>REVEAL</span></div>';
+let pocketSelection='start';
+function openPocketGuide(page='start'){
+ overlayFocusReturn=document.activeElement;
+ pocketSelection=Object.hasOwn(pocketPages,page)?page:'start';
+ const overlay=$('rulesOverlay');
+ overlay.classList.remove('hidden');
+ overlay.setAttribute('aria-label','How to Play and Kingdom Chronicle');
+ overlay.innerHTML='<section class="card gold pocket-handbook"><div class="eyebrow">YOUR POCKET HANDBOOK</div><h1>How to Play</h1>'+
+  '<div class="pocket-tabs" role="group" aria-label="Rulebook chapters">'+
+  [['start','Start here'],['actions','Seven actions'],['story','Kingdom lore'],['history','Real history']].map(t=>'<button type="button" class="btn alt" data-page="'+t[0]+'" aria-pressed="'+(t[0]===pocketSelection)+'">'+t[1]+'</button>').join('')+'</div>'+
+  '<div class="pocket-guide-body" id="pocketPage" tabindex="0"></div>'+
+  '<button class="btn" type="button" id="closeRules">Back to the game</button></section>';
+ const draw=()=>{
+  $('pocketPage').innerHTML=(pocketSelection==='start'?pocketOverview:'')+
+   pocketPages[pocketSelection].map((item,i)=>'<article class="pocket-guide-step"><h2>'+esc(item[0])+'</h2><p>'+esc(item[1])+'</p></article>').join('')+
+   (pocketSelection==='start'?'<p class="pocket-footnote">Steam → Iron → Electric. Pick an Upgrade each era. Advanced mode adds events and special tycoon perks.</p>':'');
+  overlay.querySelectorAll('[data-page]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.page===pocketSelection)));
+  $('pocketPage').scrollTop=0;
+ };
+ overlay.querySelectorAll('[data-page]').forEach(b=>b.onclick=()=>{pocketSelection=b.dataset.page;draw();});
+ $('closeRules').onclick=closeOverlay;draw();
+ overlay.querySelector('[data-page="'+pocketSelection+'"]').focus();
+}
+const PHONE_CUES=new Set(['ui-select','ui-confirm','dice-roll']);
+let phoneAudioEnabled=false,phoneLastCue=0,phoneLastAudio=null;
+try{phoneAudioEnabled=localStorage.getItem('ironPhoneSound')==='on';}catch{}
+function updatePhoneSound(){
+ const button=$('phoneSoundBtn');if(!button)return;
+ button.textContent=phoneAudioEnabled?'♪ On':'♪ Off';
+ button.setAttribute('aria-pressed',String(phoneAudioEnabled));
+ button.setAttribute('aria-label',phoneAudioEnabled?'Turn phone sound effects off':'Turn phone sound effects on');
+}
+function playPhoneCue(key){
+ if(!phoneAudioEnabled||!PHONE_CUES.has(key)||document.visibilityState==='hidden')return;
+ if(Date.now()-phoneLastCue<160)return;phoneLastCue=Date.now();
+ try{
+  if(phoneLastAudio){phoneLastAudio.pause();phoneLastAudio.currentTime=0;}
+  const a=new Audio('/audio/'+key+'.mp3');
+  a.preload='auto';a.volume=key==='dice-roll'?.36:.25;
+  a.play().catch(()=>{});phoneLastAudio=a;
+ }catch{}
+}
+function togglePhoneSound(){
+ phoneAudioEnabled=!phoneAudioEnabled;
+ try{localStorage.setItem('ironPhoneSound',phoneAudioEnabled?'on':'off');}catch{}
+ if(!phoneAudioEnabled&&phoneLastAudio){phoneLastAudio.pause();phoneLastAudio=null;}
+ updatePhoneSound();
+ if(phoneAudioEnabled)playPhoneCue('ui-confirm');
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&phoneLastAudio){phoneLastAudio.pause();phoneLastAudio=null;}});
 document.addEventListener('keydown',e=>{
  const overlay=$('rulesOverlay');if(overlay.classList.contains('hidden'))return;
  if(e.key==='Escape'){e.preventDefault();closeOverlay();return;}
@@ -397,6 +517,9 @@ document.addEventListener('keydown',e=>{
  if(e.shiftKey&&(document.activeElement===first||document.activeElement===overlay)){e.preventDefault();last.focus();}
  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}
 });
-$('rules').onclick=()=>{overlayFocusReturn=document.activeElement;$('rulesOverlay').innerHTML=`<section class="card gold"><div class="eyebrow">A pocket rulebook</div><h1>How to Play</h1>${ruleCopy.map(([t,v])=>`<div class="ticket"><h3>${t}</h3><p>${v}</p></div>`).join('')}<button class="btn" id="closeRules">Back to the game</button></section>`;$('rulesOverlay').classList.remove('hidden');$('closeRules').onclick=closeOverlay;$('closeRules').focus();};
+$('rules').onclick=()=>openPocketGuide('start');
+$('storyBtn').onclick=()=>openPocketGuide('story');
+$('phoneSoundBtn').onclick=togglePhoneSound;
+updatePhoneSound();
 render();connect();
 </script></body></html>
