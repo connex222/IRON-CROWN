@@ -1,8 +1,8 @@
 {
   "name": "iron-crown",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "private": true,
-  "description": "Iron Crown — a shared-TV Victorian railway empire game with private phone controllers",
+  "description": "Iron Crown \u2014 a shared-TV Victorian railway empire game with private phone controllers",
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {

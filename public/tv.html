@@ -61,7 +61,7 @@
 /* High-contrast controls on the permanently dark TV command bar. */
 .bar .btn.alt{color:#f9edd3;background:#f3d89716;border-color:#b59a67}
 .bar .btn.alt:hover{background:#f3d8972f}
-/* Phase 3.5: human portraits with server-authoritative visual reaction framing. */
+/* Phase 3.5 — human portraits stay consistent in TV, gallery, and notices. */
 img[data-mood="smug"]{box-shadow:0 0 0 3px #e5be59,0 0 18px #d8ac3b85}
 img[data-mood="furious"]{box-shadow:0 0 0 3px #d96e5f,0 0 18px #b8343485}
 /* Phase 3 continuation — era-tuned premium board and live human expressions. */
@@ -106,8 +106,51 @@ body[data-era="electric"] .board-overlay,body[data-era="electric"] .board-trophi
 #galleryBtn{border-color:#ae914b}
 @media(max-width:850px){.tycoon-gallery-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.gallery-feature{grid-template-columns:130px 1fr}.gallery-feature img{width:130px}}
 @media(prefers-reduced-motion:reduce){.gallery-tile{transition:none}}
+
+.visually-hidden{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+/* Phase 6 — theatrical railway spectacle. Animation always remains optional. */
+.cinema-layer{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden;isolation:isolate}
+.era-curtain{position:absolute;inset:0;display:grid;place-content:center;text-align:center;gap:12px;opacity:0;visibility:hidden;background:radial-gradient(ellipse at 50% 35%,#c9a45e9c,#1b201eea 70%);color:#fff0ce;text-shadow:0 4px 18px #050b0b;letter-spacing:.04em;border:0}
+.era-curtain .era-small{font:700 14px Georgia,serif;letter-spacing:.3em;color:#f1c963}
+.era-curtain strong{font:700 clamp(34px,5.5vw,68px) Georgia,serif;letter-spacing:.12em}
+.era-curtain .era-detail{font:500 17px system-ui,sans-serif;letter-spacing:.08em}
+.era-curtain.iron{background:radial-gradient(ellipse at 50% 35%,#b8905999,#31271deb 72%)}
+.era-curtain.electric{background:radial-gradient(ellipse at 50% 35%,#a5c9cf8a,#071a2beb 72%)}
+.era-curtain.is-visible{visibility:visible;animation:eraArrival 3.1s ease-in-out both}
+@keyframes eraArrival{0%{opacity:0;transform:translateY(20px)}19%,68%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-20px)}}
+.cinema-flash{position:absolute;inset:0;opacity:0;background:radial-gradient(ellipse at 50% 45%,#e8c77766,transparent 75%)}
+.cinema-flash.flash{animation:cinemaFlash 1.25s ease-out}
+.cinema-flash.clash{background:radial-gradient(ellipse at 50% 50%,#de615866,transparent 72%)}
+@keyframes cinemaFlash{0%{opacity:0}24%{opacity:.9}100%{opacity:0}}
+#map .cinema-highlight{animation:trackSpotlight 2.1s ease-out both}
+@keyframes trackSpotlight{0%{filter:drop-shadow(0 0 18px #ffe38e) brightness(1.65)}100%{filter:none}}
+.cinema-dice{display:flex;justify-content:center;flex-wrap:wrap;gap:14px;margin:8px auto 16px}
+.cinema-die{display:grid;place-items:center;width:70px;height:77px;padding:5px;border:2px solid #e7c983;border-radius:12px;background:linear-gradient(145deg,#fcf2d4,#b28e55);color:#21160e;box-shadow:0 12px 16px #0709068f}
+.cinema-die strong{font:700 29px Georgia,serif;line-height:1}
+.cinema-die small{font:700 11px system-ui,sans-serif;color:#3e3423;white-space:nowrap;max-width:62px;overflow:hidden;text-overflow:ellipsis}
+.actor-notice .cinema-die{animation:diceLand .5s cubic-bezier(.2,.9,.3,1.2) both}
+.actor-notice .cinema-die:nth-child(2){animation-delay:.11s}
+.actor-notice .cinema-die:nth-child(3){animation-delay:.2s}
+@keyframes diceLand{0%{opacity:0;transform:translateY(-44px) rotate(-32deg) scale(.7)}70%{transform:translateY(7px) rotate(9deg)}100%{opacity:1;transform:none}}
+#map .engine-smoke{fill:#eff0e6;opacity:.52;filter:drop-shadow(0 0 2px #eef1e9a8)}
+#map .engine-smoke circle{animation:steamWisp 1.5s ease-out infinite}
+#map .engine-smoke circle:nth-child(2){animation-delay:.5s}
+#map .engine-smoke circle:nth-child(3){animation-delay:1s}
+@keyframes steamWisp{0%{opacity:.82;transform:translateY(0) scale(.5)}100%{opacity:0;transform:translateY(-22px) translateX(6px) scale(1.8)}}
+.board-frame.iron #map .moving-train{filter:drop-shadow(0 0 4px #e9be83)}
+.board-frame.electric #map .moving-train{filter:drop-shadow(0 0 7px #ffebad)}
+.audio-mixer{display:grid;gap:17px;margin:15px 0 24px}
+.audio-mixer label{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:17px;font-weight:700}
+.audio-mixer input[type=range]{width:100%;accent-color:#bd9040;min-height:32px}
+.audio-mixer .audio-detail{font-size:13px;color:var(--muted);line-height:1.45}
+.audio-mixer .audio-status{padding:9px 12px;border:1px solid var(--line);border-radius:10px}
+@media(prefers-reduced-motion:reduce){.era-curtain.is-visible,.cinema-flash.flash,#map .cinema-highlight,.actor-notice .cinema-die,#map .engine-smoke circle{animation:none}.era-curtain,.cinema-flash{display:none}#map .moving-train{display:none}}
+body.minimal-motion .era-curtain,body.minimal-motion .cinema-flash{display:none!important}
+body.minimal-motion .cinema-die,body.minimal-motion #map .engine-smoke circle,body.minimal-motion #map .cinema-highlight{animation:none!important}
+body.minimal-motion #map .moving-train{display:none!important}
+
 </style></head><body>
-<header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn alt small" id="rulesBtn">Rules</button><button class="btn alt small" id="soundBtn">♫ Sound off</button></div></header>
+<header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn alt small" id="rulesBtn">Rules</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
 <div id="connection" class="hidden">Reconnecting…</div>
 <section class="hero-premium" id="lobby" aria-label="Iron Crown railway parlour">
   <div class="hero-haze" aria-hidden="true"></div>
@@ -135,12 +178,15 @@ body[data-era="electric"] .board-overlay,body[data-era="electric"] .board-trophi
      <div><img src="/art/avatars/augusta_human.png?v=1.5.0" alt=""><span>THE DUCHESS</span></div><div><img src="/art/avatars/silas_human.png?v=1.5.0" alt=""><span>THE ENGINEER</span></div><div><img src="/art/avatars/jack_human.png?v=1.5.0" alt=""><span>THE GAMBLER</span></div><div><img src="/art/avatars/ada_human.png?v=1.5.0" alt=""><span>THE BANKER</span></div><div><img src="/art/avatars/rupert_human.png?v=1.5.0" alt=""><span>THE COLONEL</span></div><div><img src="/art/avatars/nell_human.png?v=1.5.0" alt=""><span>THE UNION BOSS</span></div><div><img src="/art/avatars/ottoline_human.png?v=1.5.0" alt=""><span>THE INVENTOR</span></div><div><img src="/art/avatars/ezra_human.png?v=1.5.0" alt=""><span>THE SMUGGLER</span></div>
   </div></div>
 </section>
-<section id="game" class="hidden"><div class="game-layout"><aside id="roster" class="roster"></aside><main class="board-frame" id="boardFrame"><svg id="map" viewBox="0 0 850 690" role="img" aria-label="Isometric Iron Crown railway country with resource terrain and owned routes"></svg><div class="map-tools" aria-label="Map controls"><button id="zoomIn" title="Zoom in on country" aria-label="Zoom in">+</button><button id="zoomOut" title="Zoom out on country" aria-label="Zoom out">−</button><button id="zoomReset" title="Show whole country" aria-label="Reset map zoom">⌂</button><button id="labelToggle" title="Show or hide town names" aria-label="Toggle town labels">Aa</button></div><div id="mapLegend" class="map-legend" aria-label="Map key"></div><div id="mapTooltip" class="map-tooltip hidden" role="status" aria-live="polite"></div><div id="boardInfo" class="board-overlay"></div><div id="boardTrophies" class="board-trophies"></div></main></div><footer class="ticker"><span class="eyebrow">THE DAILY GAZETTE</span><div id="news" class="news">No news from the Empire.</div><span id="scoreGoal">★ 15 to win</span></footer></section>
-<div id="notice" class="notice hidden"></div><div id="modalShade" class="modal-shade hidden"><div class="modal" id="modal"></div></div>
+<section id="game" class="hidden"><div class="game-layout"><aside id="roster" class="roster"></aside><main class="board-frame" id="boardFrame"><svg id="map" viewBox="0 0 850 690" role="img" aria-label="Isometric Iron Crown railway country with resource terrain and owned routes"></svg><div class="map-tools" aria-label="Map controls"><button id="zoomIn" title="Zoom in on country" aria-label="Zoom in">+</button><button id="zoomOut" title="Zoom out on country" aria-label="Zoom out">−</button><button id="zoomReset" title="Show whole country" aria-label="Reset map zoom">⌂</button><button id="labelToggle" title="Show or hide town names" aria-label="Toggle town labels">Aa</button></div><div id="mapLegend" class="map-legend" aria-label="Map key"></div><div id="mapTooltip" class="map-tooltip hidden" role="status" aria-live="polite"></div><div id="cinemaLayer" class="cinema-layer" aria-hidden="true"><div id="eraCurtain" class="era-curtain"><div class="era-small">A NEW INDUSTRIAL AGE</div><strong id="eraCurtainTitle">STEAM</strong><div class="era-detail" id="eraCurtainDetail"></div></div><div id="cinemaFlash" class="cinema-flash"></div></div><div id="boardInfo" class="board-overlay"></div><div id="boardTrophies" class="board-trophies"></div></main></div><footer class="ticker"><span class="eyebrow">THE DAILY GAZETTE</span><div id="news" class="news">No news from the Empire.</div><span id="scoreGoal">★ 15 to win</span></footer></section>
+<div id="notice" class="notice hidden"></div><div id="cinemaLive" class="visually-hidden" role="status" aria-live="polite"></div><div id="modalShade" class="modal-shade hidden"><div class="modal" id="modal"></div></div>
 <script>
 'use strict';
 const $=id=>document.getElementById(id),icons={coal:'⚒',forest:'♠',farm:'❀',steel:'⚙',town:'⌂',hill:'▲',lake:'≈',capital:'♛'}, colours={coal:['#645d53','#373a3b'],forest:['#4f7858','#294c37'],farm:['#cda852','#927b3e'],steel:['#8c6f56','#634b47'],town:['#d6b28b','#98735f'],hill:['#819175','#4d624a'],lake:['#7bb0bb','#3b758f'],capital:['#d3ae62','#946b38']};
 let ws,publicState=null,hostToken=null,code=null,seenSeq=0,prevStatus='',noticeTimer=null,muted=true,audioCtx=null,musicTick=null;
+let lastEra=null,cinemaReady=false,eraRelease=null,flashRelease=null,highlightRelease=null;
+const prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+const motionOff=()=>prefersReduced.matches||document.body.classList.contains('minimal-motion');
 let mapZoom=1, mapLabelled=true, mapPan={x:0,y:0}, mapRaf=0, cameraRelease=null, mapHovered=null;
 const escapeHTML=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const say=(kind,data)=>ws&&ws.readyState===1?ws.send(JSON.stringify({type:'action',kind,...data})):error('Not connected.');
@@ -150,8 +196,8 @@ function connect(){const stored=JSON.parse(localStorage.getItem('ironHost')||'nu
  ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.type==='welcome'){code=m.code;hostToken=m.token;localStorage.setItem('ironHost',JSON.stringify({code,token:hostToken}));updateQR();}if(m.type==='state'){publicState=m.public;render();}if(m.type==='error'){if(m.message==='Host room not found.'&&stored){localStorage.removeItem('ironHost');ws.close();return;}error(m.message);}}catch(err){console.error(err);}};
  ws.onclose=()=>{$('connection').classList.remove('hidden');setTimeout(connect,1400);};ws.onerror=()=>{};}
 const actorMood=(p)=>p?.reactionUntil>Date.now()&&['smug','furious'].includes(p.reaction)?p.reaction:'neutral';
-const avatarIds=['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'];
 const avatarFor=(p,mood)=>`/art/avatars/${avatarIds.includes(p?.avatar)?p.avatar:'augusta'}_human.png?v=1.5.0`;
+const avatarIds=['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'];
 const actorTitles={augusta:'THE DUCHESS',silas:'THE ENGINEER',jack:'THE GAMBLER',ada:'THE BANKER',rupert:'THE COLONEL',nell:'THE UNION BOSS',ottoline:'THE INVENTOR',ezra:'THE SMUGGLER'};
 const avatarImage=(p,sz=44)=>`<img class="portrait" width="${sz}" height="${sz}" style="width:${sz}px;height:${sz}px;border-color:${p?.avatar?avatar(p.avatar).colour:'#7d755c'}" src="${avatarFor(p)}" data-player-avatar="${p?.id||''}" data-mood="${actorMood(p)}" alt="">`;
 const avatar=id=>[{id:'augusta',colour:'#B3261E'},{id:'silas',colour:'#1F4FA8'},{id:'jack',colour:'#1E7A46'},{id:'ada',colour:'#C99A2E'},{id:'rupert',colour:'#22305A'},{id:'nell',colour:'#C2571A'},{id:'ottoline',colour:'#6B3FA0'},{id:'ezra',colour:'#167B7B'}].find(a=>a.id===id)||{colour:'#7d755c'};
@@ -160,8 +206,11 @@ document.addEventListener('error',ev=>{const img=ev.target;if(!(img instanceof H
 function render(){if(!publicState)return;const s=publicState;document.body.dataset.era=s.era;
  $('lobby').classList.toggle('hidden',s.status!=='lobby');$('game').classList.toggle('hidden',s.status==='lobby');
  $('top-status').textContent=s.status==='lobby'?'THE RAILWAY EMPIRE':`${s.era.toUpperCase()} ERA  ·  ROUND ${s.round}/${s.totalRounds}  ·  ${s.status.toUpperCase()}  ·  ${remaining(s.deadline)}`;
- if(s.status==='lobby'){renderLobby();return;}
+ if(s.status==='lobby'){lastEra=null;cinemaReady=false;renderLobby();return;}
  renderRoster();if(s.seq!==seenSeq||prevStatus!==s.status){renderMap(s);renderBoard(s);renderFx(s);focusAction(s);seenSeq=s.seq;}
+ if((lastEra&&lastEra!==s.era)||(prevStatus==='placement'&&s.status==='draft'))startEraSequence(s.era);
+ lastEra=s.era;
+ if(prevStatus!==s.status){syncEngineAudio(s.status);if(s.status==='income'){playCue('train-whistle');playCue('steam-release');}}
  if(prevStatus!==s.status&&s.status==='finished')showResults();
  prevStatus=s.status;
 }
@@ -218,7 +267,7 @@ function renderMap(s){
  for(const route of s.routes){
   const path=route.path.map((tid,i)=>{const p=geometry(byId[tid]);return `${i?'L':'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;}).join(' ');
   const person=people[route.owner],ownerColour=person?avatar(person.avatar).colour:null;
-  routes+=route.owner?`<g class="built-rail ${route.blocked?'rail-closed':''}" data-route="${route.id}"><path d="${path}" fill="none" stroke="#312c28" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#d4c3a0" stroke-width="12" stroke-dasharray="4 8" stroke-linecap="butt"/><path d="${path}" fill="none" stroke="${route.blocked?'#c33d3d':ownerColour}" stroke-width="6" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#ffe5a8" stroke-width="1.7" opacity=".95"/>${s.status==='income'&&!route.blocked?`<g class="moving-train"><g transform="translate(-9,-8)"><rect x="0" y="-3" width="18" height="15" rx="3" fill="${ownerColour}" stroke="#f9e4ac" stroke-width="2"/><rect x="3" y="-13" width="11" height="11" fill="#443c33"/><rect x="14" y="-11" width="5" height="13" fill="#a98457"/><circle cx="3" cy="13" r="4" fill="#201e19" stroke="#e8c984"/><circle cx="16" cy="13" r="4" fill="#201e19" stroke="#e8c984"/></g><animateMotion dur="${Math.max(3,route.segments*.7)}s" repeatCount="indefinite" rotate="auto" path="${path}"/></g>`:''}</g>`:
+  routes+=route.owner?`<g class="built-rail ${route.blocked?'rail-closed':''}" data-route="${route.id}"><path d="${path}" fill="none" stroke="#312c28" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#d4c3a0" stroke-width="12" stroke-dasharray="4 8" stroke-linecap="butt"/><path d="${path}" fill="none" stroke="${route.blocked?'#c33d3d':ownerColour}" stroke-width="6" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#ffe5a8" stroke-width="1.7" opacity=".95"/>${s.status==='income'&&!route.blocked?`<g class="moving-train"><g transform="translate(-9,-8)"><g class="engine-smoke"><circle cx="17" cy="-16" r="3"/><circle cx="19" cy="-16" r="3"/><circle cx="20" cy="-16" r="3"/></g><rect x="0" y="-3" width="18" height="15" rx="3" fill="${ownerColour}" stroke="#f9e4ac" stroke-width="2"/><rect x="3" y="-13" width="11" height="11" fill="#443c33"/><rect x="14" y="-11" width="5" height="13" fill="#a98457"/><circle cx="3" cy="13" r="4" fill="#201e19" stroke="#e8c984"/><circle cx="16" cy="13" r="4" fill="#201e19" stroke="#e8c984"/></g><animateMotion dur="2.25s" repeatCount="indefinite" rotate="auto" path="${path}"/></g>`:''}</g>`:
   `<g class="prospect-rail" data-route="${route.id}"><path d="${path}" stroke="#392d22" stroke-width="5" opacity=".45" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/><path d="${path}" stroke="#f1d8a2" stroke-width="2.2" opacity=".7" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/></g>`;
  }
  const defs=`<defs><linearGradient id="terrainLight" x1=".12" x2=".82" y1="0" y2="1"><stop stop-color="#fff7c9"/><stop offset=".7" stop-color="#fffbd8" stop-opacity="0"/><stop offset="1" stop-color="#172a26"/></linearGradient><linearGradient id="lakeWater" x1="0" x2=".75" y1="0" y2="1"><stop stop-color="#b8e2d5"/><stop offset=".55" stop-color="#5ea5b0"/><stop offset="1" stop-color="#317c96"/></linearGradient><radialGradient id="mapVignette"><stop stop-color="#f8f0cd" stop-opacity=".04"/><stop offset="1" stop-color="#0b1c1e" stop-opacity=".25"/></radialGradient><filter id="soilShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="12"/></filter></defs>`;
@@ -232,7 +281,7 @@ function renderMap(s){
 function showTileInfo(id){const s=publicState,t=s?.tiles.find(x=>x.id===id);if(!t)return;const owner=s.players.find(p=>p.id===t.owner),type={coal:'Coalfield · +1 Coal',forest:'Forest · +1 Timber',farm:'Farmland · +1 Grain',steel:'Steelworks · +1 Steel',town:'Market Town · +1 Gold (City: +2)',hill:'Hills · +1 defence',lake:'Lake · impassable',capital:'Capital · unclaimable'}[t.type];$('mapTooltip').innerHTML=`<strong>${svgEscape(t.name||t.type[0].toUpperCase()+t.type.slice(1))}</strong><span>${svgEscape(type)}</span><span>${owner?'Flag: '+svgEscape(owner.name)+' · Soldiers: '+t.soldiers:'Neutral territory'}${t.city?' · City':''}</span>`;$('mapTooltip').classList.remove('hidden');}
 function showRouteInfo(id){const s=publicState,r=s?.routes.find(x=>x.id===id);if(!r)return;const get=t=>s.tiles.find(x=>x.id===t)?.name||'The countryside';const owner=s.players.find(p=>p.id===r.owner);$('mapTooltip').innerHTML=`<strong>${svgEscape(get(r.a))} – ${svgEscape(get(r.b))}</strong><span>${r.segments} segments · ${r.segments} Timber + ${r.segments} Steel</span><span>${owner?'Owned by '+svgEscape(owner.name):'Unclaimed railway'}${r.blocked?' · Bridge closed':''}${r.a==='0,0'||r.b==='0,0'?' · Capital connection bonus':''}</span>`;$('mapTooltip').classList.remove('hidden');}
 function applyCamera(){const view=$('cameraLayer');if(!view)return;const z=mapZoom;view.setAttribute('transform',`translate(${425*(1-z)+mapPan.x} ${344*(1-z)+mapPan.y}) scale(${z})`);}
-function focusAction(s){const last=s.feed.at(-1);if(!last||s.status==='income'||s.status==='plan'||s.status==='draft'||s.status==='placement'){mapPan={x:0,y:0};applyCamera();return;}
+function focusAction(s){if(motionOff()){mapPan={x:0,y:0};applyCamera();return;}const last=s.feed.at(-1);if(!last||s.status==='income'||s.status==='plan'||s.status==='draft'||s.status==='placement'){mapPan={x:0,y:0};applyCamera();return;}
  const id=last.tile||(last.route&&s.routes.find(r=>r.id===last.route)?.path[Math.floor((s.routes.find(r=>r.id===last.route)?.path.length||2)/2)]);
  const t=s.tiles.find(t=>t.id===id);if(!t)return;const p=geometry(t);
  const start={...mapPan},target={x:(425-p.x)*mapZoom*.65,y:(344-p.y)*mapZoom*.65};const began=performance.now();cancelAnimationFrame(mapRaf);
@@ -256,8 +305,51 @@ function renderBoard(s){let msg='',hint='';
  $('boardTrophies').innerHTML=`<span>🚂 Longest Railway · <b>${escapeHTML(find(s.trophies?.rail))}</b></span><span>⚔ Largest Army · <b>${escapeHTML(find(s.trophies?.army))}</b></span>`;
  $('news').textContent=s.feed.at(-1)?.message||'The country awaits its railway tycoons.';$('scoreGoal').textContent=`★ ${s.winTarget} to win`;
 }
-function renderFx(s){const fx=s.feed.filter(x=>x.seq>seenSeq);for(const item of fx){if(['clash','city','track','win','era','income'].includes(item.kind))playFX(item.kind);if(item.kind==='clash')showActorNotice('⚔ THE CLASH',item,2700);if(item.kind==='win')showActorNotice('♛ THE CROWN',item,5000);if(item.kind==='city')showActorNotice('♜ A NEW CITY',item,2600);if(item.kind==='ticket')showActorNotice('★ DESTINATION FULFILLED',item,2600);if(item.kind==='trophy')showActorNotice(item.change==='lost'?'◈ TROPHY LOST':'♛ TROPHY CLAIMED',item,2600);if(item.kind==='era'&&s.status==='draft')showNotice(`${s.era.toUpperCase()} ERA`,'A new age begins. Choose an Upgrade!',2600);}}
-function showActorNotice(heading,item,ms){const ids=item.kind==='clash'&&Array.isArray(item.results)?item.results.map(r=>r.id):[item.player];const actors=ids.map(id=>publicState.players.find(p=>p.id===id)).filter(Boolean).slice(0,4);clearTimeout(noticeTimer);$('notice').classList.add('actor-notice');$('notice').innerHTML=`<div class="eyebrow">THE DAILY GAZETTE</div><h2>${escapeHTML(heading)}</h2><div class="clash-actors">${actors.map(p=>`<div><img src="${avatarFor(p)}" data-mood="${item.kind==='trophy'&&item.change==='lost'?'furious':p.id===item.player?'smug':'furious'}" alt="${escapeHTML(p.name)}"><div class="actor-label">${escapeHTML(p.name)}</div></div>`).join('')}</div><p>${escapeHTML(item.message)}</p>`;$('notice').classList.remove('hidden');noticeTimer=setTimeout(()=>{$('notice').classList.add('hidden');$('notice').classList.remove('actor-notice');},ms);}
+function startEraSequence(era){
+ if(motionOff())return;
+ const curtain=$('eraCurtain');if(!curtain)return;
+ clearTimeout(eraRelease);curtain.className='era-curtain '+era;void curtain.offsetWidth;
+ const names={steam:'THE AGE OF STEAM',iron:'THE IRON AGE',electric:'THE ELECTRIC AGE'};
+ const descriptions={steam:'Coal, courage and the first great engines',iron:'Steel viaducts. New fortunes.',electric:'The kingdom awakens in electric light'};
+ $('eraCurtainTitle').textContent=names[era]||era.toUpperCase();$('eraCurtainDetail').textContent=descriptions[era]||'';
+ curtain.classList.add('is-visible');$('cinemaLive').textContent=names[era]||'';
+ eraRelease=setTimeout(()=>curtain.classList.remove('is-visible'),3200);
+}
+function flashBoard(kind='gold'){
+ if(motionOff())return;const el=$('cinemaFlash');if(!el)return;
+ clearTimeout(flashRelease);el.className='cinema-flash';void el.offsetWidth;
+ el.classList.add('flash');if(kind==='clash')el.classList.add('clash');
+ flashRelease=setTimeout(()=>el.className='cinema-flash',1350);
+}
+function spotlightAction(item){
+ if(motionOff())return;
+ let node=null;
+ if(item.tile)node=[...$('map').querySelectorAll('.land-hex')].find(n=>n.dataset.tile===item.tile);
+ if(!node&&item.route)node=[...$('map').querySelectorAll('.built-rail')].find(n=>n.dataset.route===item.route);
+ if(!node)return;
+ $('map').querySelectorAll('.cinema-highlight').forEach(n=>n.classList.remove('cinema-highlight'));
+ clearTimeout(highlightRelease);void node.getBoundingClientRect();node.classList.add('cinema-highlight');
+ highlightRelease=setTimeout(()=>node.classList.remove('cinema-highlight'),2200);
+}
+const eventCues={build:'depot-build',track:'track-lay',city:'city-build',income:'coin-clink',clash:'dice-roll',trade:'coin-clink',research:'ui-confirm',ticket:'ui-confirm',trophy:'ui-confirm',era:'era-fanfare',win:'victory-fanfare'};
+function renderFx(s){
+ if(!cinemaReady){cinemaReady=true;return;}
+ const fx=s.feed.filter(x=>x.seq>seenSeq).slice(-6);
+ for(const item of fx){
+  if(eventCues[item.kind])playCue(eventCues[item.kind]);
+  if(['build','track','city','clash'].includes(item.kind))spotlightAction(item);
+  if(['city','clash','track','trophy','win'].includes(item.kind))flashBoard(item.kind);
+  if(item.kind==='clash')showActorNotice('⚔ THE CLASH',item,2800);
+  if(item.kind==='win')showActorNotice('♛ THE CROWN',item,5000);
+  if(item.kind==='city')showActorNotice('♜ A NEW CITY',item,2500);
+  if(item.kind==='ticket')showActorNotice('★ DESTINATION FULFILLED',item,2500);
+  if(item.kind==='trophy')showActorNotice(item.change==='lost'?'◈ TROPHY LOST':'♛ TROPHY CLAIMED',item,2500);
+  if(item.kind==='clash'){setTimeout(()=>playCue('clash-impact'),420);setTimeout(()=>playCue('crowd-gasp'),800);}
+  if(item.kind==='win')setTimeout(()=>playCue('crowd-cheer'),850);
+  $('cinemaLive').textContent=item.message;
+ }
+}
+function showActorNotice(heading,item,ms){const ids=item.kind==='clash'&&Array.isArray(item.results)?item.results.map(r=>r.id):[item.player];const actors=ids.map(id=>publicState.players.find(p=>p.id===id)).filter(Boolean).slice(0,4);clearTimeout(noticeTimer);$('notice').classList.add('actor-notice');$('notice').innerHTML=`<div class="eyebrow">THE DAILY GAZETTE</div><h2>${escapeHTML(heading)}</h2><div class="clash-actors">${actors.map(p=>`<div><img src="${avatarFor(p)}" data-mood="${item.kind==='trophy'&&item.change==='lost'?'furious':p.id===item.player?'smug':'furious'}" alt="${escapeHTML(p.name)}"><div class="actor-label">${escapeHTML(p.name)}</div></div>`).join('')}</div>${item.kind==='clash'&&Array.isArray(item.results)?`<div class="cinema-dice" aria-label="Clash dice results">${item.results.slice(0,4).map(r=>`<div class="cinema-die"><strong>${Number(r.roll)||1}</strong><small>${escapeHTML(publicState.players.find(p=>p.id===r.id)?.name||'Tycoon')}</small></div>`).join('')}</div>`:''}<p>${escapeHTML(item.message)}</p>`;$('notice').classList.remove('hidden');noticeTimer=setTimeout(()=>{$('notice').classList.add('hidden');$('notice').classList.remove('actor-notice');},ms);}
 
 function showNotice(heading,message,ms=3000){clearTimeout(noticeTimer);$('notice').classList.remove('actor-notice');$('notice').innerHTML=`<div class="eyebrow">THE DAILY GAZETTE</div><h2>${escapeHTML(heading)}</h2><p>${escapeHTML(message)}</p>`;$('notice').classList.remove('hidden');noticeTimer=setTimeout(()=>$('notice').classList.add('hidden'),ms);}
 const galleryActors=[
@@ -284,8 +376,88 @@ const rules=[['The objective','Earn 15 Prestige in Standard or Advanced, or 10 i
 $('galleryBtn').onclick=showTycoons;document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
 $('rulesBtn').onclick=()=>{$('modal').innerHTML=`<div class="eyebrow">How to play</div><h2>The Iron Crown Rulebook</h2><div class="rules-grid">${rules.map(([a,b])=>`<article><h3>${a}</h3><p>${b}</p></article>`).join('')}</div><div class="footer-actions"><button class="btn" onclick="closeModal()">Return to the kingdom</button></div>`;$('modalShade').classList.remove('hidden');};
 $('modalShade').onclick=e=>{if(e.target===$('modalShade'))closeModal();};$('botBtn').onclick=()=>say('addAI',{});$('mode').onchange=e=>say('mode',{mode:e.target.value});$('startBtn').onclick=()=>say('start',{mode:$('mode').value});
-function playFX(kind){if(muted)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const now=audioCtx.currentTime;const patterns={income:[[440,.12],[660,.14]],track:[[220,.22],[330,.25],[440,.28]],city:[[330,.13],[440,.15],[550,.2]],clash:[[140,.16],[95,.25]],win:[[392,.19],[523,.19],[659,.24],[784,.43]],era:[[262,.2],[349,.24],[523,.32]]};let offset=0;for(const [hz,d] of patterns[kind]||[]){const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type=kind==='clash'?'sawtooth':'triangle';o.frequency.setValueAtTime(hz,now+offset);g.gain.setValueAtTime(.0001,now+offset);g.gain.exponentialRampToValueAtTime(.055,now+offset+.02);g.gain.exponentialRampToValueAtTime(.0001,now+offset+d);o.connect(g);g.connect(audioCtx.destination);o.start(now+offset);o.stop(now+offset+d);offset+=d*.7;}}catch{}}
-function ambience(){if(muted)return;try{audioCtx=audioCtx||new(window.AudioContext||window.webkitAudioContext)();const now=audioCtx.currentTime;[262,330,392,440,392,330,294,262].forEach((hz,i)=>{const o=audioCtx.createOscillator(),gain=audioCtx.createGain();o.type='sine';o.frequency.value=hz;gain.gain.setValueAtTime(.0001,now+i*.32);gain.gain.linearRampToValueAtTime(.012,now+i*.32+.035);gain.gain.exponentialRampToValueAtTime(.0001,now+i*.32+.28);o.connect(gain);gain.connect(audioCtx.destination);o.start(now+i*.32);o.stop(now+i*.32+.3);});}catch{}}$('soundBtn').onclick=()=>{muted=!muted;$('soundBtn').textContent=muted?'♫ Sound off':'♫ Sound on';if(musicTick)clearInterval(musicTick);if(!muted){playFX('era');ambience();musicTick=setInterval(ambience,2800);}};
+/* Only same-origin bundled audio is used. An optional local file replaces the
+   synthesised cue automatically; no audio asset means the playable fallback remains. */
+const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour'];
+let soundManifest=new Map(),soundManifestReady=false,masterVolume=.55,musicVolume=.18,railLoop=null,parlourLoop=null,engineLoop=null,lastCueAt=new Map();
+try{const cfg=JSON.parse(localStorage.getItem('ironCrownAudio')||'{}');muted=true;masterVolume=Math.max(0,Math.min(1,Number(cfg.master??.55)));musicVolume=Math.max(0,Math.min(1,Number(cfg.music??.18)));if(cfg.lessMotion)document.body.classList.add('minimal-motion');}catch{}
+function saveAudio(){try{localStorage.setItem('ironCrownAudio',JSON.stringify({enabled:!muted,master:masterVolume,music:musicVolume,lessMotion:document.body.classList.contains('minimal-motion')}));}catch{}}
+function updateAudioButton(){$('soundBtn').textContent=muted?'♫ Sound off':'♫ Sound on';$('soundBtn').setAttribute('aria-pressed',String(!muted));}
+async function scanBundledAudio(){
+ try{const r=await fetch('/audio/manifest.json',{cache:'no-store'});if(!r.ok)throw Error('No audio manifest');const data=await r.json();
+  soundManifest=new Map((data.files||[]).filter(f=>SOUND_KEYS.includes(f.replace(/\.(ogg|wav|mp3)$/,''))).map(f=>[f.replace(/\.(ogg|wav|mp3)$/,''),f]));
+  soundManifestReady=true;
+ }catch{soundManifest=new Map();soundManifestReady=false;}
+}
+function context(){if(!audioCtx){const AudioCtor=window.AudioContext||window.webkitAudioContext;if(!AudioCtor)return null;audioCtx=new AudioCtor();}if(audioCtx.state==='suspended')audioCtx.resume().catch(()=>{});return audioCtx;}
+function synthCue(key){
+ const ctx=context();if(!ctx)return;
+ const notes={
+ 'train-whistle':[[440,.48],[554,.42]],'train-chug':[[115,.12],[103,.15]],'steam-release':[[180,.3]],
+ 'track-lay':[[320,.11],[210,.14],[415,.13]],'depot-build':[[240,.14],[360,.18]],
+ 'city-build':[[262,.12],[330,.14],[392,.2],[523,.2]],'coin-clink':[[1050,.10],[1360,.15]],
+ 'dice-roll':[[130,.10],[178,.09],[140,.13]],'clash-impact':[[100,.28],[77,.36]],
+ 'crowd-gasp':[[440,.14],[390,.13]],'crowd-cheer':[[440,.13],[660,.18],[780,.22]],
+ 'era-fanfare':[[262,.2],[349,.2],[523,.3]],'victory-fanfare':[[392,.2],[523,.2],[659,.25],[784,.48]],
+ 'ui-select':[[740,.08]],'ui-confirm':[[622,.10],[880,.14]],'music-parlour':[[262,.22],[330,.22],[392,.22],[440,.22],[392,.22],[330,.22],[294,.22],[262,.35]]
+ };
+ let offset=0,now=ctx.currentTime+.005;
+ for(const [freq,duration] of notes[key]||[]){
+  const osc=ctx.createOscillator(),gain=ctx.createGain();osc.type=key==='clash-impact'||key==='train-chug'?'sawtooth':'triangle';
+  osc.frequency.setValueAtTime(freq,now+offset);gain.gain.setValueAtTime(.0001,now+offset);
+  gain.gain.exponentialRampToValueAtTime(Math.max(.0001,.055*masterVolume*(key==='music-parlour'?musicVolume*.42:1)),now+offset+.016);
+  gain.gain.exponentialRampToValueAtTime(.0001,now+offset+duration);
+  osc.connect(gain);gain.connect(ctx.destination);osc.start(now+offset);osc.stop(now+offset+duration+.02);
+  offset+=duration*.78;
+ }
+}
+function playCue(key){
+ if(muted||!SOUND_KEYS.includes(key))return;
+ const now=Date.now();if(now-(lastCueAt.get(key)||0)<180)return;lastCueAt.set(key,now);
+ const filename=soundManifest.get(key);
+ if(filename){
+  const audio=new Audio('/audio/'+filename);audio.volume=Math.min(1,masterVolume*(key==='coin-clink'?.72:.9));
+  audio.addEventListener('error',()=>synthCue(key),{once:true});audio.play().catch(()=>synthCue(key));
+ }else synthCue(key);
+}
+function stopAudioLoops(){if(musicTick){clearInterval(musicTick);musicTick=null;}for(const sound of [railLoop,parlourLoop,engineLoop]){if(sound){sound.pause();sound.currentTime=0;}}railLoop=null;parlourLoop=null;engineLoop=null;}
+function startAudioLoops(){
+ stopAudioLoops();if(muted)return;
+ for(const [name,setting] of [['ambience-railway','rail'],['music-parlour','music']]){
+  const file=soundManifest.get(name);if(!file)continue;
+  const audio=new Audio('/audio/'+file);audio.loop=true;audio.preload='auto';audio.volume=Math.min(1,masterVolume*(setting==='rail'?.25:musicVolume));
+  audio.play().catch(()=>{});if(setting==='rail')railLoop=audio;else parlourLoop=audio;
+ }
+ if(!soundManifest.has('music-parlour')&&musicVolume>0)musicTick=setInterval(()=>{if(!muted&&document.visibilityState==='visible')synthCue('music-parlour');},4900);
+ syncEngineAudio(publicState?.status);
+}
+function syncEngineAudio(status){
+ if(engineLoop){engineLoop.pause();engineLoop.currentTime=0;engineLoop=null;}
+ if(muted||status!=='income'||!soundManifest.get('train-chug'))return;
+ engineLoop=new Audio('/audio/'+soundManifest.get('train-chug'));engineLoop.loop=true;engineLoop.volume=Math.min(1,masterVolume*.28);engineLoop.play().catch(()=>{});
+}
+function applyLoopVolume(){if(railLoop)railLoop.volume=Math.min(1,masterVolume*.25);if(parlourLoop)parlourLoop.volume=Math.min(1,masterVolume*musicVolume);if(engineLoop)engineLoop.volume=Math.min(1,masterVolume*.28);}
+$('soundBtn').onclick=async()=>{
+ muted=!muted;context();updateAudioButton();saveAudio();
+ if(!muted){await scanBundledAudio();playCue('train-whistle');}
+ startAudioLoops();
+};
+$('audioSettingsBtn').onclick=()=>{
+ $('modal').innerHTML=`<div class="eyebrow">The railway parlour · Audio controls</div><h2>Sound &amp; motion</h2><div class="audio-mixer">
+ <div><label for="masterVol">Sound effects <span id="masterVal">${Math.round(masterVolume*100)}%</span></label><input id="masterVol" aria-label="Master sound volume" type="range" min="0" max="100" value="${Math.round(masterVolume*100)}"></div>
+ <div><label for="musicVol">Background music <span id="musicVal">${Math.round(musicVolume*100)}%</span></label><input id="musicVol" aria-label="Music volume" type="range" min="0" max="100" value="${Math.round(musicVolume*100)}"></div>
+ <div><label for="motionChoice">Reduce cinematic movement <input id="motionChoice" type="checkbox" ${motionOff()?'checked':''}></label><p class="audio-detail">Also follows your device's reduced-motion setting. The game remains fully playable without animations.</p></div>
+ <div id="soundInventory" class="audio-status" role="status">${soundManifest.size} professional audio files installed. Missing cues use discreet synthesised sound.</div>
+ <p class="audio-detail">Sound starts off by default; the TV host chooses when to enable it. All music and effects are loaded from this game, never external sites.</p>
+ </div><div class="footer-actions"><button class="btn" id="previewAudio">Preview whistle</button><button class="btn alt" id="closeMixer">Back to the game</button></div>`;
+ $('modalShade').classList.remove('hidden');
+ $('masterVol').oninput=e=>{masterVolume=Number(e.target.value)/100;$('masterVal').textContent=e.target.value+'%';applyLoopVolume();saveAudio();};
+ $('musicVol').oninput=e=>{musicVolume=Number(e.target.value)/100;$('musicVal').textContent=e.target.value+'%';startAudioLoops();saveAudio();};
+ $('motionChoice').onchange=e=>{document.body.classList.toggle('minimal-motion',e.target.checked);saveAudio();};
+ $('previewAudio').onclick=async()=>{if(muted){muted=false;context();updateAudioButton();await scanBundledAudio();startAudioLoops();}playCue('train-whistle');saveAudio();$('soundInventory').textContent=soundManifest.size+' optional audio files installed; everything else is synthesised.';};
+ $('closeMixer').onclick=closeModal;
+};
+updateAudioButton();
 // Small self-contained QR Model 2 byte-mode encoder: Reed–Solomon ECC L, auto version 5–12.
 // No external calls, image services or QR runtime packages.
 function makeQR(text){const bytes=new TextEncoder().encode(text),ec=[0,7,10,15,20,26,18,20,24,30,18,20,24],blocks=[0,1,1,1,1,1,2,2,2,2,4,4,4];
