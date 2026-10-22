@@ -5,7 +5,8 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const WebSocket=require('ws');
 const game=require('./game');
-const {availableAudio}=require('./audio');
+const {availableAudio,CUES}=require('./audio');
+const GAME_VERSION=require('../package.json').version;
 const PORT=Number(process.env.PORT)||3000;
 const ROOT=path.resolve(__dirname,'../public');
 const rooms=new Map(), links=new Map();
@@ -21,7 +22,7 @@ function response(res,status,body,kind='text/plain; charset=utf-8'){
 const httpServer=http.createServer((req,res)=>{
  if(req.method!=='GET'&&req.method!=='HEAD')return response(res,405,'Method not allowed');
  const pathname=new URL(req.url,'http://localhost').pathname;
- if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',rooms:rooms.size}),mime['.json']);
+ if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,installedSounds:availableAudio(path.join(ROOT,'audio')).length,expectedSounds:CUES.length}),mime['.json']);
  if(pathname==='/audio/manifest.json')return response(res,200,JSON.stringify({files:availableAudio(path.join(ROOT,'audio'))}),mime['.json']);
  const urlPath=pathname==='/'?'/tv.html':pathname;
  let file;try{file=path.resolve(ROOT,'.'+decodeURIComponent(urlPath));}catch{return response(res,400,'Invalid URL');}
@@ -62,7 +63,10 @@ function action(ws,data){
  const p=link.role==='player'?room.players.find(x=>x.id===link.playerId):null;
  const kind=String(data.kind||'');
  if(link.role==='host'){
-  if(kind==='start')game.startGame(room,data.mode);
+  if(kind==='start'){
+   if(room.players.some(p=>!p.ai&&!p.connected))throw Error('All human players must be online. Reconnect them or assign AI before starting.');
+   game.startGame(room,data.mode);
+  }
   else if(kind==='mode'){if(room.status!=='lobby'||!game)throw Error('Mode is locked.');if(!['quick','standard','advanced'].includes(data.mode))throw Error('Invalid mode.');room.mode=data.mode;room.settings=require('./constants').MODE[data.mode];}
   else if(kind==='addAI')game.addPlayer(room,`Iron Bot ${room.players.length+1}`,true);
   else if(kind==='remove'){
