@@ -7,6 +7,7 @@ const WebSocket=require('ws');
 const game=require('./game');
 const {availableAudio,CUES}=require('./audio');
 const recovery=require('./recovery');
+const {isExpired,assertCapacity}=require('./room-lifecycle');
 const GAME_VERSION=require('../package.json').version;
 const PORT=Number(process.env.PORT)||3000;
 const ROOT=path.resolve(__dirname,'../public');
@@ -14,7 +15,17 @@ const rooms=new Map(), links=new Map();
 const mime={'.html':'text/html; charset=utf-8','.css':'text/css','.js':'text/javascript','.svg':'image/svg+xml','.png':'image/png','.jpg':'image/jpeg','.jpeg':'image/jpeg','.woff2':'font/woff2','.wav':'audio/wav','.ogg':'audio/ogg','.mp3':'audio/mpeg','.json':'application/json','.ico':'image/x-icon'};
 const stateFile=process.env.STATE_FILE===undefined?path.resolve(__dirname,'../.data/rooms.json'):process.env.STATE_FILE;
 const isCode=code=>/^[A-Z]{4}$/.test(String(code||''));
-function restore(){if(!stateFile)return;try{const data=JSON.parse(fs.readFileSync(stateFile,'utf8'));for(const r of data){if(r&&isCode(r.code)&&r.hostToken&&r.players){r.players.forEach(p=>p.connected=!!p.ai);rooms.set(r.code,r);}}console.log(`Restored ${rooms.size} games`);}catch(e){if(e.code!=='ENOENT')console.warn('Could not restore game state:',e.message);}}
+function markActivity(room){room.lastActivityAt=Date.now();}
+function sweepRooms(now=Date.now()){
+ let deleted=0;
+ for(const [code,room] of rooms){
+  const connected=[...links.values()].some(link=>link.code===code);
+  if(isExpired(room,now,connected)){rooms.delete(code);deleted++;}
+ }
+ if(deleted)save();
+ return deleted;
+}
+function restore(){if(!stateFile)return;try{const data=JSON.parse(fs.readFileSync(stateFile,'utf8'));for(const r of data){if(r&&isCode(r.code)&&r.hostToken&&r.players){r.players.forEach(p=>p.connected=!!p.ai);if(!Number.isSafeInteger(r.lastActivityAt))r.lastActivityAt=Date.now();rooms.set(r.code,r);}}console.log(`Restored ${rooms.size} games`);}catch(e){if(e.code!=='ENOENT')console.warn('Could not restore game state:',e.message);}}
 function save(){if(!stateFile)return;try{const target=path.resolve(stateFile);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target+'.tmp',JSON.stringify([...rooms.values()]));fs.renameSync(target+'.tmp',target);}catch(e){console.error('Could not save game state:',e.message);}}
 function code4(){const alpha='ABCDEFGHJKLMNPQRSTUVWXYZ';let code='';do{code=Array.from(crypto.randomBytes(4),b=>alpha[b%alpha.length]).join('');}while(rooms.has(code));return code;}
 function response(res,status,body,kind='text/plain; charset=utf-8'){
@@ -22,7 +33,9 @@ function response(res,status,body,kind='text/plain; charset=utf-8'){
 }
 const httpServer=http.createServer((req,res)=>{
  if(req.method!=='GET'&&req.method!=='HEAD')return response(res,405,'Method not allowed');
- const pathname=new URL(req.url,'http://localhost').pathname;
+ let pathname;
+ try{pathname=new URL(req.url,'http://localhost').pathname;}
+ catch{return response(res,400,'Invalid URL');}
  if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,installedSounds:availableAudio(path.join(ROOT,'audio')).length,expectedSounds:CUES.length}),mime['.json']);
  if(pathname==='/audio/manifest.json')return response(res,200,JSON.stringify({files:availableAudio(path.join(ROOT,'audio'))}),mime['.json']);
  const urlPath=pathname==='/'?'/tv.html':pathname;
@@ -64,11 +77,13 @@ function host(ws,data){
  }else if(isCode(data.code)&&data.recovery){
   // Recover only with the original 24-byte host credential. No copy is ever
   // included in public state or sent to player controllers.
+  sweepRooms();
+  assertCapacity(rooms);
   const recovered=recovery.unseal(data.recovery,data.code,data.token);
-  room=recovered.room;rooms.set(room.code,room);restoredFromBrowser=true;
+  room=recovered.room;markActivity(room);rooms.set(room.code,room);restoredFromBrowser=true;
   console.log('Recovered room '+room.code+' from host browser ('+recovered.ageSeconds+' seconds old)');
- }else if(!data.code){room=game.createRoom(code4());rooms.set(room.code,room);}else throw Error('Host room not found.');
- bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken,recovered:restoredFromBrowser});broadcast(room);
+ }else if(!data.code){sweepRooms();assertCapacity(rooms);room=game.createRoom(code4());markActivity(room);rooms.set(room.code,room);}else throw Error('Host room not found.');
+ markActivity(room);bind(ws,room.code,'host');send(ws,{type:'welcome',role:'host',code:room.code,token:room.hostToken,recovered:restoredFromBrowser});broadcast(room);
 }
 function join(ws,data){
  const code=String(data.code||'').trim().toUpperCase();const room=rooms.get(code);if(!room)throw Error('Room not found. Ask the host for the four-letter code.');
@@ -107,6 +122,7 @@ function action(ws,data){
   else if(kind==='restart'){
    if(room.status!=='finished')throw Error('You can only rematch after a completed game.');
    const newRoom=game.createRoom(room.code);
+   markActivity(newRoom);
    newRoom.hostToken=room.hostToken;
    newRoom.mode=room.mode;newRoom.settings=require('./constants').MODE[room.mode];
    // Preserve friends and their seat credentials, but never reuse last match's score,
@@ -136,7 +152,7 @@ function action(ws,data){
    default:throw Error('Unknown player command.');
   }
  }
- broadcast(room);
+ markActivity(room);broadcast(room);
 }
 wss.on('connection',(ws,request)=>{
  // Browsers always provide an Origin. Reject cross-site WebSocket commands.
@@ -157,7 +173,7 @@ wss.on('connection',(ws,request)=>{
    if(data.type==='host')host(ws,data);else if(data.type==='join')join(ws,data);else if(data.type==='action')action(ws,data);else throw Error('Unknown message type.');
   }catch(err){bad(ws,err);}
  });
- ws.on('close',()=>{const link=links.get(ws);links.delete(ws);if(link?.role==='player'){const room=rooms.get(link.code);const p=room?.players.find(p=>p.id===link.playerId);if(p&&!p.ai){p.connected=false;broadcast(room);}}});
+ ws.on('close',()=>{const link=links.get(ws);links.delete(ws);if(link?.role==='player'){const room=rooms.get(link.code);if(room)markActivity(room);const p=room?.players.find(p=>p.id===link.playerId);if(p&&!p.ai){p.connected=false;broadcast(room);}}});
 });
 // Detect dead phone sockets so a dropped connection does not leave a ghost seat.
 // The client reconnects using the same authenticated seat and token.
@@ -170,6 +186,8 @@ const heartbeats=setInterval(()=>{
  }
 },30000);
 heartbeats.unref();
+const roomSweep=setInterval(()=>sweepRooms(),15*60*1000);
+roomSweep.unref();
 let lastTick=0;
 setInterval(()=>{
  const now=Date.now();for(const room of rooms.values()){
