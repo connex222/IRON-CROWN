@@ -1,0 +1,31 @@
+name: Iron Crown isolated preflight verification
+on:
+  push:
+    branches:
+      - staging/iron-crown-preflight-20261023
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verified-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install exact current runtime dependencies
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Syntax check
+        run: |
+          node --check src/server.js
+          node --check src/game.js
+          node --check src/recovery.js
+          node --check src/room-lifecycle.js
+      - name: Real WebSocket and rules test suite
+        run: npm test
+      - name: Record installed ws version and available assets
+        run: |
+          node -p "'ws ' + require('ws/package.json').version"
+          node -e "const fs=require('fs');const a=fs.readdirSync('public/audio').filter(x=>x.endsWith('.mp3'));console.log('sound assets '+a.length);if(a.length!==17)process.exit(1)"
