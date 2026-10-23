@@ -15,6 +15,6 @@ test('A normal host rejoin is not incorrectly called a browser restore',()=>{
  const fs=require('node:fs'),path=require('node:path');
  const server=fs.readFileSync(path.resolve(__dirname,'../src/server.js'),'utf8');
  assert.match(server,/let room=null,restoredFromBrowser=false/);
- assert.match(server,/room=recovered\.room;rooms\.set\(room\.code,room\);restoredFromBrowser=true/);
+ assert.match(server,/room=recovered\.room;markActivity\(room\);rooms\.set\(room\.code,room\);restoredFromBrowser=true/);
  assert.match(server,/recovered:restoredFromBrowser/);
 });
