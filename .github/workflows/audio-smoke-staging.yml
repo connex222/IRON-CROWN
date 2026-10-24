@@ -1,0 +1,38 @@
+name: Verify IRON CROWN staging audio delivery
+on:
+  push:
+    branches:
+      - staging/iron-crown-preflight-20261023
+    paths:
+      - .github/workflows/audio-smoke-staging.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  audio-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install WS and run game regressions
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm test
+      - name: Check live Render game and audio assets
+        run: |
+          set -euo pipefail
+          BASE="https://iron-crown-v2-preflight.onrender.com"
+          curl -fsSL --retry 5 --retry-delay 3 --max-time 60 "$BASE/health" -o /tmp/iron-health.json
+          node -e "const h=require('/tmp/iron-health.json');console.log(h);if(h.status!=='ok'||h.installedSounds!==17||h.expectedSounds!==17)process.exit(1)"
+          curl -fsSL --retry 3 --max-time 60 "$BASE/audio/mastered/music-parlour.mp3" -o /tmp/iron-music.mp3
+          curl -fsSL --retry 3 --max-time 60 "$BASE/audio/mastered/ui-confirm.mp3" -o /tmp/iron-cue.mp3
+          test "$(wc -c </tmp/iron-music.mp3)" -gt 100000
+          test "$(wc -c </tmp/iron-cue.mp3)" -gt 10000
+          curl -fsSL --retry 3 --max-time 60 "$BASE/tv.html" -o /tmp/iron-tv.html
+          curl -fsSL --retry 3 --max-time 60 "$BASE/phone.html" -o /tmp/iron-phone.html
+          grep -F -q "studioMasterPath" /tmp/iron-tv.html
+          grep -F -q "/audio/mastered/" /tmp/iron-phone.html
+          echo "Live staging: health, 17 manifest assets, mastered music, SFX and controllers verified."
