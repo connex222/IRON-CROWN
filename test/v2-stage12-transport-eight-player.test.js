@@ -65,7 +65,10 @@ test('Stage 12: eight live humans, seat-cap denial, rejoin takeover, and no publ
   assert.equal(reconnect.playerId,original.auth.playerId);
   const state=await replacement.wait(m=>m.type==='state'&&m.public.players.length===8);
   assert.equal(state.public.players.length,8);
-  await Promise.race([new Promise(resolve=>original.client.ws.once('close',resolve)),new Promise((_,reject)=>setTimeout(()=>reject(Error('original controller still signed in')),5000))]);
+  if(original.client.ws.readyState!==WebSocket.CLOSED){
+   await Promise.race([new Promise(resolve=>original.client.ws.once('close',resolve)),new Promise((_,reject)=>setTimeout(()=>reject(Error('original controller still signed in')),5000))]);
+  }
+  assert.equal(original.client.ws.readyState,WebSocket.CLOSED);
   assert.equal((await host.wait(m=>m.type==='state'&&m.public.players.length===8)).public.players.length,8);
  }finally{await box.close();}
 });
