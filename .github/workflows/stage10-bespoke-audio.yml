@@ -1,4 +1,5 @@
 name: Stage 10 nine new original game recordings
+# Re-run after optional nine-audio inventory regression assertions were corrected.
 on:
   push:
     branches: [staging/iron-crown-stage10-audio]
