@@ -1,0 +1,33 @@
+name: Verify new The Five Lost Crowns soundtrack on Stage 13 Render
+on:
+  push:
+    branches: [staging/iron-crown-stage13-readiness]
+    paths: [.github/workflows/stage13-owner-music-smoke.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  music-and-multiplayer-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install runtime for genuine TLS WebSocket test
+        run: npm install --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check 27 sounds, eight remote controllers, and HTTP game clients
+        env:
+          SMOKE_BASE_URL: https://iron-crown-stage13-music-preview.onrender.com
+          SMOKE_EXPECT_VERSION: 2.0.0-dev.13
+          SMOKE_EXPECT_AUDIO: '27'
+        run: node tools/hosted-smoke.js
+      - name: Download live hosted track and prove exact supplied music bytes
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 5 --retry-delay 5 --max-time 120 \
+            'https://iron-crown-stage13-music-preview.onrender.com/audio/music-five-lost-crowns.mp3' -o /tmp/the-five-lost-crowns.mp3
+          echo '137be7367127fc94615486c04c856067daed60f3c66d0be609e87c3f752626f2  /tmp/the-five-lost-crowns.mp3' | sha256sum --check
+          test "$(wc -c </tmp/the-five-lost-crowns.mp3)" -eq 3800963
+          echo 'Live Render serves the exact owner-supplied web audio.'
