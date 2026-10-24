@@ -8,9 +8,9 @@ if(start<0||end<0)throw Error('Missing sound mix policies');
 const {SOUND_GAIN,MIX_PRESETS}=vm.runInNewContext(script.slice(start,end)+'\n({SOUND_GAIN,MIX_PRESETS})');
 
 test('Audio mix: every bundled cue has a calibrated gain and priority',()=>{
- const {CUES}=require('../src/audio');
+ const {CUES,EXTRA_CUES}=require('../src/audio');
  assert.deepEqual(Object.keys(SOUND_GAIN).filter(k=>CUES.includes(k)).sort(),[...CUES].sort());
- assert.equal(Object.keys(SOUND_GAIN).length,26);
+ assert.equal(Object.keys(SOUND_GAIN).length,CUES.length+EXTRA_CUES.length);
  for(const [k,cue] of Object.entries(SOUND_GAIN)){
   assert.ok(cue.gain>0&&cue.gain<=.7,k);
   assert.ok(Number.isInteger(cue.priority)&&cue.priority>=0&&cue.priority<=6,k);
@@ -39,7 +39,7 @@ test('Audio mix: dramatic reveals smoothly duck background audio',()=>{
  assert.match(script,/function duckMusic\(ms\)/);
  assert.match(script,/duckUntil=Math\.max\(duckUntil,Date\.now\(\)\+ms\)/);
  assert.match(script,/const target=Date\.now\(\)<duckUntil \? \.26 : 1/);
- assert.match(script,/musicVolume\*SOUND_GAIN\['music-parlour'\]\.gain\*smoothedDuck/);
+ assert.ok(script.includes("musicVolume*(SOUND_GAIN[currentMusicKey]?.gain||SOUND_GAIN['music-parlour'].gain)*smoothedDuck"));
 });
 test('Audio mix: at most three effects play and higher priority wins',()=>{
  assert.match(script,/if\(activeEffects\.size>=3\)/);
