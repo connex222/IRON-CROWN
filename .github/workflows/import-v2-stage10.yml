@@ -9,7 +9,7 @@ permissions:
   contents: write
 jobs:
   import-tested-source:
-    if: github.event.head_commit.message == 'Stage10 import retry final'
+    if: startsWith(github.event.head_commit.message, 'Stage10 import retry')
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -21,11 +21,12 @@ jobs:
         run: |
           set -euo pipefail
           base64 -d .stage10-transfer-b64.txt > /tmp/iron-stage10.tar.xz
-          echo '49af7893cec4d41b42e463b9c415a2788b72bcfebcd94a5b8b363ac5a58c287a  /tmp/iron-stage10.tar.xz' | sha256sum -c
+          echo 'a83177c463454758cabe55814694d00e55fec5ced28a5116135999004818ccf3  /tmp/iron-stage10.tar.xz' | sha256sum -c
           tar -tJf /tmp/iron-stage10.tar.xz > /tmp/iron-stage10-list.txt
           grep -F 'src/game.js' /tmp/iron-stage10-list.txt
           tar -xJf /tmp/iron-stage10.tar.xz
           node -e "if(require('./package.json').version!=='2.0.0-dev.10')process.exit(1)"
+          find public/art/avatars -maxdepth 1 -type f -name '*.png' ! -name '*_human.png' -delete
           rm .stage10-transfer-b64.txt
       - name: Install and fully test v2 including WebSockets
         run: |
@@ -41,7 +42,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A src public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml .github/workflows/test-iron-crown.yml
+          git add -A src public/art/avatars public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml .github/workflows/test-iron-crown.yml
           git add -u .stage10-transfer-b64.txt
           git commit -m 'Stage 10 v2 full source, UI and audio integration'
           git push origin HEAD:staging/iron-crown-stage10-audio
