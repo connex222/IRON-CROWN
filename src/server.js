@@ -8,6 +8,7 @@ const game=require('./game');
 const {availableAudio,CUES,EXTRA_CUES}=require('./audio');
 const recovery=require('./recovery');
 const {isExpired,assertCapacity}=require('./room-lifecycle');
+const {loadRooms,saveRooms}=require('./snapshot-store');
 const {sendSafely}=require('./socket-safety');
 const GAME_VERSION=require('../package.json').version;
 const PORT=Number(process.env.PORT)||3000;
@@ -26,8 +27,34 @@ function sweepRooms(now=Date.now()){
  if(deleted)save();
  return deleted;
 }
-function restore(){if(!stateFile)return;try{const data=JSON.parse(fs.readFileSync(stateFile,'utf8'));for(const r of data){if(r&&isCode(r.code)&&r.hostToken&&r.players){r.players.forEach(p=>p.connected=!!p.ai);if(!Number.isSafeInteger(r.lastActivityAt))r.lastActivityAt=Date.now();rooms.set(r.code,r);}}console.log(`Restored ${rooms.size} games`);}catch(e){if(e.code!=='ENOENT')console.warn('Could not restore game state:',e.message);}}
-function save(){if(!stateFile)return;try{const target=path.resolve(stateFile);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target+'.tmp',JSON.stringify([...rooms.values()]));fs.renameSync(target+'.tmp',target);}catch(e){console.error('Could not save game state:',e.message);}}
+let localSnapshotSource='pending',localSnapshotWriteOk=null;
+function restore(){
+ if(!stateFile){localSnapshotSource='disabled';return;}
+ try{
+  const loaded=loadRooms(stateFile);
+  localSnapshotSource=loaded.source;
+  // Failed or retired seat snapshots must never prevent restoring other rooms.
+  for(const room of loaded.rooms){
+   if(!room||!isCode(room.code)||typeof room.hostToken!=='string'
+      ||!Array.isArray(room.players)||room.players.length>8||rooms.has(room.code))continue;
+   room.players.forEach(p=>{p.connected=!!p.ai});
+   if(!Number.isSafeInteger(room.lastActivityAt))room.lastActivityAt=Date.now();
+   rooms.set(room.code,room);
+  }
+  // If primary was truncated, repair it from the valid backup *before*
+  // another save can rotate the damaged file into the good backup location.
+  if(loaded.source==='backup'){try{
+   fs.copyFileSync(stateFile+'.bak',stateFile);
+   fs.chmodSync(stateFile,0o600);
+  }catch(e){console.warn('Could not repair local room snapshot:',e.message);}}
+  console.log(`Restored ${rooms.size} games from local ${loaded.source} snapshot`);
+ }catch(e){localSnapshotSource='unavailable';console.warn('Could not restore game state:',e.message);}
+}
+function save(){
+ if(!stateFile){localSnapshotWriteOk=false;return;}
+ try{saveRooms(stateFile,[...rooms.values()]);localSnapshotWriteOk=true;}
+ catch(e){localSnapshotWriteOk=false;console.error('Could not save game state:',e.message);}
+}
 function code4(){const alpha='ABCDEFGHJKLMNPQRSTUVWXYZ';let code='';do{code=Array.from(crypto.randomBytes(4),b=>alpha[b%alpha.length]).join('');}while(rooms.has(code));return code;}
 function response(res,status,body,kind='text/plain; charset=utf-8'){
  res.writeHead(status,{'Content-Type':kind,'X-Content-Type-Options':'nosniff','Cache-Control':'no-cache','Content-Security-Policy':"default-src 'self' 'unsafe-inline' data: blob:; connect-src 'self' ws: wss:; img-src 'self' data:; font-src 'self'; object-src 'none'; frame-ancestors 'none'",'Referrer-Policy':'same-origin'});res.end(body);
@@ -37,7 +64,7 @@ const httpServer=http.createServer((req,res)=>{
  let pathname;
  try{pathname=new URL(req.url,'http://localhost').pathname;}
  catch{return response(res,400,'Invalid URL');}
- if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,installedSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>CUES.some(k=>f.startsWith(k+'.'))).length,expectedSounds:CUES.length,extraSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>EXTRA_CUES.some(k=>f.startsWith(k+'.'))).length}),mime['.json']);
+ if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,recoveryStorage:stateFile?'local-file':'disabled',recoveryDurability:'host-persistence-unverified',lastSnapshotWriteOk:localSnapshotWriteOk,installedSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>CUES.some(k=>f.startsWith(k+'.'))).length,expectedSounds:CUES.length,extraSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>EXTRA_CUES.some(k=>f.startsWith(k+'.'))).length}),mime['.json']);
  if(pathname==='/audio/manifest.json')return response(res,200,JSON.stringify({files:availableAudio(path.join(ROOT,'audio'))}),mime['.json']);
  const urlPath=pathname==='/'?'/tv.html':pathname;
  let file;try{file=path.resolve(ROOT,'.'+decodeURIComponent(urlPath));}catch{return response(res,400,'Invalid URL');}
