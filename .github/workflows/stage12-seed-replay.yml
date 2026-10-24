@@ -1,0 +1,28 @@
+name: Stage 12 reproduce 2000-game eight-player seeds
+on:
+  push:
+    branches: [staging/iron-crown-stage12-resilience]
+    paths: [.github/workflows/stage12-seed-replay.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  replay:
+    strategy:
+      fail-fast: false
+      matrix:
+        seed: [20261212, 20261214]
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Replay 2000 Quick eight-player matches from the actual committed engine
+        run: |
+          set -euo pipefail
+          SIM_JSON="/tmp/quick8-${{ matrix.seed }}.json" node tools/simulate.js --mode quick --players 8 --games 2000 --seed "${{ matrix.seed }}" --maps 128 --bots greedy
+          diff -u "docs/stage12-run/quick8-2000-seed${{ matrix.seed }}.json" "/tmp/quick8-${{ matrix.seed }}.json"
+          REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js "/tmp/quick8-${{ matrix.seed }}.json"
+          echo "Seed ${{ matrix.seed }} reproduced exactly from the checked-out engine."
