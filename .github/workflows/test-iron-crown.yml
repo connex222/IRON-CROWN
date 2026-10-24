@@ -1,7 +1,7 @@
 name: Iron Crown v2 tests and audio integrity
 on:
   push:
-    branches: [main, staging/iron-crown-stage10-audio]
+    branches: [main, staging/iron-crown-stage10-audio, staging/iron-crown-stage11-balance]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -25,7 +25,7 @@ jobs:
       - name: Run the full Node and real WebSocket regression suite
         run: npm test
       - name: Verify installed Stage 10 audio and eight approved portraits
-        if: github.ref == 'refs/heads/staging/iron-crown-stage10-audio'
+        if: github.ref == 'refs/heads/staging/iron-crown-stage10-audio' || github.ref == 'refs/heads/staging/iron-crown-stage11-balance'
         run: |
           set -euo pipefail
           sha256sum --check docs/STAGE10-BESPOKE-SHA256.txt
@@ -33,3 +33,8 @@ jobs:
           node -e "const {CUES,EXTRA_CUES,availableAudio}=require('./src/audio');const a=availableAudio('public/audio');if(CUES.length!==17||EXTRA_CUES.length!==9||a.length!==26)process.exit(1);console.log('26 of 26 original plus bespoke recordings verified')"
           test "$(find public/art/avatars -maxdepth 1 -name '*_human.png' | wc -l)" -eq 8
           test "$(find public/art/avatars -maxdepth 1 -name '*.png' | wc -l)" -eq 8
+      - name: Validate both independent 2,000-game Quick four-player samples
+        if: github.ref == 'refs/heads/staging/iron-crown-stage11-balance'
+        run: |
+          REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage11-run/quick4-2000-margin9.json docs/stage11-run/quick4-2000-independent.json
+          echo 'Historical Stage 8 failure remains archived; current Stage 11 criteria passed.'
