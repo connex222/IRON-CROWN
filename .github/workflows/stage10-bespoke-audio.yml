@@ -1,0 +1,75 @@
+name: Stage 10 nine new original game recordings
+on:
+  push:
+    branches: [staging/iron-crown-stage10-audio]
+    paths: [.github/workflows/stage10-bespoke-audio.yml]
+permissions:
+  contents: write
+jobs:
+  import-bespoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install offline audio validation tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+      - name: Download eight Mirelo effects and original Daydream score
+        run: |
+          set -euo pipefail
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx7fksd6nsyxn3q7htzb9q0kq58gw4nk/0?k=wD2jJX96QUnuAURy' --output 'public/audio/railway-switch.mp3'
+          test "$(wc -c < public/audio/railway-switch.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/railway-switch.mp3' -f null - < /dev/null
+          echo 'Validated railway-switch.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx711jjnx07s2y0qfaxhfszb6s8gw1j6/0?k=v491DdUT4kDAqlId' --output 'public/audio/contract-stamp.mp3'
+          test "$(wc -c < public/audio/contract-stamp.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/contract-stamp.mp3' -f null - < /dev/null
+          echo 'Validated contract-stamp.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx7320f30rmksmtmhx2sstnw6s8gwqzw/0?k=3R2s6AFczqfS9z_r' --output 'public/audio/trade-handshake.mp3'
+          test "$(wc -c < public/audio/trade-handshake.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/trade-handshake.mp3' -f null - < /dev/null
+          echo 'Validated trade-handshake.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx73rn6knsktmzs6bb596173418gxwce/0?k=iKU6wGIMHDbuerb0' --output 'public/audio/royal-ledger.mp3'
+          test "$(wc -c < public/audio/royal-ledger.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/royal-ledger.mp3' -f null - < /dev/null
+          echo 'Validated royal-ledger.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx72q7jj5sd6evrjzvck71kk798gwd6p/0?k=rBwD55Dla8C0ZILA' --output 'public/audio/grand-station.mp3'
+          test "$(wc -c < public/audio/grand-station.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/grand-station.mp3' -f null - < /dev/null
+          echo 'Validated grand-station.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx7f2tbgq3m3aw4wwbv16z4t998gwrqc/0?k=VKOFRO8zGta1x_fs' --output 'public/audio/ticket-complete.mp3'
+          test "$(wc -c < public/audio/ticket-complete.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/ticket-complete.mp3' -f null - < /dev/null
+          echo 'Validated ticket-complete.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx7b8w8y8zpmyx12443fy9gvts8gw1bx/0?k=UpQYUpRoHJeIVH6x' --output 'public/audio/invalid-order.mp3'
+          test "$(wc -c < public/audio/invalid-order.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/invalid-order.mp3' -f null - < /dev/null
+          echo 'Validated invalid-order.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://mirelo.ai/dl/qx71yk2pzqb07zyps0ymt47x0n8gwf7e/0?k=GpbUcUaAk9B1EJGY' --output 'public/audio/electric-era.mp3'
+          test "$(wc -c < public/audio/electric-era.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/electric-era.mp3' -f null - < /dev/null
+          echo 'Validated electric-era.mp3'
+          curl --fail --location --silent --show-error --retry 3 --retry-delay 2 --max-time 120 'https://gen.daydream.live/v1/songs/sng_WlZ7Di3CBJOCBGSRrpOH6C/1.mp3' --output 'public/audio/music-parlour-deluxe.mp3'
+          test "$(wc -c < public/audio/music-parlour-deluxe.mp3)" -gt 2000
+          ffmpeg -v error -nostdin -i 'public/audio/music-parlour-deluxe.mp3' -f null - < /dev/null
+          echo 'Validated music-parlour-deluxe.mp3'
+      - name: Record integrity without provider download URLs
+        run: |
+          mkdir -p docs
+          sha256sum public/audio/railway-switch.mp3 public/audio/contract-stamp.mp3 public/audio/trade-handshake.mp3 public/audio/royal-ledger.mp3 public/audio/grand-station.mp3 public/audio/ticket-complete.mp3 public/audio/invalid-order.mp3 public/audio/electric-era.mp3 public/audio/music-parlour-deluxe.mp3 > docs/STAGE10-BESPOKE-SHA256.txt
+      - name: Run entire v2 WebSocket and game suite
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm test
+          node -e "const {CUES,EXTRA_CUES,availableAudio}=require('./src/audio');const a=availableAudio('public/audio');for(const k of [...CUES,...EXTRA_CUES])if(!a.includes(k+'.mp3'))throw Error('Missing '+k);console.log('All 26 expected locally served tracks are installed.')"
+      - name: Commit all verified recordings to the v2 staging branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add public/audio/railway-switch.mp3 public/audio/contract-stamp.mp3 public/audio/trade-handshake.mp3 public/audio/royal-ledger.mp3 public/audio/grand-station.mp3 public/audio/ticket-complete.mp3 public/audio/invalid-order.mp3 public/audio/electric-era.mp3 public/audio/music-parlour-deluxe.mp3 docs/STAGE10-BESPOKE-SHA256.txt
+          git commit -m 'Stage 10: include all eight bespoke effects and original parlour score'
+          git push origin HEAD:staging/iron-crown-stage10-audio
