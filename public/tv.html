@@ -497,7 +497,7 @@ function renderBoard(s){let msg='',hint='';
  $('boardInfo').innerHTML=`<div class="eyebrow">${s.event?`<span class="event">${escapeHTML(s.event.name)}</span>`:'THE IRON KINGDOM'}</div><h2>${msg}</h2><p>${hint}</p>${marketQueue}`;
  const find=id=>s.players.find(p=>p.id===id)?.name?.split(' ')[0]||'Unclaimed';
  $('boardTrophies').innerHTML=`<span>🚂 Longest Railway · <b>${escapeHTML(find(s.trophies?.rail))}</b></span><span>⚔ Largest Army · <b>${escapeHTML(find(s.trophies?.army))}</b></span>`;
- $('news').textContent=s.feed.at(-1)?.message||'The country awaits its railway tycoons.';$('scoreGoal').textContent=`★ ${s.winTarget} to win`;
+ $('news').textContent=s.feed.at(-1)?.message||'The country awaits its railway tycoons.';$('scoreGoal').textContent=s.earlyCrownLeadRequired?`★ ${s.winTarget} · +${s.earlyCrownLeadRequired} lead for early win`:`★ ${s.winTarget} to win`;
 }
 function startEraSequence(era){
  if(motionOff())return;
@@ -591,7 +591,7 @@ const guideSections={
  quick:[
   '<p class="guide-lead">An easy, one-minute introduction. The TV shows the shared railway map; your phone keeps your plans and tickets private.</p>',
   '<div class="guide-three"><article><span>1</span><h3>Join &amp; claim</h3><p>Use the TV room code or QR. Pick a tycoon, keep at least 2 secret Destination Tickets and place 2 starting Depots.</p></article><article><span>2</span><h3>Plan three orders</h3><p>Each round you earn resources, secretly choose <b>three actions</b> on your phone, then press <b>Lock In</b>.</p></article><article><span>3</span><h3>Watch the reveal</h3><p>The TV resolves the orders. Build towns and railway links, fulfil tickets and claim trophies to win Prestige.</p></article></div>',
-  '<div class="guide-takeaway"><strong>Win the Crown</strong><p>First to <b>12 Prestige</b> in Quick, <b>22</b> in Standard or <b>24</b> in Advanced after a Reveal; otherwise highest at the end. Nobody gets eliminated.</p></div>',
+  '<div class="guide-takeaway"><strong>Win the Crown</strong><p>First to <b>12 Prestige</b> in Quick, <b>22</b> in Standard or <b>24</b> in Advanced after a Reveal; otherwise highest at the end. With four or more Quick players, an early Crown needs a nine-Prestige lead; if the leader reaches 12 but the lead is smaller, the race continues. Nobody gets eliminated.</p></div>',
   '<p class="guide-note"><b>Three eras:</b> Steam → Iron → Electric. At each new era, choose one free Upgrade. Iron unlocks three Lake Viaducts; Electric unlocks three Capital Express routes (2 Gold income plus bonuses). Advanced mode adds events and tycoon abilities.</p>'
  ].join(''),
  actions:[

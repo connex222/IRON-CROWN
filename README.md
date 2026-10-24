@@ -3,9 +3,11 @@
 **A cinematic, private Victorian railway empire game for 2–8 players.** One TV or computer displays the shared railway kingdom; each human uses a phone, tablet or a separate computer window to plan secret orders. The Node.js/`ws` server validates every move. Includes eight approved human tycoon portraits, 17 preserved original recordings plus 17 mastered editions, eight new bespoke railway effects and a new original instrumental parlour score, an accessible How to Play handbook and fictional railway lore.
 
 
+**Stage 11 (24 October 2026):** Quick four- to eight-player games now need a nine-Prestige advantage to clinch an early Crown once a player reaches 12. Two independent 2,000-game four-player greedy-bot samples pass all four fairness gates; the same-seed two-player 2,000-game metrics are unchanged. This is a staging-only balancing change. Eight-player Quick and real human enjoyment require later acceptance.
+
 **Stage 10 GitHub verification (24 October 2026):** 177/177 actual Node and WebSocket tests passed; all nine bespoke provider MP3s decoded and bundled locally alongside the 17 original and 17 mastered recordings. Quick 4-player balancing, physical device tests, hosting durability and independent commercial redistribution clearance remain unresolved. GitHub `main` and production Render have not been promoted.
 
-> **v2.0.0-dev.10 — STAGING-ONLY DEVELOPMENT BUILD, NOT THE LIVE GAME.** The existing production game remains unchanged. Standard and Advanced 4-player statistical gates passed their recorded 2,000-game seeded samples; new Quick 4-player balance evidence is under review, and real multiplayer/device acceptance remains outstanding. Do not deploy this ZIP to Render or `main` before network/browser acceptance and balance gates pass.
+> **v2.0.0-dev.11 — STAGING-ONLY DEVELOPMENT BUILD, NOT THE LIVE GAME.** The existing production game remains unchanged. Standard and Advanced 4-player statistical gates passed their recorded 2,000-game seeded samples; new Quick 4-player balance evidence is under review, and real multiplayer/device acceptance remains outstanding. Do not deploy this ZIP to Render or `main` before network/browser acceptance and balance gates pass.
 
 ## Get running locally
 

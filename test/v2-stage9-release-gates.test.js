@@ -2,10 +2,10 @@
 const test=require('node:test'),assert=require('node:assert/strict');
 const {results,failed,scenarios}=require('../tools/release_preflight');
 const check=name=>results.find(r=>r.name===name);
-test('Stage 9 release preflight covers Quick/Standard/Advanced at 2, 4 and 8 players as applicable',()=>{
+test('Stage 11 release preflight uses the new Quick 4-player evidence while preserving all six scenarios',()=>{
  assert.equal(scenarios.length,6);
- assert.equal(check('Quick / 4 players').status,'FAIL');
- assert.match(check('Quick / 4 players').details,/66\.25%/);
+ assert.equal(check('Quick / 4 players').status,'PASS');
+ assert.match(check('Quick / 4 players').details,/36\.9%/);
  assert.equal(check('Advanced / 8 players').status,'BLOCKED');
 });
 test('Stage 9 does not mistake generated audio or screenshots for rights and physical acceptance',()=>{

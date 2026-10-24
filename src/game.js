@@ -463,6 +463,17 @@ function royalDividend(resources,mode='standard'){
  const gold=Math.max(0,Number(resources?.gold)||0);
  return Math.min(3,Math.floor(goods/8))+Math.min(mode==='advanced'?5:3,Math.floor(gold/4));
 }
+// At four or more Quick seats, reaching the target is a contested Crown claim.
+// Only a commanding lead can end the race before the eighth round. No other
+// mode or party size changes its ordinary scoring target or finish threshold.
+const QUICK_MULTI_EARLY_LEAD=9;
+function earlyCrownEligible(room,ranking){
+ if(!ranking?.length||ranking[0].prestige<room.settings.target)return false;
+ if(room.mode==='quick'&&room.players.length>=4){
+  return ranking[0].prestige-(ranking[1]?.prestige??0)>=QUICK_MULTI_EARLY_LEAD;
+ }
+ return true;
+}
 function concludeRound(room){
  if(eventIs(room,'royal')){
   const count=room.players.map(p=>({p,n:owned(room,p).filter(t=>t.city).length})).sort((a,b)=>b.n-a.n);
@@ -477,7 +488,10 @@ function concludeRound(room){
  }
  updatePrestige(room);
  const ranking=[...room.players].sort((a,b)=>comparePlayers(room,a,b));
- const finish=ranking[0].prestige>=room.settings.target||room.round>=room.settings.rounds;
+ const finish=earlyCrownEligible(room,ranking)||room.round>=room.settings.rounds;
+ if(!finish&&room.mode==='quick'&&room.players.length>=4&&ranking[0].prestige>=room.settings.target){
+  addFeed(room,'THE CROWN IS STILL CONTESTED — The leader needs a nine-Prestige lead to win Quick early.','news');
+ }
  if(finish){
   const crowned=ranking.filter(p=>comparePlayers(room,p,ranking[0])===0);
   room.status='finished';room.lastWinner=crowned.length===1?crowned[0].id:null;
@@ -595,6 +609,6 @@ function tick(room,now=Date.now()){
  if(room.status==='reveal'){revealStep(room);return true;}
  return false;
 }
-function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.filter(r=>routeOpen(room,r)).map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,era:r.era||'steam',owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:Object.fromEntries(Object.entries(p.breakdown||{}).filter(([key])=>key!=='completed')),reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,market:room.status==='market'?{deadline:room.deadline,offers:room.marketOffers.map(o=>({id:o.id,from:o.from,to:o.to,answered:o.answer!==null}))}:null,offer:null,winner:room.lastWinner,winners:room.status==='finished'?(room.sharedWinners||[room.lastWinner]).filter(Boolean):null,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>comparePlayers(room,a,b)).map(p=>p.id):null};}
+function publicView(room){return {code:room.code,mode:room.mode,status:room.status,round:room.round,totalRounds:room.settings.rounds,winTarget:room.settings.target,earlyCrownLeadRequired:room.mode==='quick'&&room.players.length>=4?QUICK_MULTI_EARLY_LEAD:0,era:room.era,deadline:room.deadline,turnOffset:room.turnOffset,event:room.event,tiles:room.tiles,routes:room.routes.filter(r=>routeOpen(room,r)).map(r=>({id:r.id,a:r.a,b:r.b,path:r.path,segments:r.segments,era:r.era||'steam',owner:r.owner,blocked:r.blocked})),players:room.players.map(p=>({id:p.id,name:p.name,seat:p.seat,avatar:p.avatar,connected:p.connected,ai:p.ai,prestige:p.prestige,locked:p.locked,breakdown:Object.fromEntries(Object.entries(p.breakdown||{}).filter(([key])=>key!=='completed')),reaction:p.reactionUntil>Date.now()?p.reaction:'neutral',reactionUntil:p.reactionUntil,reactionReason:p.reactionUntil>Date.now()?p.reactionReason:''})),trophies:room.trophies||{},feed:room.feed.slice(-18),seq:room.seq,placementTurn:room.placement[room.placementIndex]||null,placementIndex:room.placementIndex,placementTotal:room.placement.length,market:room.status==='market'?{deadline:room.deadline,offers:room.marketOffers.map(o=>({id:o.id,from:o.from,to:o.to,answered:o.answer!==null}))}:null,offer:null,winner:room.lastWinner,winners:room.status==='finished'?(room.sharedWinners||[room.lastWinner]).filter(Boolean):null,finalRanking:room.status==='finished'?[...room.players].sort((a,b)=>comparePlayers(room,a,b)).map(p=>p.id):null};}
 function privateView(room,p){return {playerId:p.id,token:p.token,resources:p.resources,tickets:p.tickets,ticketProgress:p.tickets.map(t=>({id:t.id,complete:ownsConnection(room.tiles,room.routes,p.id,t.a,t.b),prestige:t.value+(has(p,'directors')?1:0)})),ticketChoices:p.ticketChoices,upgrades:p.upgrades,draftChoices:p.draftChoices,draftDone:p.draftDone,actions:p.actions,locked:p.locked,avatar:p.avatar,bankResource:p.bankResource,telegraphUsed:p.telegraphUsed,planBalance:room.status==='plan'?calculatePlanBudget(room,p,p.actions):null,bankRates:Object.fromEntries(Object.keys(p.resources).map(k=>[k,tradeRate(room,p,k)])),legal:['placement','plan','reveal'].includes(room.status)?legalTargets(room,p):null,placementTurn:room.status==='placement'&&room.placement[room.placementIndex]===p.id,offers:room.status==='market'?room.marketOffers.filter(o=>o.to===p.id).map(o=>({...o,deadline:room.deadline})):[],offer:null};}
-module.exports={createRoom,addPlayer,chooseAvatar,startGame,chooseTickets,placeDepot,chooseUpgrade,setAction,lockIn,replyOffer,telegraph,publicView,privateView,tick,autopilot,legalTargets,costOf,tradeRate,score,updatePrestige,beginIncome,beginPlan,revealStep,beginReveal,resolveClashes,owned,routeName,eraOf,avatar,royalDividend};
+module.exports={QUICK_MULTI_EARLY_LEAD,earlyCrownEligible,createRoom,addPlayer,chooseAvatar,startGame,chooseTickets,placeDepot,chooseUpgrade,setAction,lockIn,replyOffer,telegraph,publicView,privateView,tick,autopilot,legalTargets,costOf,tradeRate,score,updatePrestige,beginIncome,beginPlan,revealStep,beginReveal,resolveClashes,owned,routeName,eraOf,avatar,royalDividend};

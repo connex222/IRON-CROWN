@@ -1,13 +1,13 @@
-# IRON CROWN v2 — Authoritative balance evidence (Stage 8)
+# IRON CROWN v2 — Authoritative balance evidence (Stage 11)
 
-**Build:** `2.0.0-dev.8` — **not a production release**. These are seeded matches between the independent greedy simulation bots and the actual game-logic engine. They are **not** human-playtest results, full-stack multiplayer verification or proof of enjoyable pacing. Every 2,000-game evaluation below used **128 independently generated map templates** reused throughout its 2,000 matches; therefore 2,000 matches does **not** mean 2,000 different maps. The Production AI is distinct from the benchmark bots.
+**Build:** `2.0.0-dev.11` — **not a production release**. These are seeded matches between the independent greedy simulation bots and the actual game-logic engine. They are **not** human-playtest results, full-stack multiplayer verification or proof of enjoyable pacing. Every 2,000-game evaluation below used **128 independently generated map templates** reused throughout its 2,000 matches; therefore 2,000 matches does **not** mean 2,000 different maps. The Production AI is distinct from the benchmark bots.
 
 ## Current accepted seeded scenarios
 
 | Scenario | Seed | Games | Prestige target | Early victories | Winner reaches ≥80% target | Prestige ties | Seat wins | Acceptance |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- |
 | Quick, 2 players | 20261103 | 2,000 | 12 | 48.95% | 78.85% | 4.05% | 48.73% / 51.28% | **Pacing evidence only; review's 90% score gate is for four-player matches** |
-| **Quick, 4 players** | **20261117** | **2,000** | **12** | **66.25% — FAIL** | **94.80%** | **3.60%** | **23.90–26.05% per seat** | **3 of 4 checks pass; early wins exceed 50% acceptance ceiling** |
+| **Quick, 4 players — Stage 11** | **20261129** | **2,000** | **12 + 9-point early lead** | **36.90% — PASS** | **93.75%** | **3.80%** | **23.77–25.72% per seat** | **All four checks pass; confirmed separately with seed 20261201** |
 | Standard, 4 players | 20261023 | 2,000 | 22 | 45.75% | 93.45% | 2.80% | 25.75% / 25.35% / 24.05% / 24.85% | **All four applicable gates pass** |
 | Standard, 8 players | 20261025 | 2,000 | 22 | 42.95% | 95.30% | 4.00% | 13.00–11.35% per seat | **All applicable gates pass** |
 | Advanced, 4 players | 20261102 | 2,000 | 24 | 44.20% | 91.50% | 2.75% | 24.43% / 24.80% / 25.75% / 25.02% | **All four applicable gates pass** |
@@ -15,6 +15,10 @@
 **Fairness gates:** four-player early wins 30–50%; four-player winners ≥80% target in at least 90%; ties under 8%; four-player seats within 20–30%; eight-player seats within 8.5–16.5%. The independent review did not prescribe the four-player 90%-score gate for two-player Quick. Eight-player figures are interpreted under the separately stipulated ±4-point fairness band.
 
 The Quick bot benchmark has **average winner Prestige 12.14** and an estimated **5.23 minutes** of planning-and-income timer time. This estimate excludes actual TV Reveal animation, conversation, trading pauses and interruptions; it is *not* the likely wall-clock length of a real Quick match. The 78.85% winning-score metric merits observation at the November games-night test even though it is not an explicit two-player failure gate.
+
+## Stage 11 correction — two independent 2,000-game four-player benchmarks
+
+The Stage 8 failure remains in the record below. Stage 11 retained Quick's 12-Prestige target and added a **nine-Prestige lead requirement for an early Crown with four or more players**. All four acceptance checks passed with seed 20261129 (36.90% early, 93.75% 80%-score, 3.80% ties, 23.77–25.72% seats) and an independent seed 20261201 (37.65% early, 93.95% 80%-score, 4.00% ties, 24.55–25.60% seats). Each sample ran 2,000 games with 128 generated templates, reused across matches. The identical-seed Quick two-player rerun reproduces all previously reported summary metrics. These are **greedy-bot** results, not a prediction of human enjoyment. See `docs/STAGE11-QUICK-BALANCE.md` and `docs/stage11-run/`.
 
 ## Stage 8 Quick four-player finding — full 2,000-game benchmark
 

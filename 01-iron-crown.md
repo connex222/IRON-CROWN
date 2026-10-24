@@ -1,6 +1,6 @@
 # IRON CROWN — Version 2 Design Bible
 
-**Status:** `2.0.0-dev.7`, unreleased; rules correspond to `src/game.js`, `src/map.js` and `src/constants.js`. This document supersedes the outdated v1 design bible, preserved as `docs/history/01-iron-crown-v1-legacy.md`. If a value in an early release note disagrees with this edition, the authoritative engine is the source of truth.
+**Status:** `2.0.0-dev.11`, unreleased; rules correspond to `src/game.js`, `src/map.js` and `src/constants.js`. This document supersedes the outdated v1 design bible, preserved as `docs/history/01-iron-crown-v1-legacy.md`. If a value in an early release note disagrees with this edition, the authoritative engine is the source of truth.
 
 ## Game at a glance
 
@@ -13,6 +13,8 @@ Iron Crown is a private, Victorian-themed strategy game played by **2–8 rival 
 | Quick | 8 | 3 / 3 / 2 | 40 sec | 12 | Basic rules, no advanced events/perks |
 | Standard | 12 | 4 / 4 / 4 | 45 sec | 22 | Basic rules, no advanced events/perks |
 | Advanced | 12 | 4 / 4 / 4 | 45 sec | 24 | Twelve shuffled Gazette events, character perks, incomplete ticket penalty |
+
+For Quick games with **four or more players**, an early win additionally requires the leader to be at least **9 Prestige ahead** of second place. Otherwise the match continues towards scheduled round eight; the 12-Prestige target and final-round winner resolution remain unchanged. Quick with two or three players and the other modes keep the ordinary target victory trigger. Stage 11 seeded bot results support this amendment; human acceptance remains outstanding.
 
 Royal Ledger bonuses are calculated only when the **scheduled final round** resolves, once per match, and have no effect on early winner eligibility. Target wins are checked **after each complete Reveal/Exchange/clash**, not in the middle of another player's orders. If the target is not reached by the last round, final rankings choose the winner. Balance values will only be final after the final multi-mode simulation programme.
 

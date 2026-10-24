@@ -1,3 +1,12 @@
+## 2.0.0-dev.11 — Stage 11 Quick four-player pacing (24 October 2026)
+
+- Revised the early-victory trigger for Quick with four or more players: 12 Prestige plus a **9-Prestige advantage** over second place. The match still ends at the planned eighth round if no early Crown is clinched.
+- Preserved normal 12-Prestige early victories for two/three players, and unchanged Standard/Advanced targets and scoring. The scheduled Royal Ledger remains final-round only.
+- Completed two independent **2,000-game four-player greedy-bot** calibrations (128 shared map templates in each set): 36.90% and 37.65% early victories; all eight applicable gate checks pass.
+- Confirmed the **2,000-game two-player Quick** benchmark is exactly unchanged under the same seed and map templates.
+- Added server-driven public lead requirement and contested Crown Gazette notification; updated TV, phone, rules, README, score evidence and release preflight.
+- Added unit regressions and persistent independent-seed evidence; production remains untouched pending Quick eight-player, cross-network/physical-device and licence acceptance.
+
 ## 2.0.0-dev.10 — Stage 10 complete audio integration (24 October 2026)
 
 - Transferred the full v2 source, server-authoritative game engine, responsive TV/phone UIs, tests, documentation and all approved eight portraits into a separate GitHub staging branch.

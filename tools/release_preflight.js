@@ -11,7 +11,7 @@ const add=(name,pass,details,status=pass?'PASS':'FAIL')=>results.push({name,stat
 function json(file){return JSON.parse(fs.readFileSync(path.join(root,file),'utf8'));}
 const scenarios=[
  {name:'Quick / 2 players',file:'docs/stage7-run/quick2-2000.json',mode:'quick',players:2,target:12},
- {name:'Quick / 4 players',file:'docs/stage8-run/quick-4p-2000.json',mode:'quick',players:4,target:12},
+ {name:'Quick / 4 players',file:'docs/stage11-run/quick4-2000-margin9.json',mode:'quick',players:4,target:12},
  {name:'Standard / 4 players',file:'docs/stage5-run/standard-4p-2000.json',mode:'standard',players:4,target:22},
  {name:'Standard / 8 players',file:'docs/stage5-run/standard-8p-2000.json',mode:'standard',players:8,target:22},
  {name:'Advanced / 4 players',file:'docs/stage7-run/advanced4-2000-gold5.json',mode:'advanced',players:4,target:24},
