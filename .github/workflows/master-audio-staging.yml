@@ -1,0 +1,33 @@
+name: Build 17 mastered staging recordings
+on:
+  push:
+    branches:
+      - staging/iron-crown-preflight-20261023
+    paths:
+      - .github/workflows/master-audio-staging.yml
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  master-audio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Verify ffmpeg availability
+        run: ffmpeg -version | head -1
+      - name: Master and decode-check 17 local recordings
+        run: bash scripts/master-audio-staging.sh
+      - name: Commit mastered variants to isolated staging branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/audio/mastered docs/AUDIO-STAGING-MASTER-SHA256.txt
+          if git diff --cached --quiet; then
+            echo "Mastered recordings already match."
+            exit 0
+          fi
+          git commit -m "Staging: add 17 mastered audio variants"
+          git push origin HEAD:staging/iron-crown-preflight-20261023
