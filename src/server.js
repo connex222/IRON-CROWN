@@ -8,6 +8,7 @@ const game=require('./game');
 const {availableAudio,CUES,EXTRA_CUES}=require('./audio');
 const recovery=require('./recovery');
 const {isExpired,assertCapacity}=require('./room-lifecycle');
+const {sendSafely}=require('./socket-safety');
 const GAME_VERSION=require('../package.json').version;
 const PORT=Number(process.env.PORT)||3000;
 const ROOT=path.resolve(__dirname,'../public');
@@ -47,7 +48,7 @@ const httpServer=http.createServer((req,res)=>{
  });
 });
 const wss=new WebSocket.Server({server:httpServer,path:'/socket',maxPayload:160*1024,perMessageDeflate:false});
-const send=(ws,payload)=>{if(ws.readyState===WebSocket.OPEN)try{ws.send(JSON.stringify(payload));}catch{}};
+const send=(ws,payload)=>sendSafely(ws,payload,WebSocket.OPEN);
 function broadcast(room){
  const data=game.publicView(room);
  let hostBackup=null;
