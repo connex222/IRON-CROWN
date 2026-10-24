@@ -1,7 +1,7 @@
 name: Iron Crown v2 tests and audio integrity
 on:
   push:
-    branches: [main, staging/iron-crown-stage10-audio, staging/iron-crown-stage11-balance]
+    branches: [main, staging/iron-crown-stage10-audio, staging/iron-crown-stage11-balance, staging/iron-crown-stage12-resilience]
   pull_request:
   workflow_dispatch:
 permissions:
@@ -25,7 +25,7 @@ jobs:
       - name: Run the full Node and real WebSocket regression suite
         run: npm test
       - name: Verify installed Stage 10 audio and eight approved portraits
-        if: github.ref == 'refs/heads/staging/iron-crown-stage10-audio' || github.ref == 'refs/heads/staging/iron-crown-stage11-balance'
+        if: github.ref == 'refs/heads/staging/iron-crown-stage10-audio' || (github.ref == 'refs/heads/staging/iron-crown-stage11-balance' || github.ref == 'refs/heads/staging/iron-crown-stage12-resilience')
         run: |
           set -euo pipefail
           sha256sum --check docs/STAGE10-BESPOKE-SHA256.txt
