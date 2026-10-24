@@ -1,28 +1,35 @@
-name: Iron Crown production checks
-
+name: Iron Crown v2 tests and audio integrity
 on:
   push:
-    branches: [main]
+    branches: [main, staging/iron-crown-stage10-audio]
+  pull_request:
   workflow_dispatch:
-
 permissions:
   contents: read
-
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install game server runtime
+      - name: Install game runtime
         run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Syntax verification
+      - name: Verify v2 source syntax
         run: |
           node --check src/server.js
           node --check src/game.js
           node --check src/audio.js
-      - name: Entire game and soundtrack regression suite
+      - name: Run the full Node and real WebSocket regression suite
         run: npm test
+      - name: Verify installed Stage 10 audio and eight approved portraits
+        if: github.ref == 'refs/heads/staging/iron-crown-stage10-audio'
+        run: |
+          set -euo pipefail
+          sha256sum --check docs/STAGE10-BESPOKE-SHA256.txt
+          sha256sum --check docs/AUDIO-STAGING-MASTER-SHA256.txt
+          node -e "const {CUES,EXTRA_CUES,availableAudio}=require('./src/audio');const a=availableAudio('public/audio');if(CUES.length!==17||EXTRA_CUES.length!==9||a.length!==26)process.exit(1);console.log('26 of 26 original plus bespoke recordings verified')"
+          test "$(find public/art/avatars -maxdepth 1 -name '*_human.png' | wc -l)" -eq 8
+          test "$(find public/art/avatars -maxdepth 1 -name '*.png' | wc -l)" -eq 8
