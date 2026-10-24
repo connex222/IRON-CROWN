@@ -6,67 +6,98 @@
       "provider": "Mirelo",
       "job_id": "39e993019c02b990d90be1b28de29526",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/railway-switch.mp3",
+      "sha256": "6279fd8043b5b01b017977944c4b873de42385f635c73f1c8283ae9049132a8c",
+      "staging_decoding_verified": true
     },
     {
       "name": "contract-stamp",
       "provider": "Mirelo",
       "job_id": "2c17593cf1ab9cc3b2768e51a7f6866c",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/contract-stamp.mp3",
+      "sha256": "94faae7e54469fa4abf72fbc8c7688b1f8f17c34f7ed45d6f26026a7d368cb41",
+      "staging_decoding_verified": true
     },
     {
       "name": "trade-handshake",
       "provider": "Mirelo",
       "job_id": "8debee8f819fe0e219264d4b6e1078dd",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/trade-handshake.mp3",
+      "sha256": "133b7e456b980cd6a9603e4b08565502a369f8b72caf0460874663674e84c857",
+      "staging_decoding_verified": true
     },
     {
       "name": "royal-ledger",
       "provider": "Mirelo",
       "job_id": "c89cf84919fa09ce9ec84688ee4b6476",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/royal-ledger.mp3",
+      "sha256": "67ca25bdc2a6fd5a757d2b6e3240f188ca30c58569491659b6e3675edcb04059",
+      "staging_decoding_verified": true
     },
     {
       "name": "grand-station",
       "provider": "Mirelo",
       "job_id": "bbfb7bbbccb9f11436d60b8e37d85bb4",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/grand-station.mp3",
+      "sha256": "cb8973cfc827f6398c2a60097a69bf6397c205bf81c590eb97312c778545374b",
+      "staging_decoding_verified": true
     },
     {
       "name": "ticket-complete",
       "provider": "Mirelo",
       "job_id": "49d9534b6dfea7596c4d80ddcfb85d75",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/ticket-complete.mp3",
+      "sha256": "e98e6eb4d764afa8ff982a65053c05fcae22fc18673e9bcf039ee60bb93aa55c",
+      "staging_decoding_verified": true
     },
     {
       "name": "invalid-order",
       "provider": "Mirelo",
       "job_id": "ecf1939a818ffdb89003c0842e5001b5",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/invalid-order.mp3",
+      "sha256": "d1dc066738ac0bfd404a52f0db3219570e81986e2757f78b7304a0df0b738b3a",
+      "staging_decoding_verified": true
     },
     {
       "name": "electric-era",
       "provider": "Mirelo",
       "job_id": "8058b122ebe9e63dff6e098645fa9c81",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/electric-era.mp3",
+      "sha256": "13a5d7d6603fb0bd2c797591924df5031720a4ec3c7521d0cc1c12ae7849a7c8",
+      "staging_decoding_verified": true
     },
     {
       "name": "victorian-parlour-deluxe",
       "provider": "Daydream",
       "job_id": "sng_WlZ7Di3CBJOCBGSRrpOH6C",
       "status": "succeeded",
-      "local_mp3": false
+      "local_mp3": true,
+      "local_file": "public/audio/music-parlour-deluxe.mp3",
+      "sha256": "7e27df49372c54954a08b42073202c542ae504a7a453a78284e8821ba4e93406",
+      "staging_decoding_verified": true
     }
   ],
   "daydream_listening_url": "https://gen.daydream.live/v1/songs/sng_WlZ7Di3CBJOCBGSRrpOH6C/1.mp3",
-  "provider_links_not_bundled_due_to_download_restriction": true,
+  "provider_links_not_bundled_due_to_download_restriction": false,
   "bundle_target": "public/audio/<name>.mp3",
-  "staging_copy_pending": true
+  "staging_copy_pending": false,
+  "production_rights_verified": false,
+  "physical_audio_acceptance_complete": false,
+  "verified_branch": "staging/iron-crown-stage10-audio",
+  "source_generation_completed": true
 }
