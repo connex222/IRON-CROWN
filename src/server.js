@@ -5,7 +5,7 @@ const path=require('node:path');
 const crypto=require('node:crypto');
 const WebSocket=require('ws');
 const game=require('./game');
-const {availableAudio,CUES}=require('./audio');
+const {availableAudio,CUES,EXTRA_CUES}=require('./audio');
 const recovery=require('./recovery');
 const {isExpired,assertCapacity}=require('./room-lifecycle');
 const GAME_VERSION=require('../package.json').version;
@@ -36,7 +36,7 @@ const httpServer=http.createServer((req,res)=>{
  let pathname;
  try{pathname=new URL(req.url,'http://localhost').pathname;}
  catch{return response(res,400,'Invalid URL');}
- if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,installedSounds:availableAudio(path.join(ROOT,'audio')).length,expectedSounds:CUES.length}),mime['.json']);
+ if(pathname==='/health')return response(res,200,JSON.stringify({status:'ok',version:GAME_VERSION,rooms:rooms.size,installedSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>CUES.some(k=>f.startsWith(k+'.'))).length,expectedSounds:CUES.length,extraSounds:availableAudio(path.join(ROOT,'audio')).filter(f=>EXTRA_CUES.some(k=>f.startsWith(k+'.'))).length}),mime['.json']);
  if(pathname==='/audio/manifest.json')return response(res,200,JSON.stringify({files:availableAudio(path.join(ROOT,'audio'))}),mime['.json']);
  const urlPath=pathname==='/'?'/tv.html':pathname;
  let file;try{file=path.resolve(ROOT,'.'+decodeURIComponent(urlPath));}catch{return response(res,400,'Invalid URL');}
@@ -75,10 +75,13 @@ function host(ws,data){
  if(isCode(data.code)&&rooms.has(data.code)){
   room=rooms.get(data.code);if(typeof data.token!=='string'||data.token!==room.hostToken)throw Error('Host credentials rejected.');
  }else if(isCode(data.code)&&data.recovery){
-  // Recover only with the original 24-byte host credential. No copy is ever
-  // included in public state or sent to player controllers.
+  // Recovery is another way to *create* a room after a server restart.
+  // Apply the same capacity policy as ordinary lobby creation so repeated
+  // valid browser snapshots cannot bypass the hosting limit.
   sweepRooms();
   assertCapacity(rooms);
+  // Recover only with the original 24-byte host credential. No copy is ever
+  // included in public state or sent to player controllers.
   const recovered=recovery.unseal(data.recovery,data.code,data.token);
   room=recovered.room;markActivity(room);rooms.set(room.code,room);restoredFromBrowser=true;
   console.log('Recovered room '+room.code+' from host browser ('+recovered.ageSeconds+' seconds old)');
@@ -91,7 +94,7 @@ function join(ws,data){
  if(!p&&(data.playerId||data.token))throw Error('Rejoin credentials rejected. Clear your saved seat to join as a new player.');
  if(!p){if(room.status!=='lobby')throw Error('This game has started. Rejoin from your original phone.');p=game.addPlayer(room,data.name);}
  if(p.ai)throw Error('That seat is controlled by the computer.');
- bind(ws,room.code,'player',p.id);p.connected=true;send(ws,{type:'welcome',role:'player',code:room.code,playerId:p.id,token:p.token});broadcast(room);
+ markActivity(room);bind(ws,room.code,'player',p.id);p.connected=true;send(ws,{type:'welcome',role:'player',code:room.code,playerId:p.id,token:p.token});broadcast(room);
 }
 function action(ws,data){
  const link=links.get(ws);if(!link)throw Error('Join or host a room first.');
@@ -122,16 +125,15 @@ function action(ws,data){
   else if(kind==='restart'){
    if(room.status!=='finished')throw Error('You can only rematch after a completed game.');
    const newRoom=game.createRoom(room.code);
-   markActivity(newRoom);
-   newRoom.hostToken=room.hostToken;
+   newRoom.hostToken=room.hostToken;markActivity(newRoom);
    newRoom.mode=room.mode;newRoom.settings=require('./constants').MODE[room.mode];
    // Preserve friends and their seat credentials, but never reuse last match's score,
    // private contracts, troop orders, era drafts or active reaction animation.
    newRoom.players=room.players.map((x,seat)=>({
     ...x,seat,connected:!!x.ai||[...links].some(([,link])=>link.code===room.code&&link.role==='player'&&link.playerId===x.id),
     resources:{},tickets:[],ticketChoices:[],upgrades:[],draftChoices:[],
-    draftDone:false,actions:[null,null],locked:false,telegraphUsed:false,smuggleUsed:false,
-    bankResource:'coal',bonusPrestige:0,prestige:0,breakdown:{},reaction:'neutral',
+    draftDone:false,actions:[null,null,null],locked:false,telegraphUsed:false,smuggleUsed:false,
+    bankResource:'coal',bonusPrestige:0,endgameDividend:0,prestige:0,breakdown:{},reaction:'neutral',
     reactionReason:'',reactionUntil:0
    }));
    newRoom.seq=room.seq+1;
@@ -147,7 +149,7 @@ function action(ws,data){
    case 'upgrade':game.chooseUpgrade(room,p,data.upgrade,data.bankResource);break;
    case 'setAction':game.setAction(room,p,data.slot,data.action);break;
    case 'lock':game.lockIn(room,p);break;
-   case 'tradeReply':game.replyOffer(room,p,!!data.accept);break;
+   case 'tradeReply':game.replyOffer(room,p,!!data.accept,data.offerId);break;
    case 'telegraph':game.telegraph(room,p,data.slot,data.action);break;
    default:throw Error('Unknown player command.');
   }
@@ -173,7 +175,7 @@ wss.on('connection',(ws,request)=>{
    if(data.type==='host')host(ws,data);else if(data.type==='join')join(ws,data);else if(data.type==='action')action(ws,data);else throw Error('Unknown message type.');
   }catch(err){bad(ws,err);}
  });
- ws.on('close',()=>{const link=links.get(ws);links.delete(ws);if(link?.role==='player'){const room=rooms.get(link.code);if(room)markActivity(room);const p=room?.players.find(p=>p.id===link.playerId);if(p&&!p.ai){p.connected=false;broadcast(room);}}});
+ ws.on('close',()=>{const link=links.get(ws);links.delete(ws);if(!link)return;const room=rooms.get(link.code);if(!room)return;markActivity(room);if(link.role==='player'){const p=room.players.find(p=>p.id===link.playerId);if(p&&!p.ai){p.connected=false;broadcast(room);}}});
 });
 // Detect dead phone sockets so a dropped connection does not leave a ghost seat.
 // The client reconnects using the same authenticated seat and token.

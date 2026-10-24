@@ -8,25 +8,27 @@ A fictional Victorian railway kingdom. For 2–8 tycoons using a television/PC f
 2. **Keep your destinations:** Each player privately gets three Destination Tickets. Keep at least two; nobody else needs to see them.
 3. **Found two Depots:** The game uses snake-order placement. Wait for your turn, then choose a vacant production tile.
 4. **Earn Income:** Your land and railway lines pay resources/Gold automatically every round.
-5. **Plan two secret orders:** On your controller choose two legal actions, in either order, then press Lock In. Research can only be taken once per round.
+5. **Plan three secret orders:** On your controller choose three legal actions, in either order, then press Lock In. Research can only be taken once per round.
 6. **Watch the TV reveal:** Each player's orders resolve and clashes are shown. Your tickets remain hidden on your controller.
-7. **Claim the Crown:** First to 10 Prestige in Quick, or 15 in Standard/Advanced at a Reveal, wins. Otherwise the most Prestige at the round limit wins. Nobody gets eliminated.
+7. **Claim the Crown:** First to 12 Prestige in Quick, 22 in Standard, or 24 in Advanced at a Reveal, wins. Otherwise the most Prestige at the round limit wins. Nobody gets eliminated. At the scheduled final round, the Royal Ledger also awards +1 Prestige for every 8 surplus Coal/Timber/Grain/Steel combined (maximum 3) and +1 for every 4 Gold (maximum 3 in Quick/Standard and maximum 5 in Advanced). An early victory does not receive this final bonus.
 
-Every round is **Income → Plan → Reveal**. The kingdom progresses through **Steam → Iron → Electric**. You receive one free Upgrade at each new era.
+Every round is **Income → Plan → Reveal → Exchange (if needed) → Clashes**. The Exchange has one shared 20-second deadline for all player offers. The kingdom progresses through **Steam → Iron → Electric**. You receive one free Upgrade at each new era. Iron unlocks three Lake-crossing Viaduct charters; Electric unlocks three new Capital Express routes, which pay 2 Gold per round, with normal Express Lines and Capital bonuses.
 
 ### The seven actions
+
+Players plan **three orders** in Quick (40 seconds), Standard (45 seconds), and Advanced (45 seconds). Research is still limited to once per round. A contested free-tile Depot build benefits from Soldiers on adjacent owned tiles; losing claimants recover their construction materials plus one Gold.
 
 | Action | Cost | Outcome |
 | --- | --- | --- |
 | Build Depot | 1 Timber + 1 Grain | Claim a free adjacent tile. |
 | Upgrade City | 2 Grain + 2 Steel + 1 Coal | Upgrade a Market Town you own. |
-| Lay Track | 1 Timber + 1 Steel per route segment | Claim a full marked route, connected to your holding. |
+| Lay Track | 1 Timber + 1 Steel per route segment | Claim an available railway touching owned or adjacent land, or extending your existing network. Rival-owned track segments block routes; each route earns 1 / 2 / 4 / 7 Prestige for lengths 2 / 3 / 4 / 5. |
 | Recruit | 2 Gold per Soldier, maximum 3 | Reinforce a tile you own. |
-| Trade | No action cost | Exchange with the bank (normally 3:1) or send a timed offer. |
+| Trade | No action cost | Exchange with the bank (normally 3:1) or submit a sealed player offer to the shared 20-second Exchange. |
 | Research | 3 Gold + 1 Coal | Draw a new secret ticket or buy an available current-era Upgrade. Once per round. |
 | Attack | Commit Soldiers | Attack an adjacent enemy tile; roll one die plus troops and bonuses. Defender wins ties. |
 
-Scoring: Market Town Depot **+1**, City **+2**, completed Destination Ticket **+2–4**, Longest Railway **+2**, Largest Army **+2**, Grand Station **+2**. In Advanced mode, each unfinished ticket deducts one Prestige.
+Scoring: Market Town Depot **+1**, City **+2**, completed Destination Ticket **+2–4**, each railway charter **+1 / +2 / +4 / +7** by route length, Longest Railway **+2**, Largest Army **+2**, Grand Station **+2**. In Advanced mode, each unfinished ticket deducts one Prestige.
 
 ## How to host on TV, computer or tablet
 
@@ -39,6 +41,8 @@ Each person opens /phone.html on their phone or another computer browser to keep
 ### Finding the help
 
 The TV/PC top bar has **? How to Play** and **History & Lore**. The TV lobby also has **Learn to Play — 60 seconds** and **Discover the Kingdom**. The controller always has **? How to Play**, **Story** and its sound control, plus a quick-start link on the Join page. Help is available during a game, not only before a game starts.
+
+From the **Iron era**, owned Hills generate +1 Gold per round. Advanced Gold Rush grants +2 Gold per Hill that round. When attacking from a Hill, your committed troops add +1 strength.
 
 ## THE CHRONICLE OF IRON CROWN — FICTION
 

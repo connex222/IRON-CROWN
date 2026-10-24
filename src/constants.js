@@ -22,7 +22,7 @@ const EVENTS=[
  {id:'boom',name:'BOOM TIMES',detail:'All income is doubled this round.'},
  {id:'strike',name:'COAL STRIKE',detail:'Coalfields produce nothing.'},
  {id:'winter',name:'HARSH WINTER',detail:'Farmland produces nothing.'},
- {id:'rush',name:'GOLD RUSH',detail:'Hills produce 1 Gold.'},
+ {id:'rush',name:'GOLD RUSH',detail:'Hills produce 2 Gold this round (instead of 1 from Iron onward).'},
  {id:'royal',name:'ROYAL VISIT',detail:'Owner of the most Cities earns +1 Prestige.'},
  {id:'collapse',name:'BRIDGE COLLAPSE',detail:'One random route pays nothing.'},
  {id:'mania',name:'RAILWAY MANIA',detail:'Track costs half (rounded up).'},
@@ -33,5 +33,5 @@ const EVENTS=[
  {id:'crash',name:'MARKET CRASH',detail:'Bank trades are 4:1.'}
 ];
 const NAMES=['Ashby','Port Ellery','Brasshaven','Oldwick','Marshfield','Riverton'];
-const MODE={quick:{rounds:8,target:10,eras:[3,3,2],plan:60},standard:{rounds:12,target:15,eras:[4,4,4],plan:90},advanced:{rounds:12,target:15,eras:[4,4,4],plan:90}};
+const MODE={quick:{rounds:8,target:12,eras:[3,3,2],plan:40},standard:{rounds:12,target:22,eras:[4,4,4],plan:45},advanced:{rounds:12,target:24,eras:[4,4,4],plan:45}};
 module.exports={TYPES,DISTRIBUTION,RESOURCES,TILES,AVATARS,UPGRADES,EVENTS,NAMES,MODE};

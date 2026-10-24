@@ -1,0 +1,25 @@
+IRON CROWN — standard / 8 players / greedy / seed 20261023
+┌────────────────────────────────┬────────┐
+│ (index)                        │ Values │
+├────────────────────────────────┼────────┤
+│ Games                          │ 12     │
+│ Winner mean Prestige           │ 16.75  │
+│ Winner median Prestige         │ 16     │
+│ Early target %                 │ 91.67  │
+│ First-place Prestige ties %    │ 0      │
+│ Routes claimed                 │ 11.25  │
+│ Winning tickets completed      │ 1.75   │
+│ Unspent resources (per bot)    │ 15.71  │
+│ Estimated timer duration (min) │ 6.94   │
+└────────────────────────────────┴────────┘
+Win % by seat: 8.33 / 16.67 / 16.67 / 8.33 / 16.67 / 8.33 / 25 / 0
+Winner Prestige sources: {
+  depot: 0.5,
+  city: 1,
+  rail: 8.42,
+  tickets: 5,
+  army: 0.5,
+  longest: 1.33,
+  grand: 0,
+  bonus: 0
+}

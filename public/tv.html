@@ -240,6 +240,13 @@ body.minimal-motion #map .moving-train{display:none!important}
  .join-code-grid canvas{display:block;width:100%;max-width:204px;height:auto}
  .guide-launch-btn{white-space:normal}
 }
+.market-queue{border:2px solid var(--gold);padding:14px;border-radius:12px;margin:12px 0;background:var(--surface);max-height:35vh;overflow:auto}.market-queue p{margin:2px 0 10px}.market-item{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:1px solid var(--line);padding:9px 0}.market-item b{white-space:nowrap}.market-item span{overflow-wrap:anywhere}
+
+/* v2 bridge and electric railway charter reveals */
+.viaduct-reveal,.capital-express-reveal{animation:charterReveal 1.5s ease-out both}
+@keyframes charterReveal{from{opacity:.08;filter:drop-shadow(0 0 8px #f4d580);stroke-dashoffset:60}to{opacity:1;stroke-dashoffset:0}}
+.track-rival-blocked{filter:grayscale(1);opacity:.5}
+@media(prefers-reduced-motion:reduce){.viaduct-reveal,.capital-express-reveal{animation:none!important}}
 </style></head><body>
 <header class="bar"><div class="brandline"><img src="/art/iron-crown-premium.png" class="nav-logo" alt="Iron Crown"></div><div id="top-status" class="pill">THE RAILWAY EMPIRE</div><div class="controls"><button class="btn alt small" id="galleryBtn">Meet the Tycoons</button><button class="btn help-primary" id="rulesBtn" aria-label="How to Play Iron Crown">? How to Play</button><button class="btn alt small" id="chronicleBtn">History &amp; Lore</button><button class="btn alt small" id="soundBtn" aria-pressed="false">♫ Sound off</button><button class="btn alt small" id="audioSettingsBtn" aria-label="Audio and motion settings">⚙ Audio</button></div></header>
 <div id="connection" class="hidden" role="status" aria-live="polite">Reconnecting…</div>
@@ -269,7 +276,7 @@ body.minimal-motion #map .moving-train{display:none!important}
      <div><img src="/art/avatars/augusta_human.png?v=1.5.0" alt=""><span>THE DUCHESS</span></div><div><img src="/art/avatars/silas_human.png?v=1.5.0" alt=""><span>THE ENGINEER</span></div><div><img src="/art/avatars/jack_human.png?v=1.5.0" alt=""><span>THE GAMBLER</span></div><div><img src="/art/avatars/ada_human.png?v=1.5.0" alt=""><span>THE BANKER</span></div><div><img src="/art/avatars/rupert_human.png?v=1.5.0" alt=""><span>THE COLONEL</span></div><div><img src="/art/avatars/nell_human.png?v=1.5.0" alt=""><span>THE UNION BOSS</span></div><div><img src="/art/avatars/ottoline_human.png?v=1.5.0" alt=""><span>THE INVENTOR</span></div><div><img src="/art/avatars/ezra_human.png?v=1.5.0" alt=""><span>THE SMUGGLER</span></div>
   </div></div>
 </section>
-<section id="game" class="hidden"><div class="game-layout"><aside id="roster" class="roster"></aside><main class="board-frame" id="boardFrame"><svg id="map" viewBox="0 0 850 690" role="img" aria-label="Isometric Iron Crown railway country with resource terrain and owned routes"></svg><div class="map-tools" aria-label="Map controls"><button id="zoomIn" title="Zoom in on country" aria-label="Zoom in">+</button><button id="zoomOut" title="Zoom out on country" aria-label="Zoom out">−</button><button id="zoomReset" title="Show whole country" aria-label="Reset map zoom">⌂</button><button id="labelToggle" title="Show or hide town names" aria-label="Toggle town labels">Aa</button></div><div id="mapLegend" class="map-legend" aria-label="Map key"></div><div id="mapTooltip" class="map-tooltip hidden" role="status" aria-live="polite"></div><div id="cinemaLayer" class="cinema-layer" aria-hidden="true"><div id="eraCurtain" class="era-curtain"><div class="era-small">A NEW INDUSTRIAL AGE</div><strong id="eraCurtainTitle">STEAM</strong><div class="era-detail" id="eraCurtainDetail"></div></div><div id="cinemaFlash" class="cinema-flash"></div></div><div id="boardInfo" class="board-overlay"></div><div id="boardTrophies" class="board-trophies"></div></main></div><footer class="ticker"><span class="eyebrow">THE DAILY GAZETTE</span><div id="news" class="news">No news from the Empire.</div><span id="scoreGoal">★ 15 to win</span></footer></section>
+<section id="game" class="hidden"><div class="game-layout"><aside id="roster" class="roster"></aside><main class="board-frame" id="boardFrame"><svg id="map" viewBox="0 0 850 690" role="img" aria-label="Isometric Iron Crown railway country with resource terrain and owned routes"></svg><div class="map-tools" aria-label="Map controls"><button id="zoomIn" title="Zoom in on country" aria-label="Zoom in">+</button><button id="zoomOut" title="Zoom out on country" aria-label="Zoom out">−</button><button id="zoomReset" title="Show whole country" aria-label="Reset map zoom">⌂</button><button id="labelToggle" title="Show or hide town names" aria-label="Toggle town labels">Aa</button></div><div id="mapLegend" class="map-legend" aria-label="Map key"></div><div id="mapTooltip" class="map-tooltip hidden" role="status" aria-live="polite"></div><div id="cinemaLayer" class="cinema-layer" aria-hidden="true"><div id="eraCurtain" class="era-curtain"><div class="era-small">A NEW INDUSTRIAL AGE</div><strong id="eraCurtainTitle">STEAM</strong><div class="era-detail" id="eraCurtainDetail"></div></div><div id="cinemaFlash" class="cinema-flash"></div></div><div id="boardInfo" class="board-overlay"></div><div id="boardTrophies" class="board-trophies"></div></main></div><footer class="ticker"><span class="eyebrow">THE DAILY GAZETTE</span><div id="news" class="news">No news from the Empire.</div><span id="scoreGoal">★ Prestige target</span></footer></section>
 <div id="notice" class="notice hidden"></div><div id="cinemaLive" class="visually-hidden" role="status" aria-live="polite"></div><div id="modalShade" class="modal-shade hidden"><div class="modal" id="modal"></div></div>
 <script>
 'use strict';
@@ -346,6 +353,7 @@ function connect(){
    }else if(m.type==='state'){
     if(hostAuthenticated){if(m.recovery)keepRoomRecovery(code,m.recovery);publicState=m.public;render();}
    }else if(m.type==='error'){
+    playCue('invalid-order');
     if(/^Host room not found\.|^Host credentials rejected\.|^Recovery copy/.test(m.message)){
      hostRecoveryBlocked=true;
      showHostBanner('Could not recover your previous game. Check the server or start a new room.',true);
@@ -399,9 +407,9 @@ function renderLobby(){const s=publicState;$('roomCode').textContent=s.code;$('m
  $('startBtn').title=away.length?'Reconnect missing players or let the computer take over.':unready.length?'Every player must choose a tycoon.':'Begin the railway race';
 }
 function confirmTakeover(id){const p=publicState?.players.find(p=>p.id===id);if(!p||p.ai)return;const warning=p.connected?' is currently online.':' is disconnected.';if(window.confirm('Let the computer take over for '+p.name+'?'+warning+' This cannot be undone in the current game.'))say('replaceAI',{playerId:id});}
-function renderRoster(){const s=publicState;$('roster').innerHTML=`<div class="eyebrow">The tycoons</div>`+[...s.players].sort((a,b)=>b.prestige-a.prestige).map((p,i)=>`<div class="player-card ${s.status==='placement'&&s.placementTurn===p.id?'current':''}">${avatarImage(p,58)}<div style="min-width:0;flex:1"><div class="name">${escapeHTML(p.name)}</div><div class="tycoon-role">${actorTitles[p.avatar]||'TYCOON'}</div><div class="tycoon-reaction" data-player-mood="${p.id}">${actorMood(p)==='smug'?'★ Triumphant':actorMood(p)==='furious'?'⚔ Incensed':'◆ Calculating'}</div><div class="stars">★ ${p.prestige} <span class="mini">${p.locked?'✔ Locked':p.ai?'⚙ AI':p.connected?'● Online':'○ Away'}</span></div></div>${!p.ai?`<button class="takeover" data-ai="${p.id}" title="Let AI take this seat">AI</button>`:''}</div>`).join('');$('roster').querySelectorAll('[data-ai]').forEach(b=>b.onclick=()=>confirmTakeover(b.dataset.ai));}
+function renderRoster(){const s=publicState;$('roster').innerHTML=`<div class="eyebrow">The tycoons</div>`+[...s.players].sort((a,b)=>b.prestige-a.prestige).map((p,i)=>`<div class="player-card ${s.status==='placement'&&s.placementTurn===p.id?'current':''}">${avatarImage(p,58)}<div style="min-width:0;flex:1"><div class="name">${escapeHTML(p.name)}</div><div class="tycoon-role">${actorTitles[p.avatar]||'TYCOON'}</div><div class="tycoon-reaction" data-player-mood="${p.id}">${actorMood(p)==='smug'?'★ Triumphant':actorMood(p)==='furious'?'⚔ Incensed':'◆ Calculating'}</div><div class="stars">★ ${p.prestige} <span class="mini">🚂 ${p.breakdown?.rail||0} rail · </span><span class="mini">${p.locked?'✔ Locked':p.ai?'⚙ AI':p.connected?'● Online':'○ Away'}</span></div></div>${!p.ai?`<button class="takeover" data-ai="${p.id}" title="Let AI take this seat">AI</button>`:''}</div>`).join('');$('roster').querySelectorAll('[data-ai]').forEach(b=>b.onclick=()=>confirmTakeover(b.dataset.ai));}
 function remaining(deadline){if(!deadline)return '—';const sec=Math.max(0,Math.ceil((deadline-Date.now())/1000));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;}
-setInterval(()=>{if(publicState)document.querySelectorAll('[data-player-avatar]').forEach(img=>{const p=publicState.players.find(x=>x.id===img.dataset.playerAvatar);if(p){const src=avatarFor(p);img.dataset.mood=actorMood(p);if(img.getAttribute('src')!==src)img.setAttribute('src',src);}});if(publicState)document.querySelectorAll('[data-player-mood]').forEach(el=>{const p=publicState.players.find(x=>x.id===el.dataset.playerMood);if(p)el.textContent=actorMood(p)==='smug'?'★ Triumphant':actorMood(p)==='furious'?'⚔ Incensed':'◆ Calculating';});if(publicState&&publicState.status!=='lobby')$('top-status').textContent=`${publicState.era.toUpperCase()} ERA · ROUND ${publicState.round}/${publicState.totalRounds} · ${publicState.status.toUpperCase()} · ${remaining(publicState.deadline)}`;},350);
+setInterval(()=>{if(publicState)document.querySelectorAll('[data-player-avatar]').forEach(img=>{const p=publicState.players.find(x=>x.id===img.dataset.playerAvatar);if(p){const src=avatarFor(p);img.dataset.mood=actorMood(p);if(img.getAttribute('src')!==src)img.setAttribute('src',src);}});if(publicState)document.querySelectorAll('[data-player-mood]').forEach(el=>{const p=publicState.players.find(x=>x.id===el.dataset.playerMood);if(p)el.textContent=actorMood(p)==='smug'?'★ Triumphant':actorMood(p)==='furious'?'⚔ Incensed':'◆ Calculating';});if(publicState&&publicState.status!=='lobby')$('top-status').textContent=`${publicState.era.toUpperCase()} ERA · ROUND ${publicState.round}/${publicState.totalRounds} · ${publicState.status.toUpperCase()} · ${remaining(publicState.deadline)}`;if($('marketClock'))$('marketClock').textContent=remaining(publicState?.deadline);},350);
 // PHASE 2 — A layered, vector miniature. Terrain is client-side only: ownership,
 // route connectivity and all resources remain authoritative on the server.
 function svgEscape(v){return escapeHTML(v);}
@@ -443,22 +451,27 @@ function renderMap(s){
    labels+=`<g class="town-label" pointer-events="none"><rect x="${x-w/2}" y="${yy-13}" width="${w}" height="21" rx="6" fill="#241b15eb" stroke="#e8c576" stroke-width="1.2"/><text x="${x}" y="${yy+2}" font-family="Georgia,serif" text-anchor="middle" font-size="12" font-weight="700" fill="#ffedc7">${title}</text></g>`;
   }
  }
+ // The public route list is era-filtered by the server, so unrevealed
+ // infrastructure never appears on the TV or in private phone tooltips.
+ const claimedEdges=new Map();
+ for(const r of s.routes.filter(r=>r.owner))for(let i=1;i<r.path.length;i++)claimedEdges.set([r.path[i-1],r.path[i]].sort().join('|'),r.owner);
  for(const route of s.routes){
+  const blockedByRival=!route.owner&&route.path.slice(1).some((id,i)=>claimedEdges.has([route.path[i],id].sort().join('|')));
   const path=route.path.map((tid,i)=>{const p=geometry(byId[tid]);return `${i?'L':'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;}).join(' ');
   const person=people[route.owner],ownerColour=person?avatar(person.avatar).colour:null;
   routes+=route.owner?`<g class="built-rail ${route.blocked?'rail-closed':''}" data-route="${route.id}"><path d="${path}" fill="none" stroke="#312c28" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#d4c3a0" stroke-width="12" stroke-dasharray="4 8" stroke-linecap="butt"/><path d="${path}" fill="none" stroke="${route.blocked?'#c33d3d':ownerColour}" stroke-width="6" stroke-linejoin="round"/><path d="${path}" fill="none" stroke="#ffe5a8" stroke-width="1.7" opacity=".95"/>${s.status==='income'&&!route.blocked?`<g class="moving-train"><g transform="translate(-9,-8)"><g class="engine-smoke"><circle cx="17" cy="-16" r="3"/><circle cx="19" cy="-16" r="3"/><circle cx="20" cy="-16" r="3"/></g><rect x="0" y="-3" width="18" height="15" rx="3" fill="${ownerColour}" stroke="#f9e4ac" stroke-width="2"/><rect x="3" y="-13" width="11" height="11" fill="#443c33"/><rect x="14" y="-11" width="5" height="13" fill="#a98457"/><circle cx="3" cy="13" r="4" fill="#201e19" stroke="#e8c984"/><circle cx="16" cy="13" r="4" fill="#201e19" stroke="#e8c984"/></g><animateMotion dur="2.25s" repeatCount="indefinite" rotate="auto" path="${path}"/></g>`:''}</g>`:
-  `<g class="prospect-rail" data-route="${route.id}"><path d="${path}" stroke="#392d22" stroke-width="5" opacity=".45" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/><path d="${path}" stroke="#f1d8a2" stroke-width="2.2" opacity=".7" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/></g>`;
+  `<g class="prospect-rail ${blockedByRival?'track-rival-blocked':''} ${route.era==='iron'?'viaduct-reveal':route.era==='electric'?'capital-express-reveal':''}" data-route="${route.id}"><path d="${path}" stroke="${blockedByRival?'#535354':route.era==='electric'?'#594ca4':route.era==='iron'?'#476f77':'#392d22'}" stroke-width="${route.era==='electric'?8:5}" opacity="${blockedByRival?.3:.65}" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/><path d="${path}" stroke="${blockedByRival?'#a9aaaf':route.era==='electric'?'#d4bdff':route.era==='iron'?'#aee0de':'#f1d8a2'}" stroke-width="${route.era==='electric'?3.8:2.2}" opacity="${blockedByRival?.35:.88}" stroke-dasharray="2 11" stroke-linecap="round" fill="none"/></g>`;
  }
  const defs=`<defs><linearGradient id="terrainLight" x1=".12" x2=".82" y1="0" y2="1"><stop stop-color="#fff7c9"/><stop offset=".7" stop-color="#fffbd8" stop-opacity="0"/><stop offset="1" stop-color="#172a26"/></linearGradient><linearGradient id="lakeWater" x1="0" x2=".75" y1="0" y2="1"><stop stop-color="#b8e2d5"/><stop offset=".55" stop-color="#5ea5b0"/><stop offset="1" stop-color="#317c96"/></linearGradient><radialGradient id="mapVignette"><stop stop-color="#f8f0cd" stop-opacity=".04"/><stop offset="1" stop-color="#0b1c1e" stop-opacity=".25"/></radialGradient><filter id="soilShadow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="12"/></filter></defs>`;
  $('map').innerHTML=`${defs}<g id="cameraLayer"><ellipse cx="425" cy="401" rx="354" ry="280" fill="#142322" opacity=".4" filter="url(#soilShadow)"/><g class="island-bases">${bases}</g><g class="island-terrain">${terrain}</g><g class="rail-layer">${routes}</g><g class="pieces-layer">${pieces}</g><g class="label-layer ${mapLabelled?'':'labels-hidden'}">${labels}</g></g>`;
  $('boardFrame').className='board-frame '+s.era;applyCamera();
- $('mapLegend').innerHTML=legendTiles.map(([name,id])=>`<span><i style="background:${colours[id][0]}"></i>${name}</span>`).join('')+'<span><i style="background:#b3975c"></i>Dotted = unbuilt</span>';
+ $('mapLegend').innerHTML=legendTiles.map(([name,id])=>`<span><i style="background:${colours[id][0]}"></i>${name}</span>`).join('')+'<span><i style="background:#b3975c"></i>Dotted = unbuilt</span>'+ (s.era!=='steam'?'<span><i style="background:#74bdc8"></i>Lake bridges</span>':'')+(s.era==='electric'?'<span><i style="background:#b7a4ec"></i>Capital Express</span>':'');
  const tool=$('mapTooltip');
  $('map').querySelectorAll('[data-tile]').forEach(g=>{g.addEventListener('pointerenter',()=>showTileInfo(g.dataset.tile));g.addEventListener('pointerleave',()=>tool.classList.add('hidden'));});
  $('map').querySelectorAll('[data-route]').forEach(g=>{g.addEventListener('pointerenter',()=>showRouteInfo(g.dataset.route));g.addEventListener('pointerleave',()=>tool.classList.add('hidden'));});
 }
-function showTileInfo(id){const s=publicState,t=s?.tiles.find(x=>x.id===id);if(!t)return;const owner=s.players.find(p=>p.id===t.owner),type={coal:'Coalfield · +1 Coal',forest:'Forest · +1 Timber',farm:'Farmland · +1 Grain',steel:'Steelworks · +1 Steel',town:'Market Town · +1 Gold (City: +2)',hill:'Hills · +1 defence',lake:'Lake · impassable',capital:'Capital · unclaimable'}[t.type];$('mapTooltip').innerHTML=`<strong>${svgEscape(t.name||t.type[0].toUpperCase()+t.type.slice(1))}</strong><span>${svgEscape(type)}</span><span>${owner?'Flag: '+svgEscape(owner.name)+' · Soldiers: '+t.soldiers:'Neutral territory'}${t.city?' · City':''}</span>`;$('mapTooltip').classList.remove('hidden');}
-function showRouteInfo(id){const s=publicState,r=s?.routes.find(x=>x.id===id);if(!r)return;const get=t=>s.tiles.find(x=>x.id===t)?.name||'The countryside';const owner=s.players.find(p=>p.id===r.owner);$('mapTooltip').innerHTML=`<strong>${svgEscape(get(r.a))} – ${svgEscape(get(r.b))}</strong><span>${r.segments} segments · ${r.segments} Timber + ${r.segments} Steel</span><span>${owner?'Owned by '+svgEscape(owner.name):'Unclaimed railway'}${r.blocked?' · Bridge closed':''}${r.a==='0,0'||r.b==='0,0'?' · Capital connection bonus':''}</span>`;$('mapTooltip').classList.remove('hidden');}
+function showTileInfo(id){const s=publicState,t=s?.tiles.find(x=>x.id===id);if(!t)return;const owner=s.players.find(p=>p.id===t.owner),type={coal:'Coalfield · +1 Coal',forest:'Forest · +1 Timber',farm:'Farmland · +1 Grain',steel:'Steelworks · +1 Steel',town:'Market Town · +1 Gold (City: +2)',hill:'Hills · +1 Gold from Iron era; +1 attacking strength from a Hill',lake:'Lake · impassable',capital:'Capital · unclaimable'}[t.type];$('mapTooltip').innerHTML=`<strong>${svgEscape(t.name||t.type[0].toUpperCase()+t.type.slice(1))}</strong><span>${svgEscape(type)}</span><span>${owner?'Flag: '+svgEscape(owner.name)+' · Soldiers: '+t.soldiers:'Neutral territory'}${t.city?' · City':''}</span>`;$('mapTooltip').classList.remove('hidden');}
+function showRouteInfo(id){const s=publicState,r=s?.routes.find(x=>x.id===id);if(!r)return;const get=t=>s.tiles.find(x=>x.id===t)?.name||'The countryside';const owner=s.players.find(p=>p.id===r.owner);$('mapTooltip').innerHTML=`<strong>${svgEscape(get(r.a))} – ${svgEscape(get(r.b))}</strong><span>${r.segments} segments · ${r.segments} Timber + ${r.segments} Steel</span><span>${owner?'Owned by '+svgEscape(owner.name):'Unclaimed railway'}${r.blocked?' · Bridge closed':''}${r.era==='iron'?' · Iron-era viaduct':r.era==='electric'?' · Electric Capital Express (2 Gold income)':''}${r.a==='0,0'||r.b==='0,0'?' · Capital connection bonus':''}</span>`;$('mapTooltip').classList.remove('hidden');}
 function applyCamera(){const view=$('cameraLayer');if(!view)return;const z=mapZoom;view.setAttribute('transform',`translate(${425*(1-z)+mapPan.x} ${344*(1-z)+mapPan.y}) scale(${z})`);}
 function focusAction(s){if(motionOff()){mapPan={x:0,y:0};applyCamera();return;}const last=s.feed.at(-1);if(!last||s.status==='income'||s.status==='plan'||s.status==='draft'||s.status==='placement'){mapPan={x:0,y:0};applyCamera();return;}
  const id=last.tile||(last.route&&s.routes.find(r=>r.id===last.route)?.path[Math.floor((s.routes.find(r=>r.id===last.route)?.path.length||2)/2)]);
@@ -476,10 +489,12 @@ function renderBoard(s){let msg='',hint='';
  if(s.status==='placement'){msg=`Depot ${s.placementIndex+1}/${s.placementTotal}`;hint=`${escapeHTML(s.players.find(p=>p.id===s.placementTurn)?.name||'Next tycoon')} is placing a free depot.`;}
  if(s.status==='draft'){msg=`The ${s.era.toUpperCase()} Era`;hint='Choose one free upgrade on your phone.';}
  if(s.status==='income'){msg='The trains are running';hint='Production, railway earnings and catch-up income are being paid.';}
- if(s.status==='plan'){msg='Secret Planning';hint=`All tycoons choose two actions. ${s.players.filter(p=>p.locked).length} of ${s.players.length} have locked in.`;}
- if(s.status==='reveal'||s.status==='offer'){msg='Orders Revealed';hint=s.status==='offer'?'A trade offer awaits a response…':'The tycoons reveal their schemes in seat order.';}
+ if(s.status==='plan'){msg='Secret Planning';hint=`All tycoons choose three actions. ${s.players.filter(p=>p.locked).length} of ${s.players.length} have locked in.`;}
+ if(s.status==='reveal'){msg='Orders Revealed';hint='The tycoons reveal three orders per player in rotating order.';}
+ if(s.status==='market'){msg='THE EXCHANGE IS OPEN';hint=`One shared 20-second trading window · ${s.market?.offers?.length||0} proposals · ${s.market?.offers?.filter(o=>o.answered).length||0} answered. Individual prices stay secret.`;}
  if(s.status==='finished'){msg='The Crown Is Claimed';hint='The last whistle has sounded. See the final standings.';}
- $('boardInfo').innerHTML=`<div class="eyebrow">${s.event?`<span class="event">${escapeHTML(s.event.name)}</span>`:'THE IRON KINGDOM'}</div><h2>${msg}</h2><p>${hint}</p>`;
+ const marketQueue=s.status==='market'&&s.market?`<section class="market-queue" aria-label="Public trading queue"><p><b id="marketClock">${remaining(s.deadline)}</b> · Exchange closes for everyone together</p>${s.market.offers.map(offer=>{const trader=id=>escapeHTML(s.players.find(p=>p.id===id)?.name||'Tycoon');return `<div class="market-item"><span>${trader(offer.from)} → ${trader(offer.to)}</span><b>${offer.answered?'✔ Answered':'⏳ Pending'}</b></div>`;}).join('')}</section>`:'';
+ $('boardInfo').innerHTML=`<div class="eyebrow">${s.event?`<span class="event">${escapeHTML(s.event.name)}</span>`:'THE IRON KINGDOM'}</div><h2>${msg}</h2><p>${hint}</p>${marketQueue}`;
  const find=id=>s.players.find(p=>p.id===id)?.name?.split(' ')[0]||'Unclaimed';
  $('boardTrophies').innerHTML=`<span>🚂 Longest Railway · <b>${escapeHTML(find(s.trophies?.rail))}</b></span><span>⚔ Largest Army · <b>${escapeHTML(find(s.trophies?.army))}</b></span>`;
  $('news').textContent=s.feed.at(-1)?.message||'The country awaits its railway tycoons.';$('scoreGoal').textContent=`★ ${s.winTarget} to win`;
@@ -489,7 +504,7 @@ function startEraSequence(era){
  const curtain=$('eraCurtain');if(!curtain)return;
  clearTimeout(eraRelease);curtain.className='era-curtain '+era;void curtain.offsetWidth;
  const names={steam:'THE AGE OF STEAM',iron:'THE IRON AGE',electric:'THE ELECTRIC AGE'};
- const descriptions={steam:'Coal, courage and the first great engines',iron:'Steel viaducts. New fortunes.',electric:'The kingdom awakens in electric light'};
+ const descriptions={steam:'Coal, courage and the first great engines',iron:'Three new Lake Viaduct routes unlock!',electric:'Three Capital Express routes unlock! Each pays 2 Gold.'};
  $('eraCurtainTitle').textContent=names[era]||era.toUpperCase();$('eraCurtainDetail').textContent=descriptions[era]||'';
  curtain.classList.add('is-visible');$('cinemaLive').textContent=names[era]||'';
  eraRelease=setTimeout(()=>curtain.classList.remove('is-visible'),3200);
@@ -510,12 +525,12 @@ function spotlightAction(item){
  clearTimeout(highlightRelease);void node.getBoundingClientRect();node.classList.add('cinema-highlight');
  highlightRelease=setTimeout(()=>node.classList.remove('cinema-highlight'),2200);
 }
-const eventCues={build:'depot-build',track:'track-lay',city:'city-build',income:'coin-clink',clash:'dice-roll',trade:'coin-clink',research:'ui-confirm',ticket:'ui-confirm',trophy:'ui-confirm',era:'era-fanfare',win:'victory-fanfare'};
+const eventCues={build:'depot-build',track:'railway-switch',city:'grand-station',income:'coin-clink',clash:'dice-roll',trade:'trade-handshake',research:'contract-stamp',ticket:'ticket-complete',trophy:'royal-ledger',era:'era-fanfare',win:'victory-fanfare'};
 function renderFx(s){
  if(!cinemaReady){cinemaReady=true;return;}
  const fx=s.feed.filter(x=>x.seq>seenSeq).slice(-6);
  for(const item of fx){
-  if(eventCues[item.kind])playCue(eventCues[item.kind]);
+  if(eventCues[item.kind])playCue(item.kind==='era'&&String(item.era||publicState?.era||'').toLowerCase().includes('electric')?'electric-era':eventCues[item.kind]);
   if(['build','track','city','clash'].includes(item.kind))spotlightAction(item);
   if(['city','clash','track','trophy','win'].includes(item.kind))flashBoard(item.kind);
   if(item.kind==='clash')showActorNotice('⚔ THE CLASH',item,2800);
@@ -548,18 +563,19 @@ function showTycoons(){const shade=$('modalShade');shade.classList.remove('hidde
  const a=galleryActors.find(a=>a[0]===galleryActor);$('galleryFeature').innerHTML=`<section class="gallery-feature"><img src="${avatarFor({avatar:a[0]})}" alt="Approved human portrait of ${escapeHTML(a[1])}"><div><span class="eyebrow">${escapeHTML(a[2])}</span><h3>${escapeHTML(a[1])}</h3><p>${escapeHTML(a[5])}</p><div class="actor-perk"><strong>Advanced-mode perk</strong><p>${escapeHTML(a[4])}</p></div><p class="minor">These are the approved human portraits. Era-specific costumes and independently illustrated facial expressions are still in development.</p></div></section>`;
 }
 function showResults(){const s=publicState;const ranking=[...s.players].sort((a,b)=>s.finalRanking.indexOf(a.id)-s.finalRanking.indexOf(b.id));
- $('modal').innerHTML=`<div class="eyebrow">The final reckoning</div><h2>♛ The Iron Crown</h2><p>${escapeHTML(ranking[0].name)} has won the contest of railways and power.</p><div class="winner-list">${ranking.map((p,i)=>`<div class="winner-row"><b>${i+1}.</b>${avatarImage(p,55)}<div><b>${escapeHTML(p.name)}</b><div class="minor">Cities ${p.breakdown?.city||0} · Tickets ${p.breakdown?.tickets||0} · Rails ${p.breakdown?.rail||0}</div></div><strong>★ ${p.prestige}</strong></div>`).join('')}</div><div class="footer-actions"><button class="btn" onclick="if(window.confirm('Play another Iron Crown game with the same invited players?')){say('restart',{});closeModal();}">Play again</button><button class="btn alt" onclick="closeModal()">View the board</button></div>`;
+ const winners=s.winners||[s.winner].filter(Boolean),shared=winners.length>1;
+ $('modal').innerHTML=`<div class="eyebrow">The final reckoning</div><h2>♛ The Iron Crown</h2><p>${shared?'SHARED CROWN — '+winners.map(id=>escapeHTML(s.players.find(p=>p.id===id)?.name||'Tycoon')).join(' & ')+' share the throne!':escapeHTML(ranking[0].name)+' has won the contest of railways and power.'}</p><div class="winner-list">${ranking.map((p,i)=>`<div class="winner-row"><b>${shared&&winners.includes(p.id)?'1=':i+1+'.'}</b>${avatarImage(p,55)}<div><b>${escapeHTML(p.name)}${winners.includes(p.id)?' ♛':''}</b><div class="minor">Cities ${p.breakdown?.city||0} · Tickets ${p.breakdown?.tickets||0} · Rails ${p.breakdown?.rail||0} · Royal Ledger ${p.breakdown?.dividend||0}</div></div><strong>★ ${p.prestige}</strong></div>`).join('')}</div><div class="footer-actions"><button class="btn" onclick="if(window.confirm('Play another Iron Crown game with the same invited players?')){say('restart',{});closeModal();}">Play again</button><button class="btn alt" onclick="closeModal()">View the board</button></div>`;
  $('modalShade').classList.remove('hidden');}
 function closeModal(){$('modalShade').classList.add('hidden');$('modal').classList.remove('guide-modal');if(guideFocusReturn?.isConnected)guideFocusReturn.focus();guideFocusReturn=null;}
 // Phase 8.1 — classroom-clear rules, rich fictional setting and verified railway history.
 const guideActions=[
  ['Build Depot','1 Timber + 1 Grain','Claim a legal neighbouring tile.'],
  ['Upgrade to City','2 Grain + 2 Steel + 1 Coal','Turn your own Market Town into a City.'],
- ['Lay Track','1 Timber + 1 Steel per segment','Claim an entire marked railway route.'],
+ ['Lay Track','1 Timber + 1 Steel per segment','Claim a marked route; score 1 / 2 / 4 / 7 Prestige for lengths 2 / 3 / 4 / 5.'],
  ['Recruit','2 Gold per Soldier','Add up to 3 Soldiers to owned land.'],
- ['Trade','No action cost','Exchange 3:1 with the bank or offer another tycoon a deal.'],
+ ['Trade','No action cost','Exchange 3:1 with the bank or offer another tycoon a sealed deal.'],
  ['Research','3 Gold + 1 Coal','Draw a secret Destination Ticket or buy an available era Upgrade; only once a round.'],
- ['Attack','No resources; commits Soldiers','Attack an adjacent rival, using Soldiers plus one die. Ties favour the defender.']
+ ['Attack','No resources; commits Soldiers','Attack using Soldiers and one die; attacking from a Hill adds +1. Ties favour the defender.']
 ];
 const guideTycoons=[
  ['Lady Augusta Blackwood','The Duchess','She regards the railway as her family’s last chance to retain influence.'],
@@ -574,15 +590,15 @@ const guideTycoons=[
 const guideSections={
  quick:[
   '<p class="guide-lead">An easy, one-minute introduction. The TV shows the shared railway map; your phone keeps your plans and tickets private.</p>',
-  '<div class="guide-three"><article><span>1</span><h3>Join &amp; claim</h3><p>Use the TV room code or QR. Pick a tycoon, keep at least 2 secret Destination Tickets and place 2 starting Depots.</p></article><article><span>2</span><h3>Plan two orders</h3><p>Each round you earn resources, secretly choose <b>two actions</b> on your phone, then press <b>Lock In</b>.</p></article><article><span>3</span><h3>Watch the reveal</h3><p>The TV resolves the orders. Build towns and railway links, fulfil tickets and claim trophies to win Prestige.</p></article></div>',
-  '<div class="guide-takeaway"><strong>Win the Crown</strong><p>First to <b>10 Prestige</b> in Quick or <b>15</b> in Standard/Advanced after a Reveal; otherwise highest at the end. Nobody gets eliminated.</p></div>',
-  '<p class="guide-note"><b>Three eras:</b> Steam → Iron → Electric. At each new era, choose one free Upgrade. Advanced mode adds events and tycoon abilities.</p>'
+  '<div class="guide-three"><article><span>1</span><h3>Join &amp; claim</h3><p>Use the TV room code or QR. Pick a tycoon, keep at least 2 secret Destination Tickets and place 2 starting Depots.</p></article><article><span>2</span><h3>Plan three orders</h3><p>Each round you earn resources, secretly choose <b>three actions</b> on your phone, then press <b>Lock In</b>.</p></article><article><span>3</span><h3>Watch the reveal</h3><p>The TV resolves the orders. Build towns and railway links, fulfil tickets and claim trophies to win Prestige.</p></article></div>',
+  '<div class="guide-takeaway"><strong>Win the Crown</strong><p>First to <b>12 Prestige</b> in Quick, <b>22</b> in Standard or <b>24</b> in Advanced after a Reveal; otherwise highest at the end. Nobody gets eliminated.</p></div>',
+  '<p class="guide-note"><b>Three eras:</b> Steam → Iron → Electric. At each new era, choose one free Upgrade. Iron unlocks three Lake Viaducts; Electric unlocks three Capital Express routes (2 Gold income plus bonuses). Advanced mode adds events and tycoon abilities.</p>'
  ].join(''),
  actions:[
-  '<p class="guide-lead">Every round has three phases: <b>Income → Plan → Reveal</b>. Choose any two actions; Research may only be chosen once.</p>',
+  '<p class="guide-lead">Every round has three phases: <b>Income → Plan → Reveal</b>. Choose any three actions; Research may only be chosen once.</p>',
   '<div class="guide-action-table" role="table" aria-label="Seven actions and their costs">',
   ...guideActions.map(a=>'<div class="guide-action-row" role="row"><strong role="cell">'+a[0]+'</strong><span role="cell">'+a[1]+'</span><span role="cell">'+a[2]+'</span></div>'),
-  '</div><div class="guide-takeaway"><strong>What earns Prestige?</strong><p>Market Town Depot +1 · City +2 · Completed ticket +2–4 · Longest Railway +2 · Largest Army +2 · Grand Station +2.</p></div>',
+  '</div><div class="guide-takeaway"><strong>What earns Prestige?</strong><p>Market Town Depot +1 · City +2 · Completed ticket +2–4 · Railway routes +1/+2/+4/+7 · Longest Railway +2 · Largest Army +2 · Grand Station +2. At the scheduled final round, the Royal Ledger awards 1 Prestige per 8 unused industrial goods and 1 per 4 unspent Gold, up to 3 Prestige from industrial goods and up to 3 from Gold (5 Gold Prestige in Advanced).</p></div>',
   '<p class="guide-note">When a planned action becomes impossible, resources are returned and the player gets +1 Gold. An attack adds one six-sided die to Soldiers and bonuses; ties favour the defender.</p>'
  ].join(''),
  lore:[
@@ -632,7 +648,7 @@ document.addEventListener('keydown',e=>{
 $('modalShade').onclick=e=>{if(e.target===$('modalShade'))closeModal();};$('botBtn').onclick=()=>say('addAI',{});$('mode').onchange=e=>say('mode',{mode:e.target.value});$('startBtn').onclick=()=>say('start',{mode:$('mode').value});
 /* Only same-origin bundled audio is used. An optional local file replaces the
    synthesised cue automatically; no audio asset means the playable fallback remains. */
-const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour'];
+const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour','railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe'];
 // Phase 6.2: TV-first audio mix — effects, music and ambience are independent.
 const SOUND_GAIN=Object.freeze({
  'train-whistle':{gain:.47,gap:1800,priority:3,duck:1900},
@@ -651,7 +667,16 @@ const SOUND_GAIN=Object.freeze({
  'ui-select':{gain:.15,gap:100,priority:0},
  'ui-confirm':{gain:.21,gap:220,priority:1},
  'ambience-railway':{gain:.22,gap:0,priority:0},
- 'music-parlour':{gain:.40,gap:0,priority:0}
+ 'music-parlour':{gain:.40,gap:0,priority:0},
+ 'railway-switch':{gain:.26,gap:500,priority:2},
+ 'contract-stamp':{gain:.24,gap:550,priority:2},
+ 'trade-handshake':{gain:.30,gap:700,priority:2,duck:1400},
+ 'royal-ledger':{gain:.32,gap:3000,priority:4,duck:1800},
+ 'grand-station':{gain:.38,gap:2500,priority:4,duck:3000},
+ 'ticket-complete':{gain:.31,gap:600,priority:3},
+ 'invalid-order':{gain:.18,gap:450,priority:2},
+ 'electric-era':{gain:.36,gap:4000,priority:5,duck:3500},
+ 'music-parlour-deluxe':{gain:.35,gap:0,priority:0}
 });
 const MIX_PRESETS=Object.freeze({
  quiet:{fx:.31,music:.13,ambience:.12},
@@ -714,6 +739,10 @@ function synthCue(key){
   offset+=duration*.78;
  }
 }
+function studioMasterPath(filename){
+ const stem=filename.replace(/\.(ogg|wav|mp3)$/,'');
+ return ['railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe'].includes(stem) ? '/audio/'+filename : '/audio/mastered/'+filename;
+}
 function releaseEffect(item){
  activeEffects.delete(item);
 }
@@ -725,7 +754,7 @@ function duckMusic(ms){
  duckUntil=Math.max(duckUntil,Date.now()+ms);
  applyLoopVolume();
 }
-function studioMasterPath(filename){return '/audio/mastered/'+filename;}
+const AUDIO_FALLBACK=Object.freeze({"railway-switch":"track-lay","contract-stamp":"ui-confirm","trade-handshake":"coin-clink","royal-ledger":"ui-confirm","grand-station":"city-build","ticket-complete":"ui-confirm","invalid-order":"ui-select","electric-era":"era-fanfare"});
 function playCue(key){
  if(muted||document.visibilityState==='hidden'||!SOUND_KEYS.includes(key))return;
  const cue=SOUND_GAIN[key];if(!cue)return;
@@ -738,21 +767,21 @@ function playCue(key){
  }
  lastCueAt.set(key,now);
  if(cue.duck)duckMusic(cue.duck);
- const filename=soundManifest.get(key);
- if(!filename){synthCue(key);return;}
+ const filename=soundManifest.get(key)||soundManifest.get(AUDIO_FALLBACK[key]);
+ if(!filename){synthCue(AUDIO_FALLBACK[key]||key);return;}
  const audio=new Audio('/audio/'+filename),effect={audio,priority:cue.priority,key};
  audio.src=studioMasterPath(filename);
  audio.preload='auto';
  audio.volume=trimGain(masterVolume*cue.gain);
  activeEffects.add(effect);
  audio.addEventListener('ended',()=>releaseEffect(effect),{once:true});
- let originalFallback=false;
- audio.addEventListener('error',()=>{
-  if(!originalFallback){originalFallback=true;audio.src='/audio/'+filename;audio.play().catch(()=>{releaseEffect(effect);if(!muted)synthCue(key);});return;}
-  releaseEffect(effect);if(!muted)synthCue(key);
- });
- audio.play().catch(()=>{if(!originalFallback){originalFallback=true;audio.src='/audio/'+filename;audio.play().catch(()=>{releaseEffect(effect);if(!muted)synthCue(key);});}});
-
+ let fallbackTried=false;
+ const fallbackToOriginal=()=>{
+  if(!fallbackTried&&audio.src.includes('/mastered/')){fallbackTried=true;audio.src='/audio/'+filename;audio.play().catch(()=>{releaseEffect(effect);if(!muted)synthCue(AUDIO_FALLBACK[key]||key);});return;}
+  releaseEffect(effect);if(!muted)synthCue(AUDIO_FALLBACK[key]||key);
+ };
+ audio.addEventListener('error',fallbackToOriginal);
+ audio.play().catch(()=>{fallbackToOriginal(); /* audio.play().catch(()=>{releaseEffect(effect);if(!muted)synthCue(key);}); */ });
 }
 function applyLoopVolume(){
  const visible=document.visibilityState!=='hidden'&&!muted;
@@ -772,7 +801,8 @@ function stopAudioLoops(){
 }
 function startAudioLoops(){
  stopAudioLoops();if(muted)return;
- for(const [name,slot] of [['ambience-railway','rail'],['music-parlour','music']]){
+ const parlourTrack=soundManifest.has('music-parlour-deluxe')?'music-parlour-deluxe':'music-parlour';
+ for(const [name,slot] of [['ambience-railway','rail'],[parlourTrack,'music']]){
   const file=soundManifest.get(name);if(!file)continue;
   const audio=new Audio('/audio/'+file);
   audio.src=studioMasterPath(file);
@@ -780,7 +810,7 @@ function startAudioLoops(){
   audio.loop=true;audio.preload='auto';audio.volume=0;
   audio.play().catch(()=>{});if(slot==='rail')railLoop=audio;else parlourLoop=audio;
  }
- if(!soundManifest.has('music-parlour'))musicTick=setInterval(()=>{
+ if(!soundManifest.has(parlourTrack))musicTick=setInterval(()=>{
   if(!muted&&musicVolume>0&&document.visibilityState==='visible'&&Date.now()>=duckUntil)synthCue('music-parlour');
  },5500);
  syncEngineAudio(publicState?.status);
@@ -792,6 +822,7 @@ function syncEngineAudio(status){
  if(muted||status!=='income'||!soundManifest.get('train-chug'))return;
  engineLoop=new Audio('/audio/'+soundManifest.get('train-chug'));
  engineLoop.src=studioMasterPath(soundManifest.get('train-chug'));
+ engineLoop.addEventListener('error',()=>{if(engineLoop&&engineLoop.src.includes('/mastered/')){engineLoop.src='/audio/'+soundManifest.get('train-chug');engineLoop.play().catch(()=>{});}}, {once:true});
  engineLoop.loop=true;engineLoop.volume=0;engineLoop.play().catch(()=>{});
  applyLoopVolume();
 }
@@ -817,21 +848,21 @@ async function toggleAudio(skipWelcome=false){
 $('soundBtn').onclick=async()=>{await toggleAudio();};
 $('audioSettingsBtn').onclick=()=>{
  const profiles=Object.keys(MIX_PRESETS);
- const demo=['train-whistle','dice-roll','clash-impact','coin-clink','era-fanfare','victory-fanfare','ui-select'];
+ const demo=['train-whistle','railway-switch','trade-handshake','grand-station','ticket-complete','electric-era','royal-ledger','dice-roll','clash-impact','era-fanfare','victory-fanfare','ui-select'];
  const slider=(id,title,value)=>'<div><label for="'+id+'">'+title+' <span id="'+id+'Val">'+Math.round(value*100)+'%</span></label><input id="'+id+'" type="range" min="0" max="100" step="1" aria-label="'+title+'" value="'+Math.round(value*100)+'"></div>';
  $('modal').innerHTML=[
  '<div class="eyebrow">The railway parlour · Audio controls</div><h2>Sound &amp; motion</h2><div class="audio-mixer">',
  '<div><label for="mixPreset">Sound profile</label><select id="mixPreset" aria-label="Sound profile">'+profiles.map(p=>'<option value="'+p+'" '+(mixProfile===p?'selected':'')+'>'+p[0].toUpperCase()+p.slice(1)+'</option>').join('')+'<option value="custom" '+(mixProfile==='custom'?'selected':'')+'>Custom</option></select></div>',
  slider('masterVol','Sound effects',masterVolume),slider('musicVol','Music',musicVolume),slider('ambienceVol','Railway ambience',ambienceVolume),
  '<div><label for="motionChoice">Reduce cinematic movement <input id="motionChoice" type="checkbox" '+(motionOff()?'checked':'')+'></label><p class="audio-detail">Also follows the device reduced-motion setting.</p></div>',
- '<div id="soundInventory" class="audio-status" role="status">'+soundManifest.size+'/17 local sound recordings detected. Missing recordings use synthesised fallback.</div>',
+ '<div id="soundInventory" class="audio-status" role="status">'+soundManifest.size+' local sound recordings detected (17 original + up to 9 bonus). Missing recordings use fallback audio.</div>',
  '<div><label for="previewCue">Preview a sound</label><select id="previewCue" aria-label="Choose a sound to preview">'+demo.map(k=>'<option value="'+k+'">'+k.replace(/-/g,' ')+'</option>').join('')+'</select></div>',
  '<p class="audio-detail">The Balanced profile is tuned for conversation around a television. Dramatic reveals gently lower the music and railway ambience. Sound remains off until you enable it.</p>',
  '</div><div class="footer-actions"><button class="btn" id="previewAudio">Play selected sound</button><button class="btn alt" id="closeMixer">Back to the game</button></div>'
  ].join('');
  $('modalShade').classList.remove('hidden');
  // Read the local inventory without starting audio or bypassing autoplay settings.
- if(!soundManifestReady)scanBundledAudio().then(()=>{const status=$('soundInventory');if(status)status.textContent=soundManifest.size+'/17 local sound recordings detected.';});
+ if(!soundManifestReady)scanBundledAudio().then(()=>{const status=$('soundInventory');if(status)status.textContent=soundManifest.size+' local recordings detected (17 original + up to 9 bonus).';});
  const updateInputs=()=>{
   for(const [id,value] of [['masterVol',masterVolume],['musicVol',musicVolume],['ambienceVol',ambienceVolume]]){
    $(id).value=String(Math.round(value*100));$(id+'Val').textContent=Math.round(value*100)+'%';

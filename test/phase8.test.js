@@ -36,7 +36,7 @@ test('Server only removes lobby players; mid-game controls require AI takeover',
 });
 test('Rematch drops all game statistics and retains invited friends',()=>{
  assert.match(serverSource,/newRoom\.players=room\.players\.map/);
- for(const fragment of ["draftDone:false","actions:[null,null]","telegraphUsed:false","smuggleUsed:false","bonusPrestige:0","prestige:0","breakdown:{}","reaction:'neutral'"])
+ for(const fragment of ["draftDone:false","actions:[null,null,null]","telegraphUsed:false","smuggleUsed:false","bonusPrestige:0","prestige:0","breakdown:{}","reaction:'neutral'"])
   assert.ok(serverSource.includes(fragment),fragment);
 });
 async function ephemeralPort(){return new Promise((resolve,reject)=>{

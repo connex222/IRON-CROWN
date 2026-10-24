@@ -3,7 +3,7 @@
 Mark these only after personally checking on a real TV and phones.
 
 - [ ] Open the published TV URL and confirm the premium logo, avatar images, QR and room code.
-- [ ] On the same deployed host visit /health: status ok, version 1.10.0, installedSounds 17, expectedSounds 17.
+- [ ] On the same deployed host visit /health: status ok, version from the current package.json, installedSounds 17, expectedSounds 17.
 - [ ] Visit /audio/manifest.json and verify the 17 local MP3 filenames; listen to at least a whistle, dice, clash and victory cue.
 - [ ] Join from 2, 4 and ideally 8 phones; confirm unique tycoons, readable action controls and private contracts.
 - [ ] Take a phone offline and online during the lobby and planning rounds. It must recover the same seat and TV Online/Away status without duplicates.

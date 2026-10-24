@@ -1,0 +1,646 @@
+TAP version 13
+# Subtest: 37-hex map satisfies tile distribution, lake spacing and route constraints
+ok 1 - 37-hex map satisfies tile distribution, lake spacing and route constraints
+  ---
+  duration_ms: 301.877571
+  type: 'test'
+  ...
+# Subtest: four-letter room, player limit, uniqueness and sanitized names
+ok 2 - four-letter room, player limit, uniqueness and sanitized names
+  ---
+  duration_ms: 1.207319
+  type: 'test'
+  ...
+# Subtest: secret ticket selection, snake placement and starting resources
+ok 3 - secret ticket selection, snake placement and starting resources
+  ---
+  duration_ms: 5.383702
+  type: 'test'
+  ...
+# Subtest: income, bank trade ratios and mode-specific rules
+ok 4 - income, bank trade ratios and mode-specific rules
+  ---
+  duration_ms: 2.726168
+  type: 'test'
+  ...
+# Subtest: validate targeted actions, prohibit research twice and enforce joint costs
+ok 5 - validate targeted actions, prohibit research twice and enforce joint costs
+  ---
+  duration_ms: 4.851732
+  type: 'test'
+  ...
+# Subtest: failed actions add exactly one Gold, valid actions spend resources
+ok 6 - failed actions add exactly one Gold, valid actions spend resources
+  ---
+  duration_ms: 6.17166
+  type: 'test'
+  ...
+# Subtest: scoring: market depots, cities, tickets and 5-soldier trophy
+ok 7 - scoring: market depots, cities, tickets and 5-soldier trophy
+  ---
+  duration_ms: 3.913296
+  type: 'test'
+  ...
+# Subtest: longest railway counts connected owned route segments
+ok 8 - longest railway counts connected owned route segments
+  ---
+  duration_ms: 0.15983
+  type: 'test'
+  ...
+# Subtest: trade requires a recipient, valid resource objects, and may be declined
+ok 9 - trade requires a recipient, valid resource objects, and may be declined
+  ---
+  duration_ms: 3.305611
+  type: 'test'
+  ...
+# Subtest: Advanced rules: avatar perks and events modify costs
+ok 10 - Advanced rules: avatar perks and events modify costs
+  ---
+  duration_ms: 2.599147
+  type: 'test'
+  ...
+# Subtest: computer-only games progress to a winner without getting stuck
+ok 11 - computer-only games progress to a winner without getting stuck
+  ---
+  duration_ms: 152.220157
+  type: 'test'
+  ...
+# Subtest: no elimination: a player with no territory is restored free at Income
+ok 12 - no elimination: a player with no territory is restored free at Income
+  ---
+  duration_ms: 2.958599
+  type: 'test'
+  ...
+# Subtest: phone and TV scripts are self-contained and parse without runtime imports
+ok 13 - phone and TV scripts are self-contained and parse without runtime imports
+  ---
+  duration_ms: 4.610818
+  type: 'test'
+  ...
+# Subtest: seeded countries reproduce the same towns, topography, railway paths and ticket deck
+ok 14 - seeded countries reproduce the same towns, topography, railway paths and ticket deck
+  ---
+  duration_ms: 107.084682
+  type: 'test'
+  ...
+# Subtest: every generated town is connected to the capital by the complete prospective network
+ok 15 - every generated town is connected to the capital by the complete prospective network
+  ---
+  duration_ms: 167.675611
+  type: 'test'
+  ...
+# Subtest: Phase 2 presentation ships painted TV terrain, accessible phone target highlighting and map controls
+ok 16 - Phase 2 presentation ships painted TV terrain, accessible phone target highlighting and map controls
+  ---
+  duration_ms: 1.360511
+  type: 'test'
+  ...
+# Subtest: Phase 3 ships all eight approved realistic human tycoon portraits across eras and moods
+ok 17 - Phase 3 ships all eight approved realistic human tycoon portraits across eras and moods
+  ---
+  duration_ms: 9.926028
+  type: 'test'
+  ...
+# Subtest: Phase 3 embeds premium working lobby, human actor selection and event reactions without a CDN
+ok 18 - Phase 3 embeds premium working lobby, human actor selection and event reactions without a CDN
+  ---
+  duration_ms: 1.409785
+  type: 'test'
+  ...
+# Subtest: Phase 3: building a City sets a public four-second smug reaction
+ok 19 - Phase 3: building a City sets a public four-second smug reaction
+  ---
+  duration_ms: 5.003389
+  type: 'test'
+  ...
+# Subtest: Phase 3: failed plans cause furious reaction, no secret private details in public state
+ok 20 - Phase 3: failed plans cause furious reaction, no secret private details in public state
+  ---
+  duration_ms: 3.520566
+  type: 'test'
+  ...
+# Subtest: Phase 3: trophy changes trigger winner and loser emotions only when ownership changes
+ok 21 - Phase 3: trophy changes trigger winner and loser emotions only when ownership changes
+  ---
+  duration_ms: 1.943279
+  type: 'test'
+  ...
+# Subtest: Phase 3: contenders react to clash results with defender and claimant treated distinctly
+ok 22 - Phase 3: contenders react to clash results with defender and claimant treated distinctly
+  ---
+  duration_ms: 2.152133
+  type: 'test'
+  ...
+# Subtest: Phase 3: TV and phone honour live server reactions and display era-specific visuals
+ok 23 - Phase 3: TV and phone honour live server reactions and display era-specific visuals
+  ---
+  duration_ms: 0.945535
+  type: 'test'
+  ...
+# Subtest: Phase 3.4: mobile selector includes eight accessible independent selections and dossiers
+ok 24 - Phase 3.4: mobile selector includes eight accessible independent selections and dossiers
+  ---
+  duration_ms: 1.200649
+  type: 'test'
+  ...
+# Subtest: Phase 3.4: TV gallery supports all eight people, eras, screen reader friendly controls and closing
+ok 25 - Phase 3.4: TV gallery supports all eight people, eras, screen reader friendly controls and closing
+  ---
+  duration_ms: 0.792274
+  type: 'test'
+  ...
+# Subtest: Phase 3.4: character art is served locally and portrait alternatives exist without network dependencies
+ok 26 - Phase 3.4: character art is served locally and portrait alternatives exist without network dependencies
+  ---
+  duration_ms: 18.809965
+  type: 'test'
+  ...
+# Subtest: Phase 3.5: game UIs use human portraits, not previous era derivatives
+ok 27 - Phase 3.5: game UIs use human portraits, not previous era derivatives
+  ---
+  duration_ms: 1.053317
+  type: 'test'
+  ...
+# Subtest: Phase 3.5: eight original human portraits exist and are distinct PNG images
+ok 28 - Phase 3.5: eight original human portraits exist and are distinct PNG images
+  ---
+  duration_ms: 11.193503
+  type: 'test'
+  ...
+# Subtest: Phase 4: two attacks cannot double-book a source army
+ok 29 - Phase 4: two attacks cannot double-book a source army
+  ---
+  duration_ms: 4.224736
+  type: 'test'
+  ...
+# Subtest: Phase 4: second Depot cannot target the same tile
+ok 30 - Phase 4: second Depot cannot target the same tile
+  ---
+  duration_ms: 2.47516
+  type: 'test'
+  ...
+# Subtest: Phase 4: combined double attack rolls once per player
+ok 31 - Phase 4: combined double attack rolls once per player
+  ---
+  duration_ms: 2.232174
+  type: 'test'
+  ...
+# Subtest: Phase 4: reject special or inherited trade resource names
+ok 32 - Phase 4: reject special or inherited trade resource names
+  ---
+  duration_ms: 2.699028
+  type: 'test'
+  ...
+# Subtest: Phase 4: bank trade can fund the second action
+ok 33 - Phase 4: bank trade can fund the second action
+  ---
+  duration_ms: 2.298454
+  type: 'test'
+  ...
+# Subtest: Phase 4: compulsory trade cannot force unavailable payment
+ok 34 - Phase 4: compulsory trade cannot force unavailable payment
+  ---
+  duration_ms: 2.085132
+  type: 'test'
+  ...
+# Subtest: Phase 4: Telegraph change rejects a depleted budget
+ok 35 - Phase 4: Telegraph change rejects a depleted budget
+  ---
+  duration_ms: 2.505856
+  type: 'test'
+  ...
+# Subtest: Phase 4: invalid bank actions and deadline pass safely
+ok 36 - Phase 4: invalid bank actions and deadline pass safely
+  ---
+  duration_ms: 1.598649
+  type: 'test'
+  ...
+# Subtest: Phase 4: two, four and eight AI players finish all game modes with valid stock
+ok 37 - Phase 4: two, four and eight AI players finish all game modes with valid stock
+  ---
+  duration_ms: 1001.857976
+  type: 'test'
+  ...
+# Subtest: Phase 4: projected costs and exchange rates are private and authoritative
+ok 38 - Phase 4: projected costs and exchange rates are private and authoritative
+  ---
+  duration_ms: 3.886086
+  type: 'test'
+  ...
+# Subtest: Phase 4: Telegraph never allows a second Research after the first resolved
+ok 39 - Phase 4: Telegraph never allows a second Research after the first resolved
+  ---
+  duration_ms: 3.57693
+  type: 'test'
+  ...
+# Subtest: Phase 5: completed destination contracts pay printed Prestige and remain secret on the TV
+ok 40 - Phase 5: completed destination contracts pay printed Prestige and remain secret on the TV
+  ---
+  duration_ms: 10.613854
+  type: 'test'
+  ...
+# Subtest: Phase 5: overlapping rail tracks contribute physical segments only once
+ok 41 - Phase 5: overlapping rail tracks contribute physical segments only once
+  ---
+  duration_ms: 0.250568
+  type: 'test'
+  ...
+# Subtest: Phase 5: Longest Railway trophy is taken away on a tie, and unique links decide lengths
+ok 42 - Phase 5: Longest Railway trophy is taken away on a tie, and unique links decide lengths
+  ---
+  duration_ms: 6.616932
+  type: 'test'
+  ...
+# Subtest: Phase 5: Board of Directors adds one Prestige per completed ticket, not per uncompleted ticket
+ok 43 - Phase 5: Board of Directors adds one Prestige per completed ticket, not per uncompleted ticket
+  ---
+  duration_ms: 4.04842
+  type: 'test'
+  ...
+# Subtest: Phase 5: Advanced unfinished-ticket penalties, but no penalty in Quick or Standard
+ok 44 - Phase 5: Advanced unfinished-ticket penalties, but no penalty in Quick or Standard
+  ---
+  duration_ms: 4.740313
+  type: 'test'
+  ...
+# Subtest: Phase 5: Largest Army trophy requires five soldiers and has no holder on ties
+ok 45 - Phase 5: Largest Army trophy requires five soldiers and has no holder on ties
+  ---
+  duration_ms: 4.800354
+  type: 'test'
+  ...
+# Subtest: Phase 5: Market Crash overrides 2:1 bank trading discounts for this round
+ok 46 - Phase 5: Market Crash overrides 2:1 bank trading discounts for this round
+  ---
+  duration_ms: 8.264434
+  type: 'test'
+  ...
+# Subtest: Phase 5: era changes happen at documented rounds in Quick and Standard
+ok 47 - Phase 5: era changes happen at documented rounds in Quick and Standard
+  ---
+  duration_ms: 16.950354
+  type: 'test'
+  ...
+# Subtest: Phase 5: Grand Station upgrades the earliest City and awards exactly two points
+ok 48 - Phase 5: Grand Station upgrades the earliest City and awards exactly two points
+  ---
+  duration_ms: 4.796277
+  type: 'test'
+  ...
+# Subtest: Phase 5: researched leftover upgrade spends the stated resources exactly once
+ok 49 - Phase 5: researched leftover upgrade spends the stated resources exactly once
+  ---
+  duration_ms: 7.175002
+  type: 'test'
+  ...
+# Subtest: Phase 5: Destination Ticket research is refunded when the deck is empty
+ok 50 - Phase 5: Destination Ticket research is refunded when the deck is empty
+  ---
+  duration_ms: 4.385829
+  type: 'test'
+  ...
+# Subtest: Phase 5: final round tie-break is Prestige, then Gold, then claimed routes
+ok 51 - Phase 5: final round tie-break is Prestige, then Gold, then claimed routes
+  ---
+  duration_ms: 9.120204
+  type: 'test'
+  ...
+# Subtest: Phase 5: Royal Visit event awards Prestige to one leading City owner only
+ok 52 - Phase 5: Royal Visit event awards Prestige to one leading City owner only
+  ---
+  duration_ms: 8.634091
+  type: 'test'
+  ...
+# Subtest: Phase 5: twelve Advanced events are distinct; Quick and Standard draw none
+ok 53 - Phase 5: twelve Advanced events are distinct; Quick and Standard draw none
+  ---
+  duration_ms: 13.693514
+  type: 'test'
+  ...
+# Subtest: Audio mix: every bundled cue has a calibrated gain and priority
+ok 54 - Audio mix: every bundled cue has a calibrated gain and priority
+  ---
+  duration_ms: 1.812211
+  type: 'test'
+  ...
+# Subtest: Audio mix: three profiles adjust separate FX, music and railway ambience buses
+ok 55 - Audio mix: three profiles adjust separate FX, music and railway ambience buses
+  ---
+  duration_ms: 0.158659
+  type: 'test'
+  ...
+# Subtest: Audio mix: muting stops current effects and all background loops
+ok 56 - Audio mix: muting stops current effects and all background loops
+  ---
+  duration_ms: 0.311098
+  type: 'test'
+  ...
+# Subtest: Audio mix: dramatic reveals smoothly duck background audio
+ok 57 - Audio mix: dramatic reveals smoothly duck background audio
+  ---
+  duration_ms: 0.196576
+  type: 'test'
+  ...
+# Subtest: Audio mix: at most three effects play and higher priority wins
+ok 58 - Audio mix: at most three effects play and higher priority wins
+  ---
+  duration_ms: 0.951895
+  type: 'test'
+  ...
+# Subtest: Audio mix: separate sliders and preview selector are wired to live volumes
+ok 59 - Audio mix: separate sliders and preview selector are wired to live volumes
+  ---
+  duration_ms: 1.497166
+  type: 'test'
+  ...
+# Subtest: Audio mix: playback is same-origin and retains fallback on load failure
+ok 60 - Audio mix: playback is same-origin and retains fallback on load failure
+  ---
+  duration_ms: 0.296016
+  type: 'test'
+  ...
+# Subtest: Audio mix: fresh install has Balanced selected, audition plays only selected cue and inventory can scan silently
+ok 61 - Audio mix: fresh install has Balanced selected, audition plays only selected cue and inventory can scan silently
+  ---
+  duration_ms: 0.19208
+  type: 'test'
+  ...
+# Subtest: Phase 6: exactly 17 safe local sound cues are declared
+ok 62 - Phase 6: exactly 17 safe local sound cues are declared
+  ---
+  duration_ms: 1.920063
+  type: 'test'
+  ...
+# Subtest: Phase 6: optional sound scanning uses exact allowlisted names and prefers OGG
+ok 63 - Phase 6: optional sound scanning uses exact allowlisted names and prefers OGG
+  ---
+  duration_ms: 2.484723
+  type: 'test'
+  ...
+# Subtest: Phase 6: missing audio is a supported fallback, without server failure
+ok 64 - Phase 6: missing audio is a supported fallback, without server failure
+  ---
+  duration_ms: 0.179331
+  type: 'test'
+  ...
+# Subtest: Phase 6: server dynamically enumerates bundled audio and serves correct MIME
+ok 65 - Phase 6: server dynamically enumerates bundled audio and serves correct MIME
+  ---
+  duration_ms: 0.246772
+  type: 'test'
+  ...
+# Subtest: Phase 6: game UI script compiles and has audio mixer, motion reduction and cinematic features
+ok 66 - Phase 6: game UI script compiles and has audio mixer, motion reduction and cinematic features
+  ---
+  duration_ms: 9.29061
+  type: 'test'
+  ...
+# Subtest: Phase 6: sound is muted by default until deliberately enabled
+ok 67 - Phase 6: sound is muted by default until deliberately enabled
+  ---
+  duration_ms: 0.261694
+  type: 'test'
+  ...
+# Subtest: Cross-device: TV and phone handbook scripts compile on their own without a CDN
+ok 68 - Cross-device: TV and phone handbook scripts compile on their own without a CDN
+  ---
+  duration_ms: 3.792174
+  type: 'test'
+  ...
+# Subtest: Cross-device: How to Play is prominent from the TV, lobby and phone join screen
+ok 69 - Cross-device: How to Play is prominent from the TV, lobby and phone join screen
+  ---
+  duration_ms: 0.329106
+  type: 'test'
+  ...
+# Subtest: Cross-device: three steps, seven action costs, Prestige and private-ticket advice are explained
+ok 70 - Cross-device: three steps, seven action costs, Prestige and private-ticket advice are explained
+  ---
+  duration_ms: 0.404669
+  type: 'test'
+  ...
+# Subtest: Lore is clearly fictional while history has correctly scoped Victorian milestones
+ok 71 - Lore is clearly fictional while history has correctly scoped Victorian milestones
+  ---
+  duration_ms: 0.196286
+  type: 'test'
+  ...
+# Subtest: Responsive TV and PC: the shared map and navigation have large/small screen layouts
+ok 72 - Responsive TV and PC: the shared map and navigation have large/small screen layouts
+  ---
+  duration_ms: 0.330508
+  type: 'test'
+  ...
+# Subtest: Responsive phone, tablet and PC: small controls, handbook tabs and zoom work
+ok 73 - Responsive phone, tablet and PC: small controls, handbook tabs and zoom work
+  ---
+  duration_ms: 0.264068
+  type: 'test'
+  ...
+# Subtest: Sound: TV has all 17 bundled cues and phone plays strictly opt-in local UI recordings
+ok 74 - Sound: TV has all 17 bundled cues and phone plays strictly opt-in local UI recordings
+  ---
+  duration_ms: 2.354227
+  type: 'test'
+  ...
+# Subtest: Readability: both default parchment accents meet AA text contrast without changing dark mode
+ok 75 - Readability: both default parchment accents meet AA text contrast without changing dark mode
+  ---
+  duration_ms: 0.547515
+  type: 'test'
+  ...
+# Subtest: Encrypted recovery retains simultaneous market offers and shared deadline
+ok 76 - Encrypted recovery retains simultaneous market offers and shared deadline
+  ---
+  duration_ms: 4.243715
+  type: 'test'
+  ...
+# Subtest: A normal host rejoin is not incorrectly called a browser restore
+ok 77 - A normal host rejoin is not incorrectly called a browser restore
+  ---
+  duration_ms: 0.45091
+  type: 'test'
+  ...
+# Subtest: B1: all three slots validate and Research remains once per round
+ok 78 - B1: all three slots validate and Research remains once per round
+  ---
+  duration_ms: 10.900897
+  type: 'test'
+  ...
+# Subtest: B1: shorter planning timers are in the authoritative mode table
+ok 79 - B1: shorter planning timers are in the authoritative mode table
+  ---
+  duration_ms: 0.152109
+  type: 'test'
+  ...
+# Subtest: A6: multiple offers escrow together, remain private and complete in original Reveal order
+ok 80 - A6: multiple offers escrow together, remain private and complete in original Reveal order
+  ---
+  duration_ms: 13.873365
+  type: 'test'
+  ...
+# Subtest: A6: all unanswered offers return escrow together at one shared deadline
+ok 81 - A6: all unanswered offers return escrow together at one shared deadline
+  ---
+  duration_ms: 3.598663
+  type: 'test'
+  ...
+# Subtest: A6: neither double-reply nor fake offer ID can change another offer
+ok 82 - A6: neither double-reply nor fake offer ID can change another offer
+  ---
+  duration_ms: 4.494733
+  type: 'test'
+  ...
+# Subtest: C2: AI answers a fair offer but protects its final Steel and Timber
+ok 83 - C2: AI answers a fair offer but protects its final Steel and Timber
+  ---
+  duration_ms: 9.789452
+  type: 'test'
+  ...
+# Subtest: C2: production AI plans three orders through authoritative validators, not random actions
+ok 84 - C2: production AI plans three orders through authoritative validators, not random actions
+  ---
+  duration_ms: 13.267452
+  type: 'test'
+  ...
+# Subtest: TV and phone scripts support three private orders and simultaneous market controls
+ok 85 - TV and phone scripts support three private orders and simultaneous market controls
+  ---
+  duration_ms: 3.54389
+  type: 'test'
+  ...
+# Subtest: B2: 2-segment owned route directly scores 1 Prestige
+ok 86 - B2: 2-segment owned route directly scores 1 Prestige
+  ---
+  duration_ms: 2.400027
+  type: 'test'
+  ...
+# Subtest: B2: 3-segment owned route directly scores 2 Prestige
+ok 87 - B2: 3-segment owned route directly scores 2 Prestige
+  ---
+  duration_ms: 0.264358
+  type: 'test'
+  ...
+# Subtest: B2: 4-segment owned route directly scores 4 Prestige
+ok 88 - B2: 4-segment owned route directly scores 4 Prestige
+  ---
+  duration_ms: 0.560315
+  type: 'test'
+  ...
+# Subtest: B2: 5-segment owned route directly scores 7 Prestige
+ok 89 - B2: 5-segment owned route directly scores 7 Prestige
+  ---
+  duration_ms: 0.149976
+  type: 'test'
+  ...
+# Subtest: B2: completed routes score separately from the longest railway trophy, including cumulative charters
+ok 90 - B2: completed routes score separately from the longest railway trophy, including cumulative charters
+  ---
+  duration_ms: 0.936041
+  type: 'test'
+  ...
+# Subtest: B4: Hills pay +1 Gold per round in the Iron and Electric eras, but not Steam
+ok 91 - B4: Hills pay +1 Gold per round in the Iron and Electric eras, but not Steam
+  ---
+  duration_ms: 1.036762
+  type: 'test'
+  ...
+# Subtest: B4: Advanced Gold Rush gives two Gold per owned Hill, rather than stacking to three
+ok 92 - B4: Advanced Gold Rush gives two Gold per owned Hill, rather than stacking to three
+  ---
+  duration_ms: 1.063773
+  type: 'test'
+  ...
+# Subtest: B2/B4: scoring and Hill production remain server-owned, not supplied by client action
+ok 93 - B2/B4: scoring and Hill production remain server-owned, not supplied by client action
+  ---
+  duration_ms: 0.491671
+  type: 'test'
+  ...
+# Subtest: V2 simulator: seeded random sequence reproducible and in [0,1)
+ok 94 - V2 simulator: seeded random sequence reproducible and in [0,1)
+  ---
+  duration_ms: 1.504597
+  type: 'test'
+  ...
+# Subtest: V2 simulator: validates CLI options and rejects unknown inputs
+ok 95 - V2 simulator: validates CLI options and rejects unknown inputs
+  ---
+  duration_ms: 0.462537
+  type: 'test'
+  ...
+# Subtest: V2 simulator: two equivalent seeded game batches have identical scoreboards
+ok 96 - V2 simulator: two equivalent seeded game batches have identical scoreboards
+  ---
+  duration_ms: 238.753538
+  type: 'test'
+  ...
+# Subtest: V2 simulator: the random and mixed bot simulation variants execute
+ok 97 - V2 simulator: the random and mixed bot simulation variants execute
+  ---
+  duration_ms: 79.822565
+  type: 'test'
+  ...
+# Subtest: V2: no town ownership needed — any owned or adjacent route-path tile unlocks rail laying
+ok 98 - V2: no town ownership needed — any owned or adjacent route-path tile unlocks rail laying
+  ---
+  duration_ms: 4.380982
+  type: 'test'
+  ...
+# Subtest: V2: extending from your existing railway unlocks track, even without owned land
+ok 99 - V2: extending from your existing railway unlocks track, even without owned land
+  ---
+  duration_ms: 0.511561
+  type: 'test'
+  ...
+# Subtest: V2: opponents cannot claim another player’s physical track section
+ok 100 - V2: opponents cannot claim another player’s physical track section
+  ---
+  duration_ms: 0.534084
+  type: 'test'
+  ...
+# Subtest: V2: own track segments cost nothing when reused
+ok 101 - V2: own track segments cost nothing when reused
+  ---
+  duration_ms: 0.27877
+  type: 'test'
+  ...
+# Subtest: V2: rival claims made after planning invalidate route at reveal without charging materials
+ok 102 - V2: rival claims made after planning invalidate route at reveal without charging materials
+  ---
+  duration_ms: 2.217992
+  type: 'test'
+  ...
+# Subtest: V2: Soldiers next to contested free tile provide strength; losers reclaim cost and gain Gold
+ok 103 - V2: Soldiers next to contested free tile provide strength; losers reclaim cost and gain Gold
+  ---
+  duration_ms: 1.047639
+  type: 'test'
+  ...
+# Subtest: V2: persistent tie without defender yields Stalemate, no capture and full build refunds
+ok 104 - V2: persistent tie without defender yields Stalemate, no capture and full build refunds
+  ---
+  duration_ms: 0.560214
+  type: 'test'
+  ...
+# Subtest: V2: completely identical final ranking crowns all tied players without seat priority
+ok 105 - V2: completely identical final ranking crowns all tied players without seat priority
+  ---
+  duration_ms: 1.193057
+  type: 'test'
+  ...
+# Subtest: V2: placement picks a random first round order and reverses it
+ok 106 - V2: placement picks a random first round order and reverses it
+  ---
+  duration_ms: 1.077253
+  type: 'test'
+  ...
+1..106
+# tests 106
+# suites 0
+# pass 106
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1937.61989

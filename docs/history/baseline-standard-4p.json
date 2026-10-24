@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "players": 4,
+    "mode": "standard",
+    "games": 150,
+    "seed": 20261023,
+    "bots": "greedy"
+  },
+  "games": 150,
+  "winnerPrestige": {
+    "mean": 9.03,
+    "median": 9
+  },
+  "earlyTargetPct": 1.33,
+  "firstPlacePrestigeTiePct": 12.67,
+  "winPctBySeat": [
+    21.33,
+    23.33,
+    28,
+    27.33
+  ],
+  "winnerSources": {
+    "depot": 0.97,
+    "city": 2.03,
+    "rail": 1.41,
+    "tickets": 3.71,
+    "army": 0.91,
+    "grand": 0,
+    "bonus": 0
+  },
+  "meanRoutesClaimed": 6.31,
+  "meanWinnerTicketsCompleted": 1.11,
+  "meanUnspentResources": 30.25,
+  "estimatedDurationMinutes": 19.05
+}

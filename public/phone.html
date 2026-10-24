@@ -247,9 +247,10 @@ function connect(){
     publicS=m.public;privateS=m.private||null;
     const newFx=publicS.feed.filter(x=>x.seq>seenSeq);
     if(newFx.some(x=>x.kind==='clash'))playPhoneCue('dice-roll');
-    const offerKey=privateS?.offer?String(privateS.offer.from)+'/'+String(privateS.offer.deadline):null;
+    if(newFx.some(x=>x.kind==='ticket'))playPhoneCue('ticket-complete');
+    const offerKey=(privateS?.offers||[]).filter(o=>o.answer===null).map(o=>o.id).join('|')||null;
     if(newFx.some(x=>x.kind==='clash'&&x.message.includes(current()?.name||'∅'))||(offerKey&&offerKey!==lastOfferAlert))navigator.vibrate?.([90,60,90]);
-    if(offerKey&&offerKey!==lastOfferAlert)playPhoneCue('ui-confirm');
+    if(offerKey&&offerKey!==lastOfferAlert)playPhoneCue('trade-handshake');
     lastOfferAlert=offerKey;
     seenSeq=publicS.seq;
     const key=JSON.stringify({phase:publicS.status,round:publicS.round,seq:publicS.seq,me:pid,actions:privateS?.actions,locked:privateS?.locked,upgrades:privateS?.upgrades,choices:privateS?.ticketChoices,offer:privateS?.offer,avatars:publicS.players.map(p=>p.avatar),resources:privateS?.resources,turn:publicS.placementTurn});
@@ -257,6 +258,7 @@ function connect(){
     if(tutorial&&publicS.round>=2&&publicS.status!=='lobby'){tutorial=false;localStorage.setItem('ironTutorialDone','true');}
    }
    if(m.type==='error'){
+    playPhoneCue('invalid-order');
     notify(m.message);
     if(/Room not found|Rejoin credentials rejected|controlled by the computer|Seat unavailable|Rejoin from your original/i.test(m.message)){
      localStorage.removeItem('ironPhone');pid=null;token=null;publicS=null;privateS=null;requestedJoin=false;lastRenderKey='';
@@ -299,7 +301,7 @@ function render(){const s=publicS,p=privateS;document.body.dataset.era=s?.era||'
  if(s.status==='draft'&&!p.draftDone){renderDraft();return;}
  if(s.status==='plan'){telegraphMode=false;if(spectateTickets){renderTickets();return;}renderPlan();return;}
  if(s.status==='reveal'&&telegraphMode&&!p.telegraphUsed){renderTelegraph();return;}
- if(s.status==='offer'&&p.offer){renderOffer();return;}
+ if(s.status==='market'){renderMarket();return;}
  if(s.status==='finished'){renderResults();return;}
  renderWatch();
 }
@@ -333,9 +335,9 @@ function resources(){const r=privateS.resources;return `<div class="resource-str
 function tutorialPlanCard(){
  if(!tutorial||tutorialDismissed||publicS?.round!==1)return '';
  const steps=[
-  ['Choose an order slot','Tap slot 1 or 2. Both orders remain secret until Reveal.'],
+  ['Choose one of three orders','Tap slot 1, 2 or 3. All three orders remain secret until Reveal.'],
   ['Choose an action','Try Build Depot on a highlighted adjacent tile, or Trade if your resources are short.'],
-  ['Review and lock','Check projected stock after both orders, then press Lock In before time expires.']
+  ['Review and lock','Check projected stock after all three orders, then press Lock In before time expires.']
  ];
  const step=steps[tutorialTip%steps.length];
  return '<section class="guide-panel" aria-labelledby="guideHeading">'+
@@ -350,7 +352,7 @@ function bindTutorialPlan(){
 }
 function renderPlan(){const s=publicS,p=privateS;
  $('app').innerHTML=`<div class="identity-strip"><img data-live-portrait="${current()?.avatar}" src="${avatar(current()?.avatar)}" alt=""><div><span>YOU ARE PLAYING AS</span><strong>${esc(people.find(a=>a[0]===current()?.avatar)?.[1]||current()?.name)}</strong></div><b>★ ${current()?.prestige||0}</b></div>${resources()}<div class="row" style="justify-content:space-between;margin:7px 0 14px"><span class="eyebrow">★ ${current()?.prestige||0}/${s.winTarget} Prestige</span><b>⏱ <span id="clock">${remaining(s.deadline)}</span></b></div>${p.locked?`<section class="card"><div class="lock">✔ Orders locked in</div><p>The plans are sealed. Watch the TV when all tycoons are ready.</p><button class="btn alt" id="ticketsBtn">Review my tickets</button></section>`:
- `<section class="card gold"><div class="eyebrow">Two orders per round</div><h2>Plan your empire</h2><p class="caption">Choose an action slot, then give it an order. Your plans stay private until Reveal.</p><div class="stack">${p.actions.map((a,i)=>`<button class="slot ${i===actionSlot?'active':''}" aria-pressed="${i===actionSlot}" aria-label="Plan order ${i+1}: ${a?esc(actionNames[a.type]):'empty'}" data-slot="${i}"><span class="index">${i+1}</span><span><strong>${a?esc(actionNames[a.type]):'Choose an action'}</strong><small>${a?esc(describeAction(a)):'Tap to select this slot'}</small></span></button>`).join('')}</div>${p.planBalance?`<div class="budget-preview" role="status" aria-label="Projected resources after both orders"><strong>After planned orders</strong><div>${Object.keys(resourceIcons).map(k=>`<span title="${k}">${resourceIcons[k]} ${p.planBalance[k]}</span>`).join('')}</div><small>Projected only. Contested claims and unexpected events may change the result.</small></div>`:''}</section><section class="card"><div class="eyebrow">Available orders · slot ${actionSlot+1}</div><div class="actions">${Object.keys(actionNames).filter(x=>x!=='skip').map(type=>`<button class="action ${editType===type?'selected':''}" aria-pressed="${editType===type}" data-type="${type}"><span class="symbol">${actionIcons[type]}</span><span>${actionNames[type]}</span></button>`).join('')}</div>${editType?`<div id="editor" style="margin-top:16px"></div>`:''}</section><section class="sticky-bottom"><button class="btn green" id="lockBtn" ${p.actions.some(a=>!a)?'disabled':''}>✔ Lock In Both Orders</button><button class="btn alt" id="ticketsBtn">Review secret tickets</button></section>${tutorialPlanCard()}`}`;
+ `<section class="card gold"><div class="eyebrow">Three orders per round</div><h2>Plan your empire</h2><p class="caption">Choose an action slot, then give it an order. Your plans stay private until Reveal.</p><div class="stack">${p.actions.map((a,i)=>`<button class="slot ${i===actionSlot?'active':''}" aria-pressed="${i===actionSlot}" aria-label="Plan order ${i+1}: ${a?esc(actionNames[a.type]):'empty'}" data-slot="${i}"><span class="index">${i+1}</span><span><strong>${a?esc(actionNames[a.type]):'Choose an action'}</strong><small>${a?esc(describeAction(a)):'Tap to select this slot'}</small></span></button>`).join('')}</div>${p.planBalance?`<div class="budget-preview" role="status" aria-label="Projected resources after three orders"><strong>After planned orders</strong><div>${Object.keys(resourceIcons).map(k=>`<span title="${k}">${resourceIcons[k]} ${p.planBalance[k]}</span>`).join('')}</div><small>Projected only. Contested claims and unexpected events may change the result.</small></div>`:''}</section><section class="card"><div class="eyebrow">Available orders · slot ${actionSlot+1}</div><div class="actions">${Object.keys(actionNames).filter(x=>x!=='skip').map(type=>`<button class="action ${editType===type?'selected':''}" aria-pressed="${editType===type}" data-type="${type}"><span class="symbol">${actionIcons[type]}</span><span>${actionNames[type]}</span></button>`).join('')}</div>${editType?`<div id="editor" style="margin-top:16px"></div>`:''}</section><section class="sticky-bottom"><button class="btn green" id="lockBtn" ${p.actions.some(a=>!a)?'disabled':''}>✔ Lock In Three Orders</button><button class="btn alt" id="ticketsBtn">Review secret tickets</button></section>${tutorialPlanCard()}`}`;
  $('ticketsBtn').onclick=()=>{spectateTickets=true;render();};
  if(!p.locked){bindTutorialPlan();$('app').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{actionSlot=Number(b.dataset.slot);editType='';editor=null;render();});$('app').querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{editType=b.dataset.type;editor={type:editType,count:1,give:'coal',want:'steel',kind:'bank',sources:[],tradeGive:{},tradeWant:{}};render();});$('lockBtn').onclick=()=>send('lock');if(editType)renderEditor();}
 }
@@ -358,7 +360,7 @@ function saveOrder(action){send(telegraphMode?'telegraph':'setAction',{slot:acti
 function renderTelegraph(){const p=privateS;$('app').innerHTML=`${resources()}<section class="card gold"><div class="eyebrow">Electric-era technology</div><h2>Telegraph · One Change</h2><p>Intercept one of your orders before it is revealed. Choose a slot and its replacement action. Orders that have already resolved cannot be changed.</p><div class="stack">${p.actions.map((a,i)=>`<button class="slot ${i===actionSlot?'active':''}" aria-pressed="${i===actionSlot}" aria-label="Plan order ${i+1}: ${a?esc(actionNames[a.type]):'empty'}" data-slot="${i}"><span class="index">${i+1}</span><span><strong>${a?actionNames[a.type]:'Pass'}</strong><small>${a?esc(describeAction(a)):''}</small></span></button>`).join('')}</div></section><section class="card"><h3>Change to…</h3><div class="actions">${Object.keys(actionNames).filter(x=>x!=='skip').map(type=>`<button class="action ${editType===type?'selected':''}" aria-pressed="${editType===type}" data-type="${type}"><span class="symbol">${actionIcons[type]}</span>${actionNames[type]}</button>`).join('')}</div>${editType?'<div id="editor" style="margin-top:15px"></div>':''}<button class="btn alt" id="cancelTele">Return to Reveal</button></section>`; $('app').querySelectorAll('[data-slot]').forEach(b=>b.onclick=()=>{actionSlot=Number(b.dataset.slot);editType='';editor=null;renderTelegraph();});$('app').querySelectorAll('[data-type]').forEach(b=>b.onclick=()=>{editType=b.dataset.type;editor={type:editType,count:1,give:'coal',want:'steel',kind:'bank',sources:[],tradeGive:{},tradeWant:{}};renderTelegraph();});$('cancelTele').onclick=()=>{telegraphMode=false;render();};if(editType)renderEditor();}
 function describeAction(a){return({build:()=>tileName(a.tile),city:()=>tileName(a.tile),track:()=>a.route,recruit:()=>`${a.count} soldiers · ${tileName(a.tile)}`,research:()=>a.kind,trade:()=>a.kind==='bank'?`${a.give} → ${a.want}`:'Player offer',attack:()=>tileName(a.tile),skip:()=>''}[a?.type]||(()=>''))();}
 function remaining(deadline){const sec=Math.max(0,Math.ceil(((deadline||0)-Date.now())/1000));return `${Math.floor(sec/60)}:${String(sec%60).padStart(2,'0')}`;}
-setInterval(()=>{if(publicS){document.querySelectorAll('img[data-live-portrait]').forEach(img=>{const id=img.dataset.livePortrait,src=avatar(id);img.dataset.mood=moodFor(id);if(img.getAttribute('src')!==src)img.setAttribute('src',src);});const moodCaption=$('liveReaction');if(moodCaption)moodCaption.textContent=reactionLabel(current());if($('clock'))$('clock').textContent=remaining(publicS.deadline);if($('tradeClock'))$('tradeClock').textContent=remaining(privateS?.offer?.deadline||0);}},400);
+setInterval(()=>{if(publicS){document.querySelectorAll('img[data-live-portrait]').forEach(img=>{const id=img.dataset.livePortrait,src=avatar(id);img.dataset.mood=moodFor(id);if(img.getAttribute('src')!==src)img.setAttribute('src',src);});const moodCaption=$('liveReaction');if(moodCaption)moodCaption.textContent=reactionLabel(current());if($('clock'))$('clock').textContent=remaining(publicS.deadline);if($('tradeClock'))$('tradeClock').textContent=remaining(publicS.deadline);}},400);
 function isLegal(type,val){if(type==='placement')return !val.owner&&['coal','forest','farm','steel'].includes(val.type);if(type==='build'||type==='city'||type==='recruit'||type==='attack')return privateS?.legal?.[type]?.includes(val.id);return false;}
 function miniMap(type,selected){
  // One-thumb target picker: same terrain palette as the shared TV board.
@@ -376,8 +378,13 @@ function miniMap(type,selected){
   marks+=`<text pointer-events="none" x="${x}" y="${y+7}" font-size="${t.type==='capital'?25:19}" font-weight="700" text-anchor="middle" fill="${t.type==='forest'?'#e0f0d9':'#263229'}">${symbols[t.type]}</text>`;
   if(t.owner)marks+=`<circle cx="${x+15}" cy="${y-15}" r="6" fill="${c}" stroke="#fff7ce" stroke-width="1.4" pointer-events="none"/>`;
  }
- if(type==='track')for(const r of publicS.routes){const d=r.path.map((id,i)=>{const p=pos(byId[id]);return`${i?'L':'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;}).join(' '),legal=privateS?.legal?.track?.includes(r.id),picked=selected===r.id;
-  railways+=`<g data-line="${r.id}"><path d="${d}" stroke="#1b2b26" stroke-width="${legal?14:7}" fill="none" opacity=".76" stroke-linecap="round" pointer-events="none"/><path d="${d}" stroke="${picked?'#fff':legal?'#ffe57a':'#a7a58b'}" stroke-width="${legal?7:3}" fill="none" stroke-linecap="round" stroke-dasharray="${legal?'':'3 8'}" pointer-events="none"/><path data-route="${r.id}" class="${legal?'legal':''} ${picked?'picked':''}" tabindex="${legal?0:-1}" role="${legal?'button':'img'}" aria-label="${esc(routeName(r.id))}${legal?' — selectable':''}" d="${d}" stroke="transparent" stroke-width="25" fill="none" pointer-events="${legal?'stroke':'none'}"><title>${esc(routeName(r.id))}</title></path></g>`;
+ if(type==='track')for(const r of publicS.routes){
+  const owner=publicS.players.find(p=>p.id===r.owner);
+  const ownerColour=owner?(people.find(a=>a[0]===owner.avatar)?.[3]||'#d6ae58'):null;
+  const rivalEdges=new Set(publicS.routes.filter(x=>x.owner&&x.owner!==pid).flatMap(x=>x.path.slice(1).map((v,i)=>[v,x.path[i]].sort().join('|'))));
+  const rivalBlocked=!r.owner&&r.path.slice(1).some((v,i)=>rivalEdges.has([v,r.path[i]].sort().join('|')));
+  const d=r.path.map((id,i)=>{const p=pos(byId[id]);return`${i?'L':'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;}).join(' '),legal=privateS?.legal?.track?.includes(r.id),picked=selected===r.id;
+  railways+=`<g data-line="${r.id}"><path d="${d}" stroke="#1b2b26" stroke-width="${legal?14:7}" fill="none" opacity=".76" stroke-linecap="round" pointer-events="none"/><path d="${d}" stroke="${picked?'#fff':ownerColour|| (legal?'#ffe57a':rivalBlocked?'#777c83':r.era==='electric'?'#bd8dfa':r.era==='iron'?'#7cdddf':'#a7a58b')}" stroke-width="${legal?7:3}" fill="none" stroke-linecap="round" stroke-dasharray="${legal?'':'3 8'}" pointer-events="none"/><path data-route="${r.id}" class="${legal?'legal':''} ${picked?'picked':''}" tabindex="${legal?0:-1}" role="${legal?'button':'img'}" aria-label="${esc(routeName(r.id))}${legal?' — selectable':''}" d="${d}" stroke="transparent" stroke-width="25" fill="none" pointer-events="${legal?'stroke':'none'}"><title>${esc(routeName(r.id))}</title></path></g>`;
  }
  return `<svg class="minimap" viewBox="0 0 355 331" role="img" aria-label="Select a highlighted ${type==='track'?'railway route':'country tile'}"><g class="mini-ground">${bases}</g><g>${marks}</g><g class="mini-routes">${railways}</g></svg><p class="map-hint">${type==='track'?'Tap a highlighted railway, or choose it from the list below.':'Gold dashed outlines mark eligible tiles. Tap one to choose it.'}</p>`;
 }
@@ -386,7 +393,7 @@ function targetList(type,selected,onPick){const values=type==='track'?privateS.l
  $('editorTargetList').innerHTML=`<div class="target-list" role="group" aria-label="Legal ${esc(type)} targets">${list.length?list.map(x=>`<button type="button" class="target-button ${x.id===selected?'selected':''}" aria-pressed="${x.id===selected}" data-pick="${x.id}">${esc(x.name)} <span>${x.id===selected?'✔':'›'}</span></button>`).join(''):'<p class="caption">No legal targets currently available.</p>'}</div>`;
  $('editorTargetList').querySelectorAll('[data-pick]').forEach(el=>el.onclick=()=>onPick(el.dataset.pick));
 }
-function routeName(id){const r=publicS.routes.find(r=>r.id===id);return r?`${tileName(r.a)} – ${tileName(r.b)} (${r.segments} segments)`:'Unknown route';}
+function routeName(id){const r=publicS.routes.find(r=>r.id===id);return r?`${r.era==='iron'?'Lake Viaduct · ':r.era==='electric'?'Capital Express · ':''}${tileName(r.a)} – ${tileName(r.b)} (${r.segments} segments)`:'Unknown route';}
 function renderEditor(){const e=editor,legal=privateS.legal||{},type=editType;if(!e)return;const out=$('editor');if(!out)return;
  const targetKinds=['build','city','track','recruit','attack'];
  if(targetKinds.includes(type)){
@@ -407,7 +414,7 @@ function renderEditor(){const e=editor,legal=privateS.legal||{},type=editType;if
   out.querySelectorAll('[data-research]').forEach(b=>b.onclick=()=>{saveOrder({type:'research',kind:b.dataset.research==='ticket'?'ticket':'upgrade',upgrade:b.dataset.research==='ticket'?undefined:b.dataset.research});});return;
  }
  if(type==='trade'){const options=Object.keys(resourceIcons);
-  out.innerHTML=`<h3>Trade</h3><p class="caption">Exchange with the bank, or ask another tycoon. Player trades are offered during Reveal with a 20-second reply timer.</p><div class="row"><button id="bankTab" class="btn alt tiny ${e.kind==='bank'?'selected':''}">Bank Trade</button><button id="playerTab" class="btn alt tiny">Player Offer</button></div><div id="tradeBody"></div>`;
+  out.innerHTML=`<h3>Trade</h3><p class="caption">Exchange with the bank, or ask another tycoon. Player trades join a shared 20-second Exchange after all orders are revealed.</p><div class="row"><button id="bankTab" class="btn alt tiny ${e.kind==='bank'?'selected':''}">Bank Trade</button><button id="playerTab" class="btn alt tiny">Player Offer</button></div><div id="tradeBody"></div>`;
   $('bankTab').onclick=()=>{e.kind='bank';renderEditor();};$('playerTab').onclick=()=>{e.kind='player';renderEditor();};
   if(e.kind==='bank'){$('tradeBody').innerHTML=`<label>Give resource</label><select id="giveResource">${options.map(x=>`<option value="${x}" ${x===e.give?'selected':''}>${x}</option>`).join('')}</select><label>Receive resource</label><select id="wantResource">${options.map(x=>`<option value="${x}" ${x===e.want?'selected':''}>${x}</option>`).join('')}</select><div class="hint" id="bankRateHint" aria-live="polite">${privateS.bankRates?.[e.give]||3}:1 bank rate for ${esc(e.give)}. Upgrades, events and perks may adjust this.</div><button id="saveTrade" class="btn">Assign bank exchange →</button>`;
    $('giveResource').onchange=()=>{$('bankRateHint').textContent=String(privateS.bankRates?.[$('giveResource').value]||3)+':1 bank rate for '+$('giveResource').value+'. Upgrades, events and perks may adjust this.';};
@@ -426,16 +433,20 @@ function renderTroops(){const target=publicS.tiles.find(t=>t.id===editor.tile);i
 }
 function renderTickets(){$('app').innerHTML=`<section class="card gold">${h('Your secret destinations','Classified contracts')}<p class="caption">Connect the marked towns with your own railways to earn Prestige. This board is private to you; other players only see your overall score.</p><div class="ticket-progress-summary" aria-live="polite">${privateS.ticketProgress?.filter(t=>t.complete).length||0} / ${privateS.tickets.length} contracts fulfilled ${publicS.mode==='advanced'?'· Unfinished contracts cost 1 Prestige each':''}</div><button class="btn alt" id="backPlan">← Return to planning</button></section><section class="card">${privateS.tickets.map(t=>ticketHTML({...t,complete:privateS.ticketProgress?.find(x=>x.id===t.id)?.complete??isTicketComplete(t),value:privateS.ticketProgress?.find(x=>x.id===t.id)?.prestige??t.value})).join('')}</section>`;$('backPlan').onclick=()=>{spectateTickets=false;render();};}
 function isTicketComplete(ticket){const adj={};for(const r of publicS.routes.filter(r=>r.owner===pid))for(let i=1;i<r.path.length;i++){const a=r.path[i-1],b=r.path[i];(adj[a]??=[]).push(b);(adj[b]??=[]).push(a);}const visited=new Set([ticket.a]),q=[ticket.a];while(q.length){const v=q.shift();if(v===ticket.b)return true;for(const n of adj[v]||[])if(!visited.has(n)){visited.add(n);q.push(n);}}return false;}
-function renderOffer(){const o=privateS.offer,from=publicS.players.find(p=>p.id===o.from);const fmt=v=>Object.entries(v).filter(([,n])=>n>0).map(([k,n])=>`${n} ${k}`).join(', ');
- $('app').innerHTML=`<section class="card gold animated"><div class="trade-character"><img src="${avatar(from?.avatar||'augusta')}" alt=""><div>${h('A trade proposal','Your decision is requested')}<h2>${esc(from?.name||'A tycoon')} proposes:</h2></div></div><div class="ticket"><p>You receive <b>${esc(fmt(o.give))}</b></p><p>You give <b>${esc(fmt(o.want))}</b></p></div><p>⏱ <b id="tradeClock">${remaining(o.deadline)}</b> to decide.</p>${o.compelled?'<div class="hint">This offer is compulsory under the Smuggler’s Advanced perk.</div>':''}<button id="accept" class="btn green">Accept trade</button><button id="decline" class="btn red" ${o.compelled?'disabled':''}>Decline</button></section>`;
- $('accept').onclick=()=>send('tradeReply',{accept:true});$('decline').onclick=()=>send('tradeReply',{accept:false});
+function renderMarket(){
+ const offers=privateS.offers||[],pending=offers.filter(o=>o.answer===null);
+ const fmt=resource=>Object.entries(resource).filter(([,n])=>n>0).map(([k,n])=>`${n} ${k}`).join(', ')||'nothing';
+ $('app').innerHTML=`<section class="card gold"><div class="eyebrow">THE EXCHANGE IS OPEN</div><h2>One shared market window</h2><p>All trade offers are answered together. Your secret deals will be resolved in Reveal order when everybody replies or the clock runs out.</p><p>⏱ <b id="tradeClock">${remaining(publicS.deadline)}</b> remaining</p><p class="caption">${pending.length} awaiting your decision · ${offers.length} total received</p></section>`+
+  (offers.length?offers.map(o=>{const from=publicS.players.find(p=>p.id===o.from);return `<section class="card" aria-label="Offer from ${esc(from?.name||'tycoon')}"><h3>${esc(from?.name||'A tycoon')}'s offer</h3><p>You receive <b>${esc(fmt(o.give))}</b></p><p>You give <b>${esc(fmt(o.want))}</b></p>${o.answer!==null?`<p class="good">✔ ${o.answer?'Accepted':'Declined'} — waiting for Exchange close</p>`:o.compelled?'<p class="caption">Compulsory Smuggler offer; accepted automatically.</p>':`<div class="row"><button class="btn green" data-accept="${esc(o.id)}">Accept</button><button class="btn red" data-decline="${esc(o.id)}">Decline</button></div>`}</section>`;}).join(''):'<section class="card"><h3>No offers for you</h3><p>Watch the TV while the other tycoons finish trading.</p></section>');
+ $('app').querySelectorAll('[data-accept]').forEach(el=>el.onclick=()=>send('tradeReply',{offerId:el.dataset.accept,accept:true}));
+ $('app').querySelectorAll('[data-decline]').forEach(el=>el.onclick=()=>send('tradeReply',{offerId:el.dataset.decline,accept:false}));
 }
 function renderWatch(){const s=publicS;const recent=s.feed.filter(x=>x.player===pid||x.message.includes(current()?.name||'∅')).slice(-4).reverse();const clash=[...s.feed].reverse().find(x=>x.kind==='clash'&&x.results?.some(r=>r.id===pid));const mood=moodFor(current()?.avatar);
- $('app').innerHTML=`${resources()}<section class="card gold" style="text-align:center"><div class="eyebrow">Round ${s.round} · ${s.status.toUpperCase()}</div><h1>${s.status==='income'?'The trains are running':s.status==='reveal'?'Watch the TV!':s.status==='draft'?'Era upgrade':'Orders in motion'}</h1><img class="big-avatar watch-avatar" data-live-portrait="${current().avatar}" src="${avatar(current().avatar)}" alt="Your tycoon"><div class="watch-mood" id="liveReaction" aria-live="polite">${esc(reactionLabel(current()))}</div><p>${s.status==='income'?'Your holdings are producing materials and railway revenue.':s.status==='reveal'?'Your secret orders are being revealed to the room. Watch the board for the action!':s.status==='draft'?'Waiting for other tycoons to choose their upgrades.':'Other tycoons are making their decisions.'}</p></section><section class="card"><h3>Your latest news</h3>${recent.length?recent.map(x=>`<p class="caption">• ${esc(x.message)}</p>`).join(''):'<p class="caption">Your next move awaits.</p>'}<button class="btn alt" id="showTickets">View my tickets</button>${s.status==='reveal'&&privateS.upgrades.includes('telegraph')&&!privateS.telegraphUsed?'<button class="btn" id="telegraphBtn">⚡ Intercept an order (Telegraph)</button>':''}</section>${hint('Income is automatic. Use the TV to enjoy the reveal, then plan two new orders next round.')}`;
+ $('app').innerHTML=`${resources()}<section class="card gold" style="text-align:center"><div class="eyebrow">Round ${s.round} · ${s.status.toUpperCase()}</div><h1>${s.status==='income'?'The trains are running':s.status==='reveal'?'Watch the TV!':s.status==='draft'?'Era upgrade':'Orders in motion'}</h1><img class="big-avatar watch-avatar" data-live-portrait="${current().avatar}" src="${avatar(current().avatar)}" alt="Your tycoon"><div class="watch-mood" id="liveReaction" aria-live="polite">${esc(reactionLabel(current()))}</div><p>${s.status==='income'?'Your holdings are producing materials and railway revenue.':s.status==='reveal'?'Your secret orders are being revealed to the room. Watch the board for the action!':s.status==='draft'?'Waiting for other tycoons to choose their upgrades.':'Other tycoons are making their decisions.'}</p></section><section class="card"><h3>Your latest news</h3>${recent.length?recent.map(x=>`<p class="caption">• ${esc(x.message)}</p>`).join(''):'<p class="caption">Your next move awaits.</p>'}<button class="btn alt" id="showTickets">View my tickets</button>${s.status==='reveal'&&privateS.upgrades.includes('telegraph')&&!privateS.telegraphUsed?'<button class="btn" id="telegraphBtn">⚡ Intercept an order (Telegraph)</button>':''}</section>${hint('Income is automatic. Use the TV to enjoy the reveal, then plan three new orders next round.')}`;
  $('showTickets').onclick=()=>{spectateTickets=true;renderTickets();};if($('telegraphBtn'))$('telegraphBtn').onclick=()=>{telegraphMode=true;actionSlot=1;editType='';renderTelegraph();};
 }
-function renderResults(){const ranking=[...publicS.players].sort((a,b)=>publicS.finalRanking.indexOf(a.id)-publicS.finalRanking.indexOf(b.id)),place=ranking.findIndex(p=>p.id===pid)+1,me=current(),b=me.breakdown;
- $('app').innerHTML=`<section class="card gold" style="text-align:center"><div class="eyebrow">The crown has been awarded</div><h1>${place===1?'♛ You are the Iron Crown!':'The Railway Race Is Over'}</h1><img class="big-avatar" src="${avatar(me.avatar,place===1?'smug':'neutral')}" alt="Your tycoon"><h2>${place===1?'Champion':`You finished #${place}`}</h2><p><strong style="font-size:32px;color:var(--brass)">★ ${me.prestige} Prestige</strong></p></section><section class="card"><h2>Your Prestige breakdown</h2>${[['Market Towns',b.depot],['Cities',b.city],['Completed Tickets',b.tickets],['Longest Railway Trophy',b.rail],['Largest Army Trophy',b.army],['Grand Station',b.grand],['Royal Prestige',b.bonus],['Unfinished tickets penalty',-b.unfinished]].map(([name,val])=>`<div class="sheet-row"><span>${name}</span><b>${val||0}</b></div>`).join('')}</section><section class="card"><h2>Final rankings</h2>${ranking.map((p,i)=>`<div class="sheet-row"><span>${i+1}. ${esc(p.name)}</span><b>★ ${p.prestige}</b></div>`).join('')}<p class="caption">The host can begin a new game on the TV.</p></section>`;
+function renderResults(){const ranking=[...publicS.players].sort((a,b)=>publicS.finalRanking.indexOf(a.id)-publicS.finalRanking.indexOf(b.id)),place=ranking.findIndex(p=>p.id===pid)+1,me=current(),b=me.breakdown,shared=(publicS.winners||[]).length>1,crowned=(publicS.winners||[]).includes(pid);
+ $('app').innerHTML=`<section class="card gold" style="text-align:center"><div class="eyebrow">The crown has been awarded</div><h1>${crowned?(shared?'♛ You Share the Iron Crown!':'♛ You are the Iron Crown!'):'The Railway Race Is Over'}</h1><img class="big-avatar" src="${avatar(me.avatar,crowned?'smug':'neutral')}" alt="Your tycoon"><h2>${crowned?(shared?'Joint Champion':'Champion'):`You finished #${place}`}</h2><p><strong style="font-size:32px;color:var(--brass)">★ ${me.prestige} Prestige</strong></p></section><section class="card"><h2>Your Prestige breakdown</h2>${[['Market Towns',b.depot],['Cities',b.city],['Completed Tickets',b.tickets],['Chartered Railway Prestige',b.rail],['Longest Railway Trophy',b.longest],['Largest Army Trophy',b.army],['Grand Station',b.grand],['Royal Prestige',b.bonus],['Final Royal Ledger',b.dividend],['Unfinished tickets penalty',-b.unfinished]].map(([name,val])=>`<div class="sheet-row"><span>${name}</span><b>${val||0}</b></div>`).join('')}</section><section class="card"><h2>Final rankings</h2>${ranking.map((p,i)=>`<div class="sheet-row"><span>${i+1}. ${esc(p.name)}</span><b>★ ${p.prestige}</b></div>`).join('')}<p class="caption">The host can begin a new game on the TV.</p></section>`;
 }
 let overlayFocusReturn=null;
 function closeOverlay(){const el=$('rulesOverlay');el.classList.add('hidden');if(overlayFocusReturn?.isConnected)overlayFocusReturn.focus();overlayFocusReturn=null;}
@@ -445,17 +456,17 @@ const pocketPages={
   ['1 · Join','Scan the QR on the TV or type the four-letter code. Choose a tycoon and keep 2 or 3 private Destination Tickets.'],
   ['2 · Claim your Depots','Place 2 starting Depots on unclaimed production tiles when your phone says it is your turn.'],
   ['3 · Take your income','Every round, land and railways pay resources and Gold automatically.'],
-  ['4 · Plan two actions','Choose two secret orders on your phone. You can repeat an action except Research. Tap Lock In.'],
-  ['5 · Watch the TV','Orders are revealed in turn order. The TV shows clashes, new railway lines and the current Prestige leader.']
+  ['4 · Plan three actions','Choose three secret orders on your phone. You can repeat an action except Research. Tap Lock In.'],
+  ['5 · Watch the TV','All orders are revealed in rotating turn order. The shared Exchange resolves all offers at once, then land clashes conclude.']
  ],
  actions:[
   ['Build Depot · 1 Timber + 1 Grain','Claim a legal neighbouring tile, extending your territory.'],
   ['Upgrade City · 2 Grain + 2 Steel + 1 Coal','Upgrade your own Market Town, earning more Gold and Prestige.'],
-  ['Lay Track · Timber + Steel per segment','Claim a complete railway route; connect two towns for a secret Destination Ticket.'],
+  ['Lay Track · Timber + Steel per new segment','Score 1/2/4/7 Prestige for 2/3/4/5 segments. Reusing your own sections is free; rival-owned sections block the route. Three Lake Viaducts open in Iron; three Capital Express routes open in Electric (2 Gold income, plus bonuses).'],
   ['Recruit · 2 Gold per Soldier','Place up to 3 Soldiers on a tile you own.'],
-  ['Trade · No action cost','Swap 3:1 with the bank, or send a 20-second offer to another player.'],
+  ['Trade · No action cost','Swap 3:1 with the bank or send a sealed player offer. All offers share one 20-second Exchange.'],
   ['Research · 3 Gold + 1 Coal','Gain a secret ticket or available era Upgrade; once each round.'],
-  ['Attack · Soldiers + one die','Attack an adjacent rival. Hills and Cities help defend. Ties favour the defender.']
+  ['Attack · Soldiers + one die','Attack an adjacent rival. Hills and Cities help defend; attacking from a Hill grants +1. Ties favour the defender.']
  ],
  story:[
   ['The Crown Without a King','This kingdom and its eight tycoons are fictional. The king has died and the rival claimants agree that the next sovereign must link the divided towns, ports and mines by rail.'],
@@ -471,7 +482,7 @@ const pocketPages={
   ['Where history ends','These milestones are historical; the succession, kingdom, railway titles and characters in Iron Crown are original fiction. Historical background: Science Museum Group and London Museum.']
  ]
 };
-const pocketOverview='<p class="pocket-lead">First to <strong>10 Prestige in Quick</strong> or <strong>15 in Standard/Advanced</strong> after Reveal wins. Otherwise the highest Prestige at the end takes the Crown. Nobody is eliminated.</p><div class="pocket-flow"><span>INCOME</span><b>→</b><span>2 ORDERS</span><b>→</b><span>REVEAL</span></div>';
+const pocketOverview='<p class="pocket-lead">First to <strong>12 Prestige in Quick</strong>, <strong>22 in Standard</strong> or <strong>24 in Advanced</strong> after Reveal wins. Otherwise the highest Prestige at the end takes the Crown. At the scheduled end, the Royal Ledger gives 1 Prestige per 8 unused industrial resources and 1 per 4 Gold, capped at 3 from industrial goods and 3 from Gold (5 from Gold in Advanced). Nobody is eliminated.</p><div class="pocket-flow"><span>INCOME</span><b>→</b><span>3 ORDERS</span><b>→</b><span>REVEAL</span></div>';
 let pocketSelection='start';
 function openPocketGuide(page='start'){
  overlayFocusReturn=document.activeElement;
@@ -495,7 +506,7 @@ function openPocketGuide(page='start'){
  $('closeRules').onclick=closeOverlay;draw();
  overlay.querySelector('[data-page="'+pocketSelection+'"]').focus();
 }
-const PHONE_CUES=new Set(['ui-select','ui-confirm','dice-roll']);
+const PHONE_CUES=new Set(['ui-select','ui-confirm','dice-roll','invalid-order','ticket-complete','trade-handshake']);
 let phoneAudioEnabled=false,phoneLastCue=0,phoneLastAudio=null;
 try{phoneAudioEnabled=localStorage.getItem('ironPhoneSound')==='on';}catch{}
 function updatePhoneSound(){
@@ -510,12 +521,10 @@ function playPhoneCue(key){
  try{
   if(phoneLastAudio){phoneLastAudio.pause();phoneLastAudio.currentTime=0;}
   const a=new Audio('/audio/'+key+'.mp3');
-  a.src='/audio/mastered/'+key+'.mp3';
+  a.src=['invalid-order','ticket-complete','trade-handshake'].includes(key)?'/audio/'+key+'.mp3':'/audio/mastered/'+key+'.mp3';
   a.preload='auto';a.volume=key==='dice-roll'?.29:.20;
-  let originalFallback=false;
-  a.addEventListener('error',()=>{if(!originalFallback){originalFallback=true;a.src='/audio/'+key+'.mp3';a.play().catch(()=>{});}});
-  a.play().catch(()=>{if(!originalFallback){originalFallback=true;a.src='/audio/'+key+'.mp3';a.play().catch(()=>{});}});
-  phoneLastAudio=a;
+  a.addEventListener('error',()=>{if(a.src.includes('/mastered/')||['invalid-order','ticket-complete','trade-handshake'].includes(key)){a.src='/audio/'+(['invalid-order','ticket-complete','trade-handshake'].includes(key)?'ui-confirm':key)+'.mp3';a.play().catch(()=>{});}}, {once:true});
+  a.play().catch(()=>{});phoneLastAudio=a;
  }catch{}
 }
 function togglePhoneSound(){

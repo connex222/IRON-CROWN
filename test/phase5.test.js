@@ -124,7 +124,7 @@ test('Phase 5: researched leftover upgrade spends the stated resources exactly o
  p.resources={coal:3,timber:5,grain:5,steel:5,gold:9};
  g.setAction(r,p,0,{type:'research',kind:'upgrade',upgrade:'corn'});
  g.setAction(r,p,1,{type:'skip'});
- g.lockIn(r,p);g.lockIn(r,q);
+ r.turnOffset=0;g.lockIn(r,p);g.lockIn(r,q);
  g.revealStep(r);
  assert.ok(p.upgrades.includes('corn'));
  assert.equal(p.resources.gold,6);assert.equal(p.resources.coal,2);

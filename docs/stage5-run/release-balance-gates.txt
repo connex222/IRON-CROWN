@@ -1,0 +1,12 @@
+
+STANDARD — 4 players — 2,000 games
+PASS Seat win rates within ±5 percentage points of 25%: 25.75% / 25.35% / 24.05% / 24.85%
+PASS Early target reached before final round, 30–50%: 45.75%
+PASS Winner achieves >=80% target in >=90% games: 93.45%
+PASS First-place Prestige tie rate under 8%: 2.8%
+
+STANDARD — 8 players — 2,000 games
+PASS Seat win rates within ±4 percentage points of 12.5%: 13% / 12.1% / 13.1% / 12.25% / 12.8% / 13% / 12.4% / 11.35%
+PASS First-place Prestige tie rate under 8%: 4%
+
+Design review gates: 6 passed, 0 failed

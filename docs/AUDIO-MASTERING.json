@@ -1,0 +1,145 @@
+{
+  "date": "2026-10-24",
+  "process": "ffmpeg highpass+lowpass+loudnorm; preserve originals in docs/audio-originals",
+  "files": [
+    {
+      "file": "train-whistle.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "b10aa9067db3aed458013be3ecfe6a25ebc7d8b60645cb487b8c1b72cedb95fa",
+      "mastered_sha256": "81968aff8764b2fb7467f5875292524045dfc1ffe336bd2221923540bc1f9aca"
+    },
+    {
+      "file": "train-chug.mp3",
+      "category": "ambience",
+      "target_lufs": -25,
+      "original_sha256": "ce52607c1db87611144fe712c31b87b5a98078e1b8cddc90631af4ca8a19ca5b",
+      "mastered_sha256": "bdad243309762f54fcaacff0bf42ffca22ce9f764b079aad99565c7ffb980067"
+    },
+    {
+      "file": "steam-release.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "206cbe6e1658c7f70a1ed2c5e1f1cceac985a94fc9279d99b50fa75827e7cb3b",
+      "mastered_sha256": "c11cfad1976ea62b1271da78e51771d3156b611af24f9ea2ba0fd29785dd0500"
+    },
+    {
+      "file": "track-lay.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "e047520d8b511658a6bb794e59502e95ac1d4e328bfa151d9967d1b62481d804",
+      "mastered_sha256": "1e967426e8e6993ae3392fb8eaf34a58ba4c0760a29348f8a9df5de7c2d261f2"
+    },
+    {
+      "file": "depot-build.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "fa587c990437da870ac3cf8f93bbed63dc9a6345e5c499c4605dd1316f86ac79",
+      "mastered_sha256": "49269f710263c2db51feae22c84a3f03aa0bd959e6f96ef0684850e7a2a337ed"
+    },
+    {
+      "file": "city-build.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "cfa2eb34db8e9504eef509c34e67310204b7bdbbff5c4a4eb9e0888229cadeb3",
+      "mastered_sha256": "f79adcc4c480576d8b72d31335e2cf3220883614f9d84c40a2037906d15f4b6d"
+    },
+    {
+      "file": "coin-clink.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "a3111d664e68b06958d4f97c38d5794dd95fc8d5680c4723be0d4ca383773411",
+      "mastered_sha256": "881d226c5d91d3b1157c50d67f81c31671b006f01e0c771ff3a7dac652cff29d"
+    },
+    {
+      "file": "dice-roll.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "305c0db9d8cb3cc7a4be1a12547f8bb2c6162a7ee41531ef054688d250d44ccf",
+      "mastered_sha256": "428128b96f08e535737d3e82810fee93d1b2e1fe0de3ed0798a0de37a7ecac1c"
+    },
+    {
+      "file": "clash-impact.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "2c1318e152024b76432ec0b6cbf22874f642d20963219128c2d3983cb38063d5",
+      "mastered_sha256": "a01890363f9e474896ce58532751013cf2dda2e9e83d6843b3f97db4d958b1cf"
+    },
+    {
+      "file": "crowd-gasp.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "695d03f2d12ba1af31dabf305292680c5b018d0b2c5de522151ef1fd8cbc2ec0",
+      "mastered_sha256": "9b511c402d3578013f6e28b493d4f803d45df3b9bf4f4f77038269ca86fa5c31"
+    },
+    {
+      "file": "crowd-cheer.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "d553cfe2ff6eaea6d0537a429c92943681c2221fb54b4761d81716e6fa2233a0",
+      "mastered_sha256": "a6149ebbe5ac5e5bd8ba7c4868002585783e1e9b4e181a028e57f82d1e6b0789"
+    },
+    {
+      "file": "era-fanfare.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "6589bacd2b90849ab35d9d0d214357078488f3bdb4336acc1b7e6b7ff38e2cc5",
+      "mastered_sha256": "a5df3a815f9fff5a45d17314e4ad272c767e65d60a6e45392632721db34decc9"
+    },
+    {
+      "file": "victory-fanfare.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "df224389c91cf0d55a08b6671b6b1e32387813f91b9aba502e4aa16c7b341bc0",
+      "mastered_sha256": "94fc3e15b8b5de7624df9d3b5d352902ba3b7ea5b7ba6649d0eb52fe9034b78c"
+    },
+    {
+      "file": "ui-select.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "d4a7c6e09b090023206faca6bc3333daea511d9328969adf68c721e650ae8e15",
+      "mastered_sha256": "923f9e7d129076f504417cf44c689feff780a29f7ab3a9d0ae2e4b19d72fe5a9"
+    },
+    {
+      "file": "ui-confirm.mp3",
+      "category": "fx",
+      "target_lufs": -17,
+      "original_sha256": "14c8a1192469dc2c2cd9ceafa5730242be2031f1c153b3fe6fb0f06070dd13e5",
+      "mastered_sha256": "c7de1a4d7943241502ceef2aadd8ba9a360157ce17af75f28c7f776eda363c5e"
+    },
+    {
+      "file": "ambience-railway.mp3",
+      "category": "ambience",
+      "target_lufs": -25,
+      "original_sha256": "ff01687c95e0e3903b53cb8d87ddf0bc241d55574739d570809d26aaa7445943",
+      "mastered_sha256": "f3d8f583f926fd6ea3071abdae281b023195a9c5e97d66ccf48c595d2cbbe5ec"
+    },
+    {
+      "file": "music-parlour.mp3",
+      "category": "music",
+      "target_lufs": -21,
+      "original_sha256": "dfc71e101cdb640f598b0f7d95901bba7741df176ec929ca9573a0f161eff9ff",
+      "mastered_sha256": "aa624d55dcb17ac458658acf63a0db78ab9bfeedcadb3ae8849b68124e4429d5"
+    }
+  ],
+  "new_cues": [
+    "railway-switch",
+    "contract-stamp",
+    "trade-handshake",
+    "royal-ledger",
+    "grand-station",
+    "ticket-complete",
+    "invalid-order",
+    "electric-era"
+  ],
+  "fallback_map": {
+    "railway-switch": "track-lay",
+    "contract-stamp": "ui-confirm",
+    "trade-handshake": "coin-clink",
+    "royal-ledger": "depot-build",
+    "grand-station": "era-fanfare",
+    "ticket-complete": "ui-confirm",
+    "invalid-order": "ui-select",
+    "electric-era": "steam-release"
+  }
+}

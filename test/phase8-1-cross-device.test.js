@@ -29,12 +29,12 @@ test('Cross-device: How to Play is prominent from the TV, lobby and phone join s
  assert.match(t,/function openGuide\(section='quick'\)/);
 });
 test('Cross-device: three steps, seven action costs, Prestige and private-ticket advice are explained',()=>{
- for(const name of ['Join &amp; claim','Plan two orders','Watch the reveal'])assert.ok(t.includes(name),name);
+ for(const name of ['Join &amp; claim','Plan three orders','Watch the reveal'])assert.ok(t.includes(name),name);
  for(const name of ['Build Depot','Upgrade to City','Lay Track','Recruit','Trade','Research','Attack'])assert.ok(t.includes(name));
- assert.match(t,/10 Prestige/);assert.match(t,/15/);
- assert.match(p,/10 Prestige in Quick/);
+ assert.match(t,/12 Prestige/);assert.match(t,/20/);assert.match(t,/22/);
+ assert.match(p,/12 Prestige in Quick/);
  assert.match(p,/keep 2 or 3 private Destination Tickets/i);
- assert.match(p,/20-second offer/);
+ assert.match(p,/shared 20-second Exchange/);
 });
 test('Lore is clearly fictional while history has correctly scoped Victorian milestones',()=>{
  assert.match(t,/Fictional kingdom/);

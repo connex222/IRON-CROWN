@@ -9,16 +9,16 @@ test('37-hex map satisfies tile distribution, lake spacing and route constraints
  for(let i=0;i<120;i++){const m=generateMap(),counts={};for(const t of m.tiles)counts[t.type]=(counts[t.type]||0)+1;
  assert.equal(m.tiles.length,37);for(const [k,n] of Object.entries(DISTRIBUTION))assert.equal(counts[k],n,`wrong ${k} count`);assert.equal(counts.capital,1);assert.equal(m.tiles.find(t=>t.type==='capital').id,'0,0');
  const byId=new Map(m.tiles.map(t=>[t.id,t]));for(const t of m.tiles.filter(x=>x.type==='lake'))assert.equal(neighbours(t,byId).some(x=>x.type==='lake'),false);
- assert.equal(m.routes.length,18);assert.equal(new Set(m.routes.map(r=>[r.a,r.b].sort().join('|'))).size,18);
+ assert.equal(m.routes.length,24);assert.equal(m.routes.filter(r=>r.era==='steam').length,18);assert.equal(new Set(m.routes.map(r=>[r.a,r.b].sort().join('|'))).size,24);
  for(const route of m.routes){assert.ok(route.segments>=2&&route.segments<=5);assert.equal(route.segments,route.path.length-1);assert.equal(route.path[0],route.a);assert.equal(route.path.at(-1),route.b);
- for(let j=1;j<route.path.length;j++){const from=byId.get(route.path[j-1]),to=byId.get(route.path[j]);assert.notEqual(from.type,'lake');assert.notEqual(to.type,'lake');assert.equal(distance(from,to),1);}}
+ for(let j=1;j<route.path.length;j++){const from=byId.get(route.path[j-1]),to=byId.get(route.path[j]);if(route.era!=='iron'){assert.notEqual(from.type,'lake');assert.notEqual(to.type,'lake');}assert.equal(distance(from,to),1);}}
  assert.equal(m.deck.length,24);assert.ok(m.deck.every(t=>t.value>=2&&t.value<=4));
  }
 });
 test('four-letter room, player limit, uniqueness and sanitized names',()=>{const r=g.createRoom('ABCD');for(let i=0;i<8;i++){const p=g.addPlayer(r,`<Tester ${i}>`,true);assert.ok(!p.name.includes('<'));assert.ok(p.token.length>=16);}
  assert.throws(()=>g.addPlayer(r,'Ninth'),/Room full/);assert.equal(new Set(r.players.map(p=>p.avatar)).size,8);
 });
-test('secret ticket selection, snake placement and starting resources',()=>{const {r,ps}=setup(3);assert.equal(r.status,'income');assert.equal(r.placement.length,6);assert.deepEqual(r.placement.slice(0,3),ps.map(p=>p.id));assert.deepEqual(r.placement.slice(3),ps.map(p=>p.id).reverse());
+test('secret ticket selection, snake placement and starting resources',()=>{const {r,ps}=setup(3);assert.equal(r.status,'income');assert.equal(r.placement.length,6);assert.deepEqual(new Set(r.placement.slice(0,3)),new Set(ps.map(p=>p.id)));assert.deepEqual(r.placement.slice(3),r.placement.slice(0,3).reverse());
  for(const p of ps){assert.equal(p.tickets.length,2);assert.equal(g.owned(r,p).length,2);assert.equal(g.owned(r,p).reduce((n,t)=>n+t.soldiers,0),2);assert.ok(p.resources.gold>=2);assert.ok(['coal','timber','grain','steel'].every(k=>p.resources[k]>=1));}
  const snapshot=g.publicView(r),privateSnapshot=g.privateView(r,ps[0]);assert.ok(!JSON.stringify(snapshot).includes(ps[0].tickets[0].id));assert.equal(privateSnapshot.tickets.length,2);assert.ok(!JSON.stringify(snapshot).includes(ps[0].token));
 });
@@ -36,7 +36,7 @@ test('failed actions add exactly one Gold, valid actions spend resources',()=>{c
  const free=g.legalTargets(r,ps[0]).build[0];assert.ok(free);g.setAction(r,ps[0],0,{type:'build',tile:free});g.setAction(r,ps[0],1,{type:'skip'});g.lockIn(r,ps[0]);
  g.setAction(r,ps[1],0,{type:'skip'});g.setAction(r,ps[1],1,{type:'skip'});g.lockIn(r,ps[1]);assert.equal(r.status,'reveal');
  // The claim stays contested until all orders are revealed.
- advance(r,5);assert.ok(r.status==='income'||r.status==='draft'||r.status==='finished');const tile=r.tiles.find(t=>t.id===free);assert.equal(tile.owner,ps[0].id);
+ advance(r,7);assert.ok(['income','draft','finished','plan'].includes(r.status));const tile=r.tiles.find(t=>t.id===free);assert.equal(tile.owner,ps[0].id);
 });
 test('scoring: market depots, cities, tickets and 5-soldier trophy',()=>{const {r,ps}=setup();const [p,q]=ps;
  const town=r.tiles.find(t=>t.type==='town');town.owner=p.id;town.city=false;g.updatePrestige(r);assert.equal(p.breakdown.depot,1);
@@ -47,10 +47,10 @@ test('longest railway counts connected owned route segments',()=>{
  const owned=[{id:'x',segments:2,path:['a','b','c']},{id:'y',segments:3,path:['c','d','e','f']},{id:'z',segments:4,path:['q','r','s','t','u']}];
  assert.equal(longestRail(owned),5);owned.push({id:'h',segments:2,path:['t','x','y']});assert.equal(longestRail(owned),6);
 });
-test('trade requires a recipient, valid resource objects, and may be declined',()=>{const {r,ps}=setup();g.tick(r,r.deadline+1);
+test('trade requires a recipient, valid resource objects, and may be declined',()=>{const {r,ps}=setup();g.tick(r,r.deadline+1);r.round=r.settings.rounds;
  assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'player',to:ps[1].id,give:{coal:-1},want:{steel:1}}),/Invalid resource amount/);
  g.setAction(r,ps[0],0,{type:'trade',kind:'player',to:ps[1].id,give:{coal:1},want:{steel:1}});g.setAction(r,ps[0],1,{type:'skip'});g.lockIn(r,ps[0]);g.lockIn(r,ps[1]);
- const before=ps[0].resources.coal;g.revealStep(r);assert.equal(r.status,'offer');assert.equal(ps[0].resources.coal,before-1);g.replyOffer(r,ps[1],false);assert.equal(r.status,'reveal');assert.equal(ps[0].resources.coal,before);
+ const before=ps[0].resources.coal;while(r.status==='reveal')g.revealStep(r);assert.equal(r.status,'market');assert.equal(ps[0].resources.coal,before-1);g.replyOffer(r,ps[1],false);assert.notEqual(r.status,'market');assert.equal(ps[0].resources.coal,before);
 });
 test('Advanced rules: avatar perks and events modify costs',()=>{const {r,ps}=setup(2,'advanced');r.era='steam';const [p]=ps;p.avatar='augusta';
  assert.equal(g.costOf(r,p,{type:'city'}).grain,1);
@@ -78,7 +78,7 @@ test('every generated town is connected to the capital by the complete prospecti
  for(let seed=30;seed<130;seed++){
   const m=generateMap(seedRandom(seed)),stations=m.tiles.filter(t=>t.type==='town'||t.type==='capital');
   const links=new Map(stations.map(t=>[t.id,new Set()]));
-  for(const r of m.routes){links.get(r.a).add(r.b);links.get(r.b).add(r.a);if(r.segments>=4)longer++;}
+  for(const r of m.routes.filter(r=>r.era==='steam')){links.get(r.a).add(r.b);links.get(r.b).add(r.a);if(r.segments>=4)longer++;}
   const visited=new Set(['0,0']),pending=['0,0'];
   while(pending.length)for(const dest of links.get(pending.shift()))if(!visited.has(dest)){visited.add(dest);pending.push(dest);}
   assert.equal(visited.size,7,`Seed ${seed} contains a stranded station`);
@@ -96,18 +96,15 @@ test('Phase 2 presentation ships painted TV terrain, accessible phone target hig
  assert.match(phone,/function miniMap\(/);assert.match(phone,/data-tile=.*legal/);assert.match(phone,/data-route=.*legal/);
 });
 
-test('Phase 3 ships all eight approved realistic human tycoon portraits across eras and moods', () => {
- const fs = require('node:fs'); const path = require('node:path');
- const root = path.resolve(__dirname,'../public/art');
- const ids = ['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'];
- for (const actor of ids) {
-  const original=path.join(root,'avatars',`${actor}_human.png`);
-  assert.ok(fs.existsSync(original), `Missing approved human portrait: ${actor}`);
-  for (const era of ['steam','iron','electric'])for(const mood of ['neutral','smug','furious']) {
-   const image=path.join(root,'avatars',`${actor}_${era}_${mood}.png`);
-   assert.ok(fs.existsSync(image), `Missing ${actor} ${era}/${mood}`);
-   assert.equal(fs.readFileSync(image).toString('hex',0,8),'89504e470d0a1a0a');
-  }
+test('Original eight approved tycoon portraits are the only runtime avatars', () => {
+ const fs=require('node:fs'),path=require('node:path');
+ const root=path.resolve(__dirname,'../public/art');
+ const ids=['augusta','silas','jack','ada','rupert','nell','ottoline','ezra'];
+ const files=fs.readdirSync(path.join(root,'avatars')).filter(x=>x.endsWith('.png')).sort();
+ assert.deepEqual(files,ids.map(id=>id+'_human.png').sort(),'No unused or substituted avatar variants');
+ for(const actor of ids){
+  const file=path.join(root,'avatars',actor+'_human.png');
+  assert.equal(fs.readFileSync(file).toString('hex',0,8),'89504e470d0a1a0a','Real portrait PNG: '+actor);
  }
  for(const file of ['iron-crown-premium.png','victorian-terminal.jpg'])assert.ok(fs.existsSync(path.join(root,file)),file);
 });
@@ -128,7 +125,7 @@ test('Phase 3: building a City sets a public four-second smug reaction',()=>{
  const {r,ps}=setup();const [p,q]=ps;
  const town=r.tiles.find(t=>t.type==='town');town.owner=p.id;town.city=false;
  g.tick(r,r.deadline+1);p.resources={coal:10,timber:10,grain:10,steel:10,gold:10};
- g.setAction(r,p,0,{type:'city',tile:town.id});g.setAction(r,p,1,{type:'skip'});g.lockIn(r,p);g.lockIn(r,q);
+ g.setAction(r,p,0,{type:'city',tile:town.id});g.setAction(r,p,1,{type:'skip'});r.turnOffset=0;g.lockIn(r,p);g.lockIn(r,q);
  g.revealStep(r);const shown=g.publicView(r).players.find(x=>x.id===p.id);
  assert.equal(town.city,true);assert.equal(shown.reaction,'smug');assert.equal(shown.reactionReason,'New city founded');
  assert.ok(shown.reactionUntil>Date.now());
@@ -137,7 +134,7 @@ test('Phase 3: failed plans cause furious reaction, no secret private details in
  const {r,ps}=setup();const [p,q]=ps;
  const target=r.tiles.find(t=>t.type==='town');target.owner=p.id;target.city=false;
  g.tick(r,r.deadline+1);p.resources={coal:10,timber:10,grain:10,steel:10,gold:10};
- g.setAction(r,p,0,{type:'city',tile:target.id});g.setAction(r,p,1,{type:'skip'});g.lockIn(r,p);g.lockIn(r,q);
+ g.setAction(r,p,0,{type:'city',tile:target.id});g.setAction(r,p,1,{type:'skip'});r.turnOffset=0;g.lockIn(r,p);g.lockIn(r,q);
  target.owner=q.id;g.revealStep(r);
  const pub=g.publicView(r);assert.equal(pub.players.find(x=>x.id===p.id).reaction,'furious');
  assert.ok(pub.feed.some(x=>x.kind==='fail'&&x.player===p.id));
@@ -192,15 +189,19 @@ test('Phase 3.4: TV gallery supports all eight people, eras, screen reader frien
  const section=html.substring(html.indexOf('const galleryActors=['),html.indexOf('let galleryActor='));
  for(const actor of require('../src/constants').AVATARS) assert.match(section,new RegExp(`['\"]${actor.id}['\"]`));
 });
-test('Phase 3.4: character art is served locally and portrait alternatives exist without network dependencies',()=>{
+test('Runtime serves only the eight individually approved character photographs',()=>{
  const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
  const dir=path.resolve(__dirname,'../public/art/avatars');
  const ids=require('../src/constants').AVATARS.map(x=>x.id);
- for(const id of ids){const seen=new Set();for(const era of ['steam','iron','electric'])for(const mood of ['neutral','smug','furious']){
-  const file=path.join(dir,`${id}_${era}_${mood}.png`);
-  assert.ok(fs.statSync(file).size>15000,`Corrupt or tiny portrait: ${file}`);
-  seen.add(crypto.createHash('sha256').update(fs.readFileSync(file)).digest('hex'));
- }assert.equal(seen.size,9,`${id} should have 9 distinct PNG render treatments`);}
+ const expected=ids.map(id=>`${id}_human.png`).sort();
+ assert.deepEqual(fs.readdirSync(dir).filter(x=>x.endsWith('.png')).sort(),expected);
+ const seen=new Set();
+ for(const name of expected){
+  const file=path.join(dir,name),buffer=fs.readFileSync(file);
+  assert.ok(buffer.length>20000,name);
+  seen.add(crypto.createHash('sha256').update(buffer).digest('hex'));
+ }
+ assert.equal(seen.size,8,'The eight real individuals must remain visually distinct');
 });
 
 test('Phase 3.5: game UIs use human portraits, not previous era derivatives',()=>{
@@ -250,7 +251,7 @@ test('Phase 4: combined double attack rolls once per player',()=>{
  assert.ok(target);target.owner=q.id;target.soldiers=0;
  for(let i=0;i<2;i++)g.setAction(r,p,i,{type:'attack',tile:target.id,sources:[{tile:home.id,count:2}]});
  g.lockIn(r,p);g.lockIn(r,q);
- for(let i=0;i<5&&r.status==='reveal';i++)g.revealStep(r);
+ for(let i=0;i<9&&r.status==='reveal';i++)g.revealStep(r);
  const clash=r.feed.find(x=>x.kind==='clash'&&x.tile===target.id);
  assert.ok(clash);assert.equal(clash.results.length,2);
  assert.equal(new Set(clash.results.map(x=>x.id)).size,2);
@@ -267,18 +268,19 @@ test('Phase 4: bank trade can fund the second action',()=>{
  p.resources={coal:2,timber:5,grain:1,steel:1,gold:2};
  g.setAction(r,p,0,{type:'trade',kind:'bank',give:'timber',want:'gold'});
  g.setAction(r,p,1,{type:'research',kind:'ticket'});
+ r.turnOffset=0; // The starting Revealer is randomised in the new fairness rules.
  g.lockIn(r,p);g.lockIn(r,q);
  g.revealStep(r);assert.equal(p.resources.gold,3);
  const tickets=p.tickets.length;g.revealStep(r);
  assert.equal(p.resources.gold,0);assert.equal(p.resources.coal,1);assert.equal(p.tickets.length,tickets+1);
 });
 test('Phase 4: compulsory trade cannot force unavailable payment',()=>{
- const {r,ps}=setup(2,'advanced');g.tick(r,r.deadline+1);const [p,q]=ps;
+ const {r,ps}=setup(2,'advanced');g.tick(r,r.deadline+1);r.round=r.settings.rounds;const [p,q]=ps;
  p.avatar='ezra';p.resources.grain=3;q.resources.steel=0;
  g.setAction(r,p,0,{type:'trade',kind:'player',to:q.id,give:{grain:2},want:{steel:1}});
  g.lockIn(r,p);g.lockIn(r,q);
- const before=p.resources.grain;g.revealStep(r);
- assert.equal(r.status,'reveal');assert.equal(p.resources.grain,before);
+ const before=p.resources.grain;while(r.status==='reveal')g.revealStep(r);
+ assert.equal(r.status,'finished');assert.equal(p.resources.grain,before);
 });
 test('Phase 4: Telegraph change rejects a depleted budget',()=>{
  const {r,ps}=setup();g.tick(r,r.deadline+1);const [p,q]=ps;
@@ -294,12 +296,12 @@ test('Phase 4: invalid bank actions and deadline pass safely',()=>{
  assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'bank',give:'coal',want:'coal'}),/different resources/);
  assert.throws(()=>g.setAction(r,ps[0],0,{type:'trade',kind:'player',to:ps[1].id,give:{gold:100},want:{coal:1}}),/Invalid resource amount/);
  g.tick(r,r.deadline+1);assert.equal(r.status,'reveal');
- assert.ok(ps.every(p=>p.locked));assert.deepEqual(ps[0].actions,[{type:'skip'},{type:'skip'}]);
+ assert.ok(ps.every(p=>p.locked));assert.deepEqual(ps[0].actions,[{type:'skip'},{type:'skip'},{type:'skip'}]);
 });
 test('Phase 4: two, four and eight AI players finish all game modes with valid stock',()=>{
  for(const mode of ['quick','standard','advanced'])for(const n of [2,4,8]){
-  const {r}=setup(n,mode,true);const steps=advance(r,220);assert.equal(r.status,'finished');
-  assert.ok(steps<220&&r.round<=r.settings.rounds);
+  const {r}=setup(n,mode,true);const steps=advance(r,440);assert.equal(r.status,'finished');
+  assert.ok(steps<440&&r.round<=r.settings.rounds);
   for(const p of r.players)for(const val of Object.values(p.resources))assert.ok(Number.isInteger(val)&&val>=0);
   for(const tile of r.tiles)assert.ok(Number.isInteger(tile.soldiers)&&tile.soldiers>=0);
  }

@@ -1,0 +1,836 @@
+{
+  "checks": [
+    {
+      "check": "tv-320: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-320: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(160deg, rgb(219, 185, 83), rgb(166, 123, 23))",
+        "height": 76,
+        "visible": true
+      }
+    },
+    {
+      "check": "tv-320: QR stays inside join panel",
+      "passed": true,
+      "details": {
+        "within": true
+      }
+    },
+    {
+      "check": "tv-320: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "tv-320: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "tv-320: Exchange banner",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-320: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "tv-320: final score present",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-320: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "tv-320: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-320: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "phone-320: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-320: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-320: primary touch target at least 56px",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-320: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "phone-320: three action slots",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-320: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "phone-320: two offers",
+      "passed": true,
+      "details": "2 THE EXCHANGE IS OPEN\nOne shared market window\n\nAll trade offers are answered together. Your secret deals will be resolved in Reveal order wh"
+    },
+    {
+      "check": "phone-320: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "phone-320: Royal Ledger visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-320: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "phone-320: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-320: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 320,
+        "actual": 320
+      }
+    },
+    {
+      "check": "tv-390: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-390: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(160deg, rgb(219, 185, 83), rgb(166, 123, 23))",
+        "height": 59,
+        "visible": true
+      }
+    },
+    {
+      "check": "tv-390: QR stays inside join panel",
+      "passed": true,
+      "details": {
+        "within": true
+      }
+    },
+    {
+      "check": "tv-390: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "tv-390: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "tv-390: Exchange banner",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-390: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "tv-390: final score present",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-390: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "tv-390: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-390: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "phone-390: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-390: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-390: primary touch target at least 56px",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-390: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "phone-390: three action slots",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-390: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "phone-390: two offers",
+      "passed": true,
+      "details": "2 THE EXCHANGE IS OPEN\nOne shared market window\n\nAll trade offers are answered together. Your secret deals will be resolved in Reveal order wh"
+    },
+    {
+      "check": "phone-390: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "phone-390: Royal Ledger visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-390: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "phone-390: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-390: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 390,
+        "actual": 390
+      }
+    },
+    {
+      "check": "tv-768: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-768: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(160deg, rgb(219, 185, 83), rgb(166, 123, 23))",
+        "height": 59,
+        "visible": true
+      }
+    },
+    {
+      "check": "tv-768: QR stays inside join panel",
+      "passed": true,
+      "details": {
+        "within": true
+      }
+    },
+    {
+      "check": "tv-768: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "tv-768: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "tv-768: Exchange banner",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-768: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "tv-768: final score present",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-768: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "tv-768: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-768: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "phone-768: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-768: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-768: primary touch target at least 56px",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-768: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "phone-768: three action slots",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-768: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "phone-768: two offers",
+      "passed": true,
+      "details": "2 THE EXCHANGE IS OPEN\nOne shared market window\n\nAll trade offers are answered together. Your secret deals will be resolved in Reveal order wh"
+    },
+    {
+      "check": "phone-768: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "phone-768: Royal Ledger visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-768: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "phone-768: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-768: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 768,
+        "actual": 768
+      }
+    },
+    {
+      "check": "tv-1280: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1280: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(160deg, rgb(219, 185, 83), rgb(166, 123, 23))",
+        "height": 59,
+        "visible": true
+      }
+    },
+    {
+      "check": "tv-1280: QR stays inside join panel",
+      "passed": true,
+      "details": {
+        "within": true
+      }
+    },
+    {
+      "check": "tv-1280: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "tv-1280: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "tv-1280: Exchange banner",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1280: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "tv-1280: final score present",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1280: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "tv-1280: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1280: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "phone-1280: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1280: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-1280: primary touch target at least 56px",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-1280: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "phone-1280: three action slots",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1280: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "phone-1280: two offers",
+      "passed": true,
+      "details": "2 THE EXCHANGE IS OPEN\nOne shared market window\n\nAll trade offers are answered together. Your secret deals will be resolved in Reveal order wh"
+    },
+    {
+      "check": "phone-1280: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "phone-1280: Royal Ledger visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1280: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "phone-1280: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1280: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1280,
+        "actual": 1280
+      }
+    },
+    {
+      "check": "tv-1920: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1920: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(160deg, rgb(219, 185, 83), rgb(166, 123, 23))",
+        "height": 59,
+        "visible": true
+      }
+    },
+    {
+      "check": "tv-1920: QR stays inside join panel",
+      "passed": true,
+      "details": {
+        "within": true
+      }
+    },
+    {
+      "check": "tv-1920: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "tv-1920: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "tv-1920: Exchange banner",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1920: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "tv-1920: final score present",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1920: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "tv-1920: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "tv-1920: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "phone-1920: help available",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1920: premium primary gold background",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-1920: primary touch target at least 56px",
+      "passed": true,
+      "details": {
+        "background": "linear-gradient(145deg, rgb(242, 209, 116), rgb(182, 140, 50))",
+        "height": 56,
+        "visible": true
+      }
+    },
+    {
+      "check": "phone-1920: join: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "phone-1920: three action slots",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1920: plan: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "phone-1920: two offers",
+      "passed": true,
+      "details": "2 THE EXCHANGE IS OPEN\nOne shared market window\n\nAll trade offers are answered together. Your secret deals will be resolved in Reveal order wh"
+    },
+    {
+      "check": "phone-1920: market: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "phone-1920: Royal Ledger visible",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1920: finished: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    },
+    {
+      "check": "phone-1920: shared Crown",
+      "passed": true,
+      "details": null
+    },
+    {
+      "check": "phone-1920: shared: horizontal scroll",
+      "passed": true,
+      "details": {
+        "viewport": 1920,
+        "actual": 1920
+      }
+    }
+  ],
+  "passed": 115,
+  "failed": 0,
+  "errors": [],
+  "screenshots": [
+    "tv-320-join.png",
+    "tv-320-plan.png",
+    "tv-320-market.png",
+    "tv-320-finished.png",
+    "tv-320-shared.png",
+    "phone-320-join.png",
+    "phone-320-plan.png",
+    "phone-320-market.png",
+    "phone-320-finished.png",
+    "phone-320-shared.png",
+    "tv-390-plan.png",
+    "tv-390-market.png",
+    "tv-390-finished.png",
+    "tv-390-shared.png",
+    "phone-390-plan.png",
+    "phone-390-market.png",
+    "phone-390-finished.png",
+    "phone-390-shared.png",
+    "tv-1280-join.png",
+    "tv-1280-plan.png",
+    "tv-1280-market.png",
+    "tv-1280-finished.png",
+    "tv-1280-shared.png",
+    "phone-1280-join.png",
+    "phone-1280-plan.png",
+    "phone-1280-market.png",
+    "phone-1280-finished.png",
+    "phone-1280-shared.png",
+    "tv-1920-join.png",
+    "tv-1920-market.png",
+    "phone-1920-join.png",
+    "phone-1920-market.png"
+  ]
+}

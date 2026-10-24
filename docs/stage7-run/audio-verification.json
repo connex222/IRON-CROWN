@@ -1,0 +1,92 @@
+{
+  "total": 17,
+  "checksum_pass": 17,
+  "probe_pass": 17,
+  "details": [
+    {
+      "file": "train-whistle.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "train-chug.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "steam-release.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "track-lay.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "depot-build.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "city-build.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "coin-clink.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "dice-roll.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "clash-impact.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "crowd-gasp.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "crowd-cheer.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "era-fanfare.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "victory-fanfare.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "ui-select.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "ui-confirm.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "ambience-railway.mp3",
+      "checksum": true,
+      "decodes": true
+    },
+    {
+      "file": "music-parlour.mp3",
+      "checksum": true,
+      "decodes": true
+    }
+  ]
+}

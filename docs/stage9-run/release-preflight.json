@@ -1,0 +1,73 @@
+{
+  "version": "2.0.0-dev.9",
+  "results": [
+    {
+      "name": "Quick / 2 players",
+      "status": "PASS",
+      "details": "2000 games, seed 20261103, early 48.95%, 80%-score 78.85%, ties 4.05%"
+    },
+    {
+      "name": "Quick / 4 players",
+      "status": "FAIL",
+      "details": "early victory 66.25% (allowed 30–50%)"
+    },
+    {
+      "name": "Standard / 4 players",
+      "status": "PASS",
+      "details": "2000 games, seed 20261023, early 45.75%, 80%-score 93.45%, ties 2.8%"
+    },
+    {
+      "name": "Standard / 8 players",
+      "status": "PASS",
+      "details": "2000 games, seed 20261025, early 42.95%, 80%-score 95.3%, ties 4%"
+    },
+    {
+      "name": "Advanced / 4 players",
+      "status": "PASS",
+      "details": "2000 games, seed 20261102, early 44.2%, 80%-score 91.5%, ties 2.75%"
+    },
+    {
+      "name": "Advanced / 8 players",
+      "status": "BLOCKED",
+      "details": "Missing 2,000-game seeded simulation: docs/stage9-run/advanced8-2000.json"
+    },
+    {
+      "name": "17 audio file checksums",
+      "status": "PASS",
+      "details": "17/17 SHA-256 hashes match"
+    },
+    {
+      "name": "Eight original portraits",
+      "status": "PASS",
+      "details": "8/8 original portraits present"
+    },
+    {
+      "name": "Browser fixture screenshots",
+      "status": "PASS",
+      "details": "32 screenshots captured; fixtures do not certify real devices"
+    },
+    {
+      "name": "Installed WebSocket runtime",
+      "status": "BLOCKED",
+      "details": "ws unavailable"
+    },
+    {
+      "name": "Commercial audio redistribution licence",
+      "status": "BLOCKED",
+      "details": "Provider terms/rights not independently verified"
+    },
+    {
+      "name": "Physical-device and cross-network acceptance",
+      "status": "BLOCKED",
+      "details": "November acceptance testing outstanding"
+    },
+    {
+      "name": "Hosting durability and rollback rehearsal",
+      "status": "BLOCKED",
+      "details": "Ephemeral Render storage and browser-only recovery not certified"
+    }
+  ],
+  "passed": 7,
+  "blocked": 6,
+  "releaseApproved": false
+}

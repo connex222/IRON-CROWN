@@ -58,7 +58,65 @@ function generateMap(rng=Math.random){
    degrees.set(r.a,(degrees.get(r.a)||0)+1);degrees.set(r.b,(degrees.get(r.b)||0)+1);
    for(let i=1;i<r.path.length;i++){const k=[r.path[i-1],r.path[i]].sort().join('|');usedTracks.set(k,(usedTracks.get(k)||0)+1);}
  }
- const routes=selected.map((r,i)=>({id:`R${i+1}`,...r,owner:null,blocked:false}));
+ const routes=selected.map((r,i)=>({id:`R${i+1}`,...r,era:'steam',owner:null,blocked:false}));
+ // These six EXTRA charters preserve the original 18 routes and ticket deck.
+ // Three viaducts cross one of the lake hexes, and three electric links
+ // terminate at the Capital. All endpoint pairs are distinct.
+ const selectedPairs=new Set(routes.map(r=>[r.a,r.b].sort().join('|')));
+ const usedBridgeEnds=new Set();
+ const bridges=[];
+ const byCoord=new Map(best.tiles.map(t=>[t.id,t]));
+ const lakes=best.tiles.filter(t=>t.type==='lake');
+ for(const lake of lakes){
+   const adjacency=neighbours(lake,byCoord).filter(t=>t.type!=='lake');
+   let pick=null,bestRank=-Infinity;
+   for(let i=0;i<adjacency.length;i++)for(let j=i+1;j<adjacency.length;j++){
+     const left=adjacency[i],right=adjacency[j];
+     // A viaduct may also have a one-hex approach ramp at either bank.
+     // This resolves rare maps where both immediate shore endpoints are
+     // an already-chartered town pair, without duplicating an endpoint pair.
+     const leftEnds=[null,...neighbours(left,byCoord).filter(t=>t.type!=='lake'&&t.id!==right.id&&t.id!==lake.id)];
+     const rightEnds=[null,...neighbours(right,byCoord).filter(t=>t.type!=='lake'&&t.id!==left.id&&t.id!==lake.id)];
+     for(const l of leftEnds)for(const rr of rightEnds){
+       const path=[...(l?[l.id]:[]),left.id,lake.id,right.id,...(rr?[rr.id]:[])];
+       if(new Set(path).size!==path.length)continue;
+       const a=byCoord.get(path[0]),b=byCoord.get(path.at(-1));
+       const pair=[a.id,b.id].sort().join('|');
+       if(selectedPairs.has(pair))continue;
+       const edgeScore=t=>routes.filter(r=>r.path.includes(t.id)).length;
+       const rank=edgeScore(a)+edgeScore(b)+(a.type==='town'?4:0)+(b.type==='town'?4:0)
+        -(usedBridgeEnds.has(a.id)?4:0)-(usedBridgeEnds.has(b.id)?4:0)
+        +Math.min(path.length-3,2)*.7+rng()*.01;
+       if(rank>bestRank){bestRank=rank;pick={a:a.id,b:b.id,path,segments:path.length-1};}
+     }
+   }
+   if(!pick)throw Error('Lake lacks a viable unique bridge charter');
+   selectedPairs.add([pick.a,pick.b].sort().join('|'));
+   usedBridgeEnds.add(pick.a);usedBridgeEnds.add(pick.b);
+   bridges.push({id:`B${bridges.length+1}`,...pick,era:'iron',owner:null,blocked:false});
+ }
+ if(bridges.length!==3)throw Error('Expected three lake-crossing bridges');
+ const capital=best.tiles.find(t=>t.type==='capital');
+ const electric=[];
+ const electricCandidates=shuffle(best.tiles.filter(t=>['coal','forest','farm','steel','town'].includes(t.type)
+   &&distance(capital,t)>=2),rng).map(t=>{
+     const path=pathfind(capital,t,new Map(best.tiles.map(n=>[n.id,n])),false,rng);
+     if(!path||path.length<3)return null;
+     // Prefer longer high-value links with fewer sections already in base routes.
+     const used=new Set(routes.flatMap(r=>r.path.slice(1).map((id,i)=>[r.path[i],id].sort().join('|'))));
+     const overlap=path.slice(1).filter((id,i)=>used.has([path[i],id].sort().join('|'))).length;
+     return {a:capital.id,b:t.id,path,segments:path.length-1,rank:(path.length-1)*5-overlap*6+(t.type==='town'?4:0)+rng()*.01};
+   }).filter(Boolean).sort((a,b)=>b.rank-a.rank);
+ for(const candidate of electricCandidates){
+   const pair=[candidate.a,candidate.b].sort().join('|');
+   if(selectedPairs.has(pair))continue;
+   selectedPairs.add(pair);
+   const {rank,...details}=candidate;
+   electric.push({id:`E${electric.length+1}`,...details,era:'electric',owner:null,blocked:false});
+   if(electric.length===3)break;
+ }
+ if(electric.length!==3)throw Error('Could not create three unique Capital express charters');
+ routes.push(...bridges,...electric);
  // A ticket deck has 24 physical cards; some town pairs intentionally occur twice.
  const nodes=best.tiles.filter(t=>t.type==='town'||t.type==='capital');
  const pairs=[];

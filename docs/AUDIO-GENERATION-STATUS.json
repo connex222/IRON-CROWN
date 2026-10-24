@@ -1,0 +1,72 @@
+{
+  "date": "2026-10-24",
+  "result": [
+    {
+      "name": "railway-switch",
+      "provider": "Mirelo",
+      "job_id": "39e993019c02b990d90be1b28de29526",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "contract-stamp",
+      "provider": "Mirelo",
+      "job_id": "2c17593cf1ab9cc3b2768e51a7f6866c",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "trade-handshake",
+      "provider": "Mirelo",
+      "job_id": "8debee8f819fe0e219264d4b6e1078dd",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "royal-ledger",
+      "provider": "Mirelo",
+      "job_id": "c89cf84919fa09ce9ec84688ee4b6476",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "grand-station",
+      "provider": "Mirelo",
+      "job_id": "bbfb7bbbccb9f11436d60b8e37d85bb4",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "ticket-complete",
+      "provider": "Mirelo",
+      "job_id": "49d9534b6dfea7596c4d80ddcfb85d75",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "invalid-order",
+      "provider": "Mirelo",
+      "job_id": "ecf1939a818ffdb89003c0842e5001b5",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "electric-era",
+      "provider": "Mirelo",
+      "job_id": "8058b122ebe9e63dff6e098645fa9c81",
+      "status": "succeeded",
+      "local_mp3": false
+    },
+    {
+      "name": "victorian-parlour-deluxe",
+      "provider": "Daydream",
+      "job_id": "sng_WlZ7Di3CBJOCBGSRrpOH6C",
+      "status": "succeeded",
+      "local_mp3": false
+    }
+  ],
+  "daydream_listening_url": "https://gen.daydream.live/v1/songs/sng_WlZ7Di3CBJOCBGSRrpOH6C/1.mp3",
+  "provider_links_not_bundled_due_to_download_restriction": true,
+  "bundle_target": "public/audio/<name>.mp3",
+  "staging_copy_pending": true
+}

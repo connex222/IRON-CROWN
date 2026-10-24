@@ -1,14 +1,16 @@
 {
   "name": "iron-crown",
-  "version": "1.12.1",
+  "version": "2.0.0-dev.10",
   "private": true,
-  "description": "Iron Crown — a shared-TV Victorian railway empire game with private phone controllers",
+  "description": "Iron Crown \u2014 a shared-TV Victorian railway empire game with private phone controllers",
   "type": "commonjs",
   "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test test/*.test.js"
+    "test": "node --test test/*.test.js",
+    "sim": "node tools/simulate.js",
+    "release:preflight": "node tools/release_preflight.js"
   },
   "engines": {
     "node": ">=20"

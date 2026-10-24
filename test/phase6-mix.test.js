@@ -9,7 +9,8 @@ const {SOUND_GAIN,MIX_PRESETS}=vm.runInNewContext(script.slice(start,end)+'\n({S
 
 test('Audio mix: every bundled cue has a calibrated gain and priority',()=>{
  const {CUES}=require('../src/audio');
- assert.deepEqual(Object.keys(SOUND_GAIN).sort(),[...CUES].sort());
+ assert.deepEqual(Object.keys(SOUND_GAIN).filter(k=>CUES.includes(k)).sort(),[...CUES].sort());
+ assert.equal(Object.keys(SOUND_GAIN).length,26);
  for(const [k,cue] of Object.entries(SOUND_GAIN)){
   assert.ok(cue.gain>0&&cue.gain<=.7,k);
   assert.ok(Number.isInteger(cue.priority)&&cue.priority>=0&&cue.priority<=6,k);

@@ -1,0 +1,15 @@
+PASS    Quick / 2 players — 2000 games, seed 20261103, early 48.95%, 80%-score 78.85%, ties 4.05%
+FAIL    Quick / 4 players — early victory 66.25% (allowed 30–50%)
+PASS    Standard / 4 players — 2000 games, seed 20261023, early 45.75%, 80%-score 93.45%, ties 2.8%
+PASS    Standard / 8 players — 2000 games, seed 20261025, early 42.95%, 80%-score 95.3%, ties 4%
+PASS    Advanced / 4 players — 2000 games, seed 20261102, early 44.2%, 80%-score 91.5%, ties 2.75%
+BLOCKED Advanced / 8 players — Missing 2,000-game seeded simulation: docs/stage9-run/advanced8-2000.json
+PASS    17 audio file checksums — 17/17 SHA-256 hashes match
+PASS    Eight original portraits — 8/8 original portraits present
+PASS    Browser fixture screenshots — 32 screenshots captured; fixtures do not certify real devices
+BLOCKED Installed WebSocket runtime — ws unavailable
+BLOCKED Commercial audio redistribution licence — Provider terms/rights not independently verified
+BLOCKED Physical-device and cross-network acceptance — November acceptance testing outstanding
+BLOCKED Hosting durability and rollback rehearsal — Ephemeral Render storage and browser-only recovery not certified
+
+Release gates: 7 passed, 6 failed/blocked. Production approval: NO.

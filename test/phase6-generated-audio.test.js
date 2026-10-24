@@ -4,14 +4,15 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const crypto=require('node:crypto');
-const {CUES,availableAudio}=require('../src/audio');
+const {CUES,EXTRA_CUES,availableAudio}=require('../src/audio');
 const root=path.join(__dirname,'..','public','audio');
 const inventory=JSON.parse(fs.readFileSync(path.join(root,'GENERATED-ASSETS.json'),'utf8'));
 
 test('Generated sound pack installs all 17 exact allowlisted local MP3 names',()=>{
  assert.equal(inventory.files.length,17);
  assert.equal(new Set(inventory.files.map(x=>x.file)).size,17);
- assert.deepEqual(availableAudio(root).sort(),CUES.map(x=>x+'.mp3').sort());
+ assert.deepEqual(availableAudio(root).filter(x=>CUES.some(k=>x===k+'.mp3')).sort(),CUES.map(x=>x+'.mp3').sort());
+ assert.ok(availableAudio(root).every(x=>[...CUES,...EXTRA_CUES].some(k=>x===k+'.mp3')));
 });
 test('Every generated audio file matches the production checksum and contains MP3 frames',()=>{
  for(const entry of inventory.files){
