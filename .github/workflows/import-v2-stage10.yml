@@ -42,7 +42,7 @@ jobs:
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A src public/art/avatars public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml .github/workflows/test-iron-crown.yml
+          git add -A src public/art/avatars public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml
           git add -u .stage10-transfer-b64.txt
           git commit -m 'Stage 10 v2 full source, UI and audio integration'
           git push origin HEAD:staging/iron-crown-stage10-audio
