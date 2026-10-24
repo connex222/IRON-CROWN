@@ -7,6 +7,7 @@ const WebSocket=require('ws');
 const base=new URL(process.env.SMOKE_BASE_URL||'https://iron-crown-stage12-preview.onrender.com');
 if(!/^https:$/.test(base.protocol))throw Error('SMOKE_BASE_URL must use HTTPS');
 const version=process.env.SMOKE_EXPECT_VERSION||'2.0.0-dev.12';
+const expectedAudio=Number(process.env.SMOKE_EXPECT_AUDIO||26);
 const CHECK_TIMEOUT=90_000;
 const sockets=[];
 async function get(route){
@@ -40,9 +41,10 @@ async function run(){
  const health=await (await get('/health')).json();
  assert.equal(health.status,'ok');assert.equal(health.version,version);
  assert.equal(health.expectedSounds,17);assert.equal(health.installedSounds,17);
- assert.equal(health.extraSounds,9);
+ assert.equal(health.extraSounds,expectedAudio-17);
  const manifest=await (await get('/audio/manifest.json')).json();
- assert.equal(manifest.files.length,26);
+ assert.equal(manifest.files.length,expectedAudio);
+ if(expectedAudio===27)assert.ok(manifest.files.includes('music-five-lost-crowns.mp3'));
  for(const file of ['railway-switch.mp3','music-parlour-deluxe.mp3','ui-confirm.mp3']){
   assert.ok(manifest.files.includes(file),'Audio manifest missing '+file);
  }
@@ -72,6 +74,6 @@ async function run(){
  assert.match(rejection.message,/full|maximum eight/i);
  const lastState=await host.wait(x=>x.type==='state'&&x.public.players.length===8);
  assert.equal(lastState.public.players.length,8);
- console.log(JSON.stringify({result:'PASS',testedVersion:health.version,source:base.origin,gameCodeRedacted:true,players:8,expectedAudio:26,expectedMastered:17,tvAndPhone:'ok',newCueFiles:'ok',transport:'wss',rejectedNinthSeat:true}));
+ console.log(JSON.stringify({result:'PASS',testedVersion:health.version,source:base.origin,gameCodeRedacted:true,players:8,expectedAudio,expectedMastered:17,tvAndPhone:'ok',newCueFiles:'ok',transport:'wss',rejectedNinthSeat:true}));
 }
 run().catch(err=>{console.error('HOSTED SMOKE FAILED:',err.message);process.exitCode=1;}).finally(()=>{for(const ws of sockets)try{ws.terminate()}catch{}});

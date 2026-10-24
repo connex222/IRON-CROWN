@@ -72,7 +72,7 @@ test('Sound: TV has all 17 bundled cues and phone plays strictly opt-in local UI
  const {CUES,availableAudio}=require('../src/audio');
  const files=availableAudio(path.join(ROOT,'public/audio'));
  assert.equal(CUES.length,17);assert.equal(files.filter(f=>CUES.some(k=>f===k+'.mp3')).length,17);
- assert.ok([17,26].includes(files.length),'Only original and optional approved audio may appear');
+ assert.ok([17,26,27].includes(files.length),'Only original and optional approved audio may appear');
  assert.match(t,/function playCue\(key\)/);
  assert.match(t,/function startAudioLoops\(\)/);
  assert.match(t,/const MIX_PRESETS=/);

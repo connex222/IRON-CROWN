@@ -648,7 +648,7 @@ document.addEventListener('keydown',e=>{
 $('modalShade').onclick=e=>{if(e.target===$('modalShade'))closeModal();};$('botBtn').onclick=()=>say('addAI',{});$('mode').onchange=e=>say('mode',{mode:e.target.value});$('startBtn').onclick=()=>say('start',{mode:$('mode').value});
 /* Only same-origin bundled audio is used. An optional local file replaces the
    synthesised cue automatically; no audio asset means the playable fallback remains. */
-const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour','railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe'];
+const SOUND_KEYS=['train-whistle','train-chug','steam-release','track-lay','depot-build','city-build','coin-clink','dice-roll','clash-impact','crowd-gasp','crowd-cheer','era-fanfare','victory-fanfare','ui-select','ui-confirm','ambience-railway','music-parlour','railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe','music-five-lost-crowns'];
 // Phase 6.2: TV-first audio mix — effects, music and ambience are independent.
 const SOUND_GAIN=Object.freeze({
  'train-whistle':{gain:.47,gap:1800,priority:3,duck:1900},
@@ -676,7 +676,8 @@ const SOUND_GAIN=Object.freeze({
  'ticket-complete':{gain:.31,gap:600,priority:3},
  'invalid-order':{gain:.18,gap:450,priority:2},
  'electric-era':{gain:.36,gap:4000,priority:5,duck:3500},
- 'music-parlour-deluxe':{gain:.35,gap:0,priority:0}
+ 'music-parlour-deluxe':{gain:.35,gap:0,priority:0},
+ 'music-five-lost-crowns':{gain:.44,gap:0,priority:0}
 });
 const MIX_PRESETS=Object.freeze({
  quiet:{fx:.31,music:.13,ambience:.12},
@@ -685,7 +686,7 @@ const MIX_PRESETS=Object.freeze({
 });
 const trimGain=v=>Math.max(0,Math.min(1,Number.isFinite(Number(v))?Number(v):0));
 let soundManifest=new Map(),soundManifestReady=false,masterVolume=.50,musicVolume=.22,ambienceVolume=.25,mixProfile='balanced';
-let railLoop=null,parlourLoop=null,engineLoop=null,duckUntil=0,smoothedDuck=1,mixClock=null;
+let railLoop=null,parlourLoop=null,engineLoop=null,duckUntil=0,smoothedDuck=1,mixClock=null,currentMusicKey='music-parlour';
 const lastCueAt=new Map(),activeEffects=new Set();
 try{
  const cfg=JSON.parse(localStorage.getItem('ironCrownAudio')||'{}');
@@ -741,7 +742,7 @@ function synthCue(key){
 }
 function studioMasterPath(filename){
  const stem=filename.replace(/\.(ogg|wav|mp3)$/,'');
- return ['railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe'].includes(stem) ? '/audio/'+filename : '/audio/mastered/'+filename;
+ return ['railway-switch','contract-stamp','trade-handshake','royal-ledger','grand-station','ticket-complete','invalid-order','electric-era','music-parlour-deluxe','music-five-lost-crowns'].includes(stem) ? '/audio/'+filename : '/audio/mastered/'+filename;
 }
 function releaseEffect(item){
  activeEffects.delete(item);
@@ -789,7 +790,7 @@ function applyLoopVolume(){
  smoothedDuck+=((target-smoothedDuck)*(target<smoothedDuck ? .38 : .12));
  if(Math.abs(target-smoothedDuck)<.002)smoothedDuck=target;
  if(railLoop)railLoop.volume=trimGain((visible?1:0)*ambienceVolume*SOUND_GAIN['ambience-railway'].gain*smoothedDuck);
- if(parlourLoop)parlourLoop.volume=trimGain((visible?1:0)*musicVolume*SOUND_GAIN['music-parlour'].gain*smoothedDuck);
+ if(parlourLoop)parlourLoop.volume=trimGain((visible?1:0)*musicVolume*(SOUND_GAIN[currentMusicKey]?.gain||SOUND_GAIN['music-parlour'].gain)*smoothedDuck);
  if(engineLoop)engineLoop.volume=trimGain((visible?1:0)*ambienceVolume*SOUND_GAIN['train-chug'].gain*smoothedDuck);
  for(const item of activeEffects)item.audio.volume=trimGain((visible?1:0)*masterVolume*SOUND_GAIN[item.key].gain);
 }
@@ -801,12 +802,23 @@ function stopAudioLoops(){
 }
 function startAudioLoops(){
  stopAudioLoops();if(muted)return;
- const parlourTrack=soundManifest.has('music-parlour-deluxe')?'music-parlour-deluxe':'music-parlour';
+ // Prefer the owner-supplied theme. Both previous scores remain local fallbacks.
+ const parlourTrack=['music-five-lost-crowns','music-parlour-deluxe','music-parlour'].find(key=>soundManifest.has(key))||'music-parlour';
+ currentMusicKey=parlourTrack;
  for(const [name,slot] of [['ambience-railway','rail'],[parlourTrack,'music']]){
   const file=soundManifest.get(name);if(!file)continue;
   const audio=new Audio('/audio/'+file);
   audio.src=studioMasterPath(file);
-  audio.addEventListener('error',()=>{if(audio.src.includes('/mastered/')){audio.src='/audio/'+file;audio.play().catch(()=>{});}}, {once:true});
+  if(slot==='music'){
+   const backups=(soundManifest.has('music-parlour-deluxe')&&name!=='music-parlour-deluxe'?['music-parlour-deluxe']:[]).concat(name==='music-parlour'?[]:['music-parlour']);
+   audio.addEventListener('error',()=>{
+    const next=backups.shift();
+    if(!next||!soundManifest.has(next))return;
+    currentMusicKey=next;
+    audio.src=studioMasterPath(soundManifest.get(next));
+    audio.play().catch(()=>{});
+   });
+  }else audio.addEventListener('error',()=>{if(audio.src.includes('/mastered/')){audio.src='/audio/'+file;audio.play().catch(()=>{});}}, {once:true});
   audio.loop=true;audio.preload='auto';audio.volume=0;
   audio.play().catch(()=>{});if(slot==='rail')railLoop=audio;else parlourLoop=audio;
  }
@@ -854,15 +866,16 @@ $('audioSettingsBtn').onclick=()=>{
  '<div class="eyebrow">The railway parlour · Audio controls</div><h2>Sound &amp; motion</h2><div class="audio-mixer">',
  '<div><label for="mixPreset">Sound profile</label><select id="mixPreset" aria-label="Sound profile">'+profiles.map(p=>'<option value="'+p+'" '+(mixProfile===p?'selected':'')+'>'+p[0].toUpperCase()+p.slice(1)+'</option>').join('')+'<option value="custom" '+(mixProfile==='custom'?'selected':'')+'>Custom</option></select></div>',
  slider('masterVol','Sound effects',masterVolume),slider('musicVol','Music',musicVolume),slider('ambienceVol','Railway ambience',ambienceVolume),
+ '<p class="audio-detail">Featured soundtrack: <strong>The Five Lost Crowns</strong> (when installed). Enable TV sound to hear music.</p>',
  '<div><label for="motionChoice">Reduce cinematic movement <input id="motionChoice" type="checkbox" '+(motionOff()?'checked':'')+'></label><p class="audio-detail">Also follows the device reduced-motion setting.</p></div>',
- '<div id="soundInventory" class="audio-status" role="status">'+soundManifest.size+' local sound recordings detected (17 original + up to 9 bonus). Missing recordings use fallback audio.</div>',
+ '<div id="soundInventory" class="audio-status" role="status">'+soundManifest.size+' local sound recordings detected (17 original + up to 10 bonus). Missing recordings use fallback audio.</div>',
  '<div><label for="previewCue">Preview a sound</label><select id="previewCue" aria-label="Choose a sound to preview">'+demo.map(k=>'<option value="'+k+'">'+k.replace(/-/g,' ')+'</option>').join('')+'</select></div>',
  '<p class="audio-detail">The Balanced profile is tuned for conversation around a television. Dramatic reveals gently lower the music and railway ambience. Sound remains off until you enable it.</p>',
  '</div><div class="footer-actions"><button class="btn" id="previewAudio">Play selected sound</button><button class="btn alt" id="closeMixer">Back to the game</button></div>'
  ].join('');
  $('modalShade').classList.remove('hidden');
  // Read the local inventory without starting audio or bypassing autoplay settings.
- if(!soundManifestReady)scanBundledAudio().then(()=>{const status=$('soundInventory');if(status)status.textContent=soundManifest.size+' local recordings detected (17 original + up to 9 bonus).';});
+ if(!soundManifestReady)scanBundledAudio().then(()=>{const status=$('soundInventory');if(status)status.textContent=soundManifest.size+' local recordings detected (17 original + up to 10 bonus).';});
  const updateInputs=()=>{
   for(const [id,value] of [['masterVol',masterVolume],['musicVol',musicVolume],['ambienceVol',ambienceVolume]]){
    $(id).value=String(Math.round(value*100));$(id+'Val').textContent=Math.round(value*100)+'%';

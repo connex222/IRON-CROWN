@@ -12,7 +12,7 @@ const CUES=Object.freeze([
 const EXTRA_CUES=Object.freeze([
  'railway-switch','contract-stamp','trade-handshake','royal-ledger',
  'grand-station','ticket-complete','invalid-order','electric-era',
- 'music-parlour-deluxe'
+ 'music-parlour-deluxe','music-five-lost-crowns'
 ]);
 const EXTENSIONS=Object.freeze(['.ogg','.wav','.mp3']);
 function availableAudio(directory){

@@ -5,7 +5,7 @@ const base=path.join(__dirname,'..');
 const tv=fs.readFileSync(path.join(base,'public/tv.html'),'utf8');
 const phone=fs.readFileSync(path.join(base,'public/phone.html'),'utf8');
 test('Stage 10 never loses the licensed originals or the allowlist',()=>{
- assert.equal(CUES.length,17);assert.equal(EXTRA_CUES.length,9);
+ assert.equal(CUES.length,17);assert.equal(EXTRA_CUES.length,10);
  const assets=availableAudio(path.join(base,'public/audio'));
  for(const k of CUES)assert.ok(assets.includes(k+'.mp3'),k);
  assert.ok(assets.every(x=>[...CUES,...EXTRA_CUES].some(k=>x.startsWith(k+'.'))));
