@@ -16,8 +16,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: true
-      - name: Verify ffmpeg availability
-        run: ffmpeg -version | head -1
+      - name: Install FFmpeg for offline sound mastering
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          ffmpeg -version | head -n 1
       - name: Master and decode-check 17 local recordings
         run: bash scripts/master-audio-staging.sh
       - name: Commit mastered variants to isolated staging branch
