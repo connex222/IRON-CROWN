@@ -71,7 +71,7 @@ test('Responsive phone, tablet and PC: small controls, handbook tabs and zoom wo
 test('Sound: TV has all 17 bundled cues and phone plays strictly opt-in local UI recordings',()=>{
  const {CUES,availableAudio}=require('../src/audio');
  const files=availableAudio(path.join(ROOT,'public/audio'));
- assert.equal(CUES.length,17);assert.equal(files.length,17);
+ assert.equal(CUES.length,17);assert.equal(files.filter(f=>CUES.some(k=>f===k+'.mp3')).length,17);\n assert.ok([17,26].includes(files.length),'Only original and optional approved audio may appear');
  assert.match(t,/function playCue\(key\)/);
  assert.match(t,/function startAudioLoops\(\)/);
  assert.match(t,/const MIX_PRESETS=/);
