@@ -1,0 +1,39 @@
+name: Stage 13 hosted preview acceptance
+on:
+  push:
+    branches: [staging/iron-crown-stage13-readiness]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  local-safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies and run all v2 tests
+        run: |
+          npm install --ignore-scripts --no-audit --no-fund
+          npm test
+      - name: Stage 12 balance evidence remains valid
+        run: |
+          REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage11-run/quick4-2000-margin9.json docs/stage11-run/quick4-2000-independent.json
+          REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage12-run/quick8-2000-seed20261212.json docs/stage12-run/quick8-2000-seed20261214.json
+  hosted-stage12-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install ws for genuine WebSocket smoke
+        run: npm install --omit=dev --ignore-scripts --no-audit --no-fund
+      - name: Check deployed Stage 12 Render HTTPS and eight-controller WSS
+        env:
+          SMOKE_BASE_URL: https://iron-crown-stage12-preview.onrender.com
+          SMOKE_EXPECT_VERSION: 2.0.0-dev.12
+        run: node tools/hosted-smoke.js
