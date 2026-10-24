@@ -1,3 +1,11 @@
+## Stage 13 music — The Five Lost Crowns (24 October 2026)
+
+- Integrated the supplied original composition **The Five Lost Crowns** as the primary optional TV background music, ahead of the previous deluxe parlour and original parlour songs.
+- Prepared an unmodified musical arrangement at 160 kbps MP3 stereo/44.1 kHz with a 2 dB level reduction, preserving the 6,147,864-byte source MP3. Recorded source and output SHA-256 digests and full decode validation.
+- Preserved all railway sound effects, TV host sound consent, separate music/ambience/effects controls, ducking of music during important events, and independently optional phone sounds.
+- Extended the local sound inventory to **27 approved files** (17 base + 10 additional) alongside 17 mastered versions; added automated track-integrity and priority regression tests.
+- The original uploaded track is held separately; redistribution/commercial rights need confirmation before production release.
+
 ## 2.0.0-dev.13 — Stage 13 underway: deploy verification and recovery hardening (24 October 2026)
 
 - Released verified Stage 12 commit `376ba7cde0d6c8470749e64d8af1759344c874e2` to the separate Render service `iron-crown-stage12-preview`, with auto-deployment off. Production `main` and existing Render service remain unchanged.

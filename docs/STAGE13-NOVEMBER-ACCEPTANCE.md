@@ -43,6 +43,12 @@ Record device/browser versions, room size, cross-household topology, reproducibl
 
 The source currently writes `.data/rooms.json` on the server unless `STATE_FILE` is set. Local state files and backups do not survive replacement of an **ephemeral Render instance**; no durable Render disk/database is present on the preview. Host-browser encrypted recovery is a fallback rather than a substitute. Before production migration, select and configure a persistent store (e.g. an attached persistent disk on an eligible Render service, or an authenticated external store) and run a verified replacement/failover drill. Never claim that the Stage 13 backup copy fixes ephemeral hosting.
 
+## Featured soundtrack added during Stage 13
+
+The owner-supplied **The Five Lost Crowns** is now the preferred TV music track on the Stage 13 GitHub branch. It runs locally as a 3-minute-10-second MP3 under the music volume slider and backs off automatically for priority sound effects. The older deluxe and classic parlour soundtracks remain as fallbacks. See `docs/STAGE13-OWNER-TRACK.md` for the source/output SHA-256 inventory and browser behaviour.
+
+On the November device test, turn the TV sound on and confirm the new track plays audibly, cycles smoothly, respects the music slider, quiets during event effects, and does not begin automatically without user interaction.
+
 ## Audio rights
 
 Nine bespoke recordings were generated with Mirelo/Daydream and are now bundled in GitHub. Production approval still requires documentary confirmation of the provider terms, commercial distribution/redistribution rights, provenance for the 17 prior recordings and any required attribution. No legal approval is implied by a successful decoding or integrity test.
