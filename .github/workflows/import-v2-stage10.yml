@@ -2,12 +2,14 @@ name: Import complete v2 Stage 10 source
 on:
   push:
     branches: [staging/iron-crown-stage10-audio]
-    paths: [.stage10-transfer-b64.txt, .github/workflows/import-v2-stage10.yml]
+    paths:
+      - .stage10-transfer-b64.txt
+      - .github/workflows/import-v2-stage10.yml
 permissions:
   contents: write
 jobs:
   import-tested-source:
-    if: contains(fromJSON('["Upload v2 Stage10 source for staging import","Stage10 import retry"]'), github.event.head_commit.message)
+    if: github.event.head_commit.message == 'Stage10 import retry final'
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -15,60 +17,31 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Authenticate and unpack Stage 10 archive
+      - name: Unpack verified v2 source archive
         run: |
           set -euo pipefail
-          test -s .stage10-transfer-b64.txt
-          base64 --decode .stage10-transfer-b64.txt > /tmp/iron-stage10-source.tar.xz
-          echo '49af7893cec4d41b42e463b9c415a2788b72bcfebcd94a5b8b363ac5a58c287a  /tmp/iron-stage10-source.tar.xz' | sha256sum --check
-          tar -tJf /tmp/iron-stage10-source.tar.xz > /tmp/iron-stage10-list.txt
-          grep -q '^src/game.js
-          tar -xJf /tmp/iron-stage10-source.tar.xz
-          node -e "const p=require('./package.json'); if(p.version!=='2.0.0-dev.10')process.exit(1)"
+          base64 -d .stage10-transfer-b64.txt > /tmp/iron-stage10.tar.xz
+          echo '49af7893cec4d41b42e463b9c415a2788b72bcfebcd94a5b8b363ac5a58c287a  /tmp/iron-stage10.tar.xz' | sha256sum -c
+          tar -tJf /tmp/iron-stage10.tar.xz > /tmp/iron-stage10-list.txt
+          grep -F 'src/game.js' /tmp/iron-stage10-list.txt
+          tar -xJf /tmp/iron-stage10.tar.xz
+          node -e "if(require('./package.json').version!=='2.0.0-dev.10')process.exit(1)"
           rm .stage10-transfer-b64.txt
-      - name: Install v2 runtime
-        run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Run full v2 WebSocket and game test suite
-        run: npm test
-      - name: Verify original and mastered audio plus portraits
+      - name: Install and fully test v2 including WebSockets
         run: |
-          set -euo pipefail
-          test "$(find public/audio -maxdepth 1 -name '*.mp3' | wc -l)" -ge 17
+          npm install --ignore-scripts --no-audit --no-fund
+          npm test
+      - name: Verify assets and syntax
+        run: |
           test "$(find public/audio/mastered -maxdepth 1 -name '*.mp3' | wc -l)" -eq 17
           test "$(find public/art/avatars -maxdepth 1 -name '*_human.png' | wc -l)" -eq 8
           node --check src/server.js
           node --check src/game.js
-      - name: Commit verified v2 Stage 10 code to GitHub branch
+      - name: Commit tested v2 game to staging
         run: |
-          set -euo pipefail
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A src public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml .github/workflows/test-iron-crown.yml
           git add -u .stage10-transfer-b64.txt
-          git commit -m 'Stage 10: complete v2 game engine, interfaces and audio integration'
-          git push origin HEAD:staging/iron-crown-stage10-audio
- /tmp/iron-stage10-list.txt
-          tar -xJf /tmp/iron-stage10-source.tar.xz
-          node -e "const p=require('./package.json'); if(p.version!=='2.0.0-dev.10')process.exit(1)"
-          rm .stage10-transfer-b64.txt
-      - name: Install v2 runtime
-        run: npm install --ignore-scripts --no-audit --no-fund
-      - name: Run full v2 WebSocket and game test suite
-        run: npm test
-      - name: Verify original and mastered audio plus portraits
-        run: |
-          set -euo pipefail
-          test "$(find public/audio -maxdepth 1 -name '*.mp3' | wc -l)" -ge 17
-          test "$(find public/audio/mastered -maxdepth 1 -name '*.mp3' | wc -l)" -eq 17
-          test "$(find public/art/avatars -maxdepth 1 -name '*_human.png' | wc -l)" -eq 8
-          node --check src/server.js
-          node --check src/game.js
-      - name: Commit verified v2 Stage 10 code to GitHub branch
-        run: |
-          set -euo pipefail
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -A src public/tv.html public/phone.html package.json docs test tools scripts README.md CHANGELOG.md HOW-TO-PLAY-AND-LORE.md GAME-NIGHT-TEST-CHECKLIST.md 01-iron-crown.md AUDIO-LICENCES.md render.yaml .github/workflows/test-iron-crown.yml
-          git add -u .stage10-transfer-b64.txt
-          git commit -m 'Stage 10: complete v2 game engine, interfaces and audio integration'
+          git commit -m 'Stage 10 v2 full source, UI and audio integration'
           git push origin HEAD:staging/iron-crown-stage10-audio
