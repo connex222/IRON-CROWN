@@ -1,3 +1,11 @@
+## 2.0.0-dev.13 — Stage 13 underway: deploy verification and recovery hardening (24 October 2026)
+
+- Released verified Stage 12 commit `376ba7cde0d6c8470749e64d8af1759344c874e2` to the separate Render service `iron-crown-stage12-preview`, with auto-deployment off. Production `main` and existing Render service remain unchanged.
+- Created a separate Stage 13 development branch and live HTTPS/WSS acceptance workflow. The hosted test opens eight real WebSocket connections, rejects a ninth, checks public-state credentials are private, verifies all 26 original/bespoke audio files plus mastered audio, and checks TV/phone HTTP delivery.
+- Introduced a **local-only** atomic room snapshot writer with mode-0600 files, a private previous-version backup and recovery from a corrupt primary snapshot. A server health field identifies local-file persistence as `host-persistence-unverified`, not durable cloud storage.
+- Added snapshot corruption, permission and disabled-storage tests; extended the full Node/real-WebSocket regression suite.
+- **Stage 13 is not yet production-ready:** No persistent Render disk or external database is configured. The November physical multi-household test, audio redistribution rights, rollback drill and durable hosted recovery remain blocked.
+
 ## 2.0.0-dev.12 — Stage 12 eight-player fairness and transport resilience (24 October 2026)
 
 - Completed two independent 2,000-game **Quick eight-player** greedy-bot samples, each using 128 recycled map templates. Seat distribution 11.30–13.75% (seed 20261212) and 11.30–13.15% (seed 20261214), within the required 8.5–16.5% bounds; first-place ties 4.95% and 5.05%, below 8%. All four eight-player formal checks passed.

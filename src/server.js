@@ -36,7 +36,8 @@ function restore(){
   // Failed or retired seat snapshots must never prevent restoring other rooms.
   for(const room of loaded.rooms){
    if(!room||!isCode(room.code)||typeof room.hostToken!=='string'
-      ||!Array.isArray(room.players)||room.players.length>8||rooms.has(room.code))continue;
+      ||!Array.isArray(room.players)||room.players.length>8
+      ||room.players.some(p=>!p||typeof p!=='object')||rooms.has(room.code))continue;
    room.players.forEach(p=>{p.connected=!!p.ai});
    if(!Number.isSafeInteger(room.lastActivityAt))room.lastActivityAt=Date.now();
    rooms.set(room.code,room);
