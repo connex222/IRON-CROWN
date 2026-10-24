@@ -1,16 +1,16 @@
 'use strict';
 const test=require('node:test'),assert=require('node:assert/strict');
 const {spawn}=require('node:child_process');
-const net=require('node:net'),path=require('node:path');
+const net=require('node:net'),path=require('node:path'),fs=require('node:fs'),os=require('node:os');
 const WebSocket=require('ws');
 const ROOT=path.resolve(__dirname,'..');
 async function freePort(){return await new Promise((resolve,reject)=>{
  const s=net.createServer();s.once('error',reject);
  s.listen(0,'127.0.0.1',()=>{const port=s.address().port;s.close(()=>resolve(port));});
 });}
-async function server(){
+async function server(stateFile=''){
  const port=await freePort();
- const child=spawn(process.execPath,['src/server.js'],{cwd:ROOT,env:{...process.env,PORT:String(port),STATE_FILE:''},stdio:['ignore','pipe','pipe']});
+ const child=spawn(process.execPath,['src/server.js'],{cwd:ROOT,env:{...process.env,PORT:String(port),STATE_FILE:stateFile},stdio:['ignore','pipe','pipe']});
  let errors='';
  child.stderr.on('data',b=>errors+=String(b));
  await Promise.race([
@@ -90,4 +90,42 @@ test('Stage 12: cross-origin and oversized WebSocket messages are rejected, serv
   const welcome=await legitimate.wait(m=>m.type==='welcome'&&m.role==='host');
   assert.match(welcome.code,/^[A-Z]{4}$/);
  }finally{await box.close();}
+});
+
+test('Stage 12: eight authenticated player identities survive a server restart',{timeout:35000},async()=>{
+ const dir=fs.mkdtempSync(path.join(os.tmpdir(),'iron-stage12-rejoin-')),stateFile=path.join(dir,'rooms.json');
+ const initial=await server(stateFile);let recovered=null;
+ try{
+  const host=await client(initial);host.send({type:'host'});
+  const h=await host.wait(x=>x.type==='welcome'&&x.role==='host');
+  const original=[];
+  for(let i=0;i<8;i++){
+   const p=await client(initial);p.send({type:'join',code:h.code,name:'Player '+(i+1)});
+   original.push(await p.wait(x=>x.type==='welcome'&&x.role==='player'));
+  }
+  await host.wait(x=>x.type==='state'&&x.public.players.length===8);
+  assert.equal(fs.existsSync(stateFile),true);
+  const stored=JSON.parse(fs.readFileSync(stateFile,'utf8'));
+  assert.equal(stored[0].players.length,8);
+  await initial.close();
+  recovered=await server(stateFile);
+  const newHost=await client(recovered);newHost.send({type:'host',code:h.code,token:h.token});
+  const h2=await newHost.wait(x=>x.type==='welcome'&&x.role==='host');
+  assert.equal(h2.code,h.code);
+  let offline=await newHost.wait(x=>x.type==='state'&&x.public.players.length===8);
+  assert.equal(offline.public.players.filter(x=>x.connected).length,0);
+  for(const identity of original){
+   const p=await client(recovered);
+   p.send({type:'join',code:h.code,playerId:identity.playerId,token:identity.token});
+   const welcome=await p.wait(x=>x.type==='welcome'&&x.role==='player');
+   assert.equal(welcome.playerId,identity.playerId);
+  }
+  const reconnected=await newHost.wait(x=>x.type==='state'&&x.public.players.length===8&&x.public.players.every(p=>p.connected));
+  assert.equal(reconnected.public.players.length,8);
+  for(const c of original)assert.equal(JSON.stringify(reconnected.public).includes(c.token),false);
+ }finally{
+  if(recovered)await recovered.close();
+  await initial.close();
+  fs.rmSync(dir,{recursive:true,force:true});
+ }
 });
