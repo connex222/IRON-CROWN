@@ -1,3 +1,13 @@
+## 2.0.0-dev.10 — Stage 10 complete audio integration (24 October 2026)
+
+- Transferred the full v2 source, server-authoritative game engine, responsive TV/phone UIs, tests, documentation and all approved eight portraits into a separate GitHub staging branch.
+- Preserved 17 original MP3 recordings and shipped 17 locally mastered variants with verified checksums.
+- Downloaded and decoded eight original Mirelo event sounds (railway switch, contract stamp, trading, Royal Ledger, Grand Station, ticket completion, invalid order and Electric era), plus the original 110-second Daydream instrumental score; all audio is served locally.
+- Integrated nine optional sound keys with fallback to original recorded cues, event priorities, music/ambience ducking and independent opt-in TV and phone controls.
+- Fixed stale two-action rematch assertions, removed unapproved/unused avatar variants from staging, retained seeded-balance JSON evidence and marked missing binary browser screenshots blocked rather than passing.
+- Passed the **entire 177-test Node.js suite including actual WebSocket tests** with nine new recordings installed.
+- **Not promoted to production:** Quick four-player fairness failure, physical-device checks, redistribution licences, cross-network acceptance and hosting durability remain open.
+
 ## 2.0.0-dev.9 — Stage 9 acceptance preflight (23 October 2026)
 
 - Added executable release preflight with six deterministic recorded balance scenarios, SHA-256 inventory, portrait/screenshot inventory and explicit blocker flags.
