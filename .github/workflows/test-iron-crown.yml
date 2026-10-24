@@ -34,7 +34,12 @@ jobs:
           test "$(find public/art/avatars -maxdepth 1 -name '*_human.png' | wc -l)" -eq 8
           test "$(find public/art/avatars -maxdepth 1 -name '*.png' | wc -l)" -eq 8
       - name: Validate both independent 2,000-game Quick four-player samples
-        if: github.ref == 'refs/heads/staging/iron-crown-stage11-balance'
+        if: github.ref == 'refs/heads/staging/iron-crown-stage11-balance' || github.ref == 'refs/heads/staging/iron-crown-stage12-resilience'
         run: |
           REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage11-run/quick4-2000-margin9.json docs/stage11-run/quick4-2000-independent.json
           echo 'Historical Stage 8 failure remains archived; current Stage 11 criteria passed.'
+      - name: Validate two independent 2,000-game Quick eight-player samples
+        if: github.ref == 'refs/heads/staging/iron-crown-stage12-resilience'
+        run: |
+          REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage12-run/quick8-2000-seed20261212.json docs/stage12-run/quick8-2000-seed20261214.json
+          echo 'Stage 12 Quick eight-player acceptance: four out of four formal gates passed.'

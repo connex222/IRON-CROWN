@@ -1,6 +1,24 @@
-# IRON CROWN v2 — Authoritative balance evidence (Stage 11)
+# IRON CROWN v2 — Authoritative balance evidence (Stage 12)
 
-**Build:** `2.0.0-dev.11` — **not a production release**. These are seeded matches between the independent greedy simulation bots and the actual game-logic engine. They are **not** human-playtest results, full-stack multiplayer verification or proof of enjoyable pacing. Every 2,000-game evaluation below used **128 independently generated map templates** reused throughout its 2,000 matches; therefore 2,000 matches does **not** mean 2,000 different maps. The Production AI is distinct from the benchmark bots.
+**Build:** `2.0.0-dev.12` — **not a production release**. These are seeded matches between the independent greedy simulation bots and the actual game-logic engine. They are **not** human-playtest results, full-stack multiplayer verification or proof of enjoyable pacing. Every 2,000-game evaluation below used **128 independently generated map templates** reused throughout its 2,000 matches; therefore 2,000 matches does **not** mean 2,000 different maps. The Production AI is distinct from the benchmark bots.
+
+## Stage 12 eight-player Quick validation
+
+The Stage 11 nine-Prestige early-Crown requirement applies to **four or more Quick players**. Stage 12 completed two new *actual* seeded 2,000-match eight-player engine runs with the existing rule, without changing the mechanics. Both independent samples passed the formal eight-player seat fairness and Prestige tie checks.
+
+| Seed | Matches | Early victories (observational) | Winner reaches ≥80% target (observational) | Prestige ties | Eight seats | Formal gates |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| 20261212 | 2,000 | 31.85% | 99.15% | **4.95%** | **11.30–13.75%** | **2/2 PASS** |
+| 20261214 | 2,000 | 31.30% | 98.75% | **5.05%** | **11.30–13.15%** | **2/2 PASS** |
+
+The criteria for eight seats are **8.5–16.5%** wins per seat and **under 8%** first-place Prestige ties. The four-player early-victory (30–50%) and winner-score (≥90% reaching 80% target) gates are **not** silently applied as official eight-player gates. Each result reuses 128 maps over its 2,000 matches, not 2,000 unique maps. The simulator's ~5.5 minutes is only the planned income-and-action clock, not a real-world match duration.
+
+Machine-readable evidence: `docs/stage12-run/quick8-2000-seed20261212.json`, `docs/stage12-run/quick8-2000-seed20261214.json`. Reproduce with:
+```sh
+SIM_JSON=docs/stage12-run/quick8-2000-seed20261212.json node tools/simulate.js --mode quick --players 8 --games 2000 --seed 20261212 --maps 128 --bots greedy
+SIM_JSON=docs/stage12-run/quick8-2000-seed20261214.json node tools/simulate.js --mode quick --players 8 --games 2000 --seed 20261214 --maps 128 --bots greedy
+REQUIRE_BALANCE_PASS=1 node tools/evaluate_balance.js docs/stage12-run/*.json
+```
 
 ## Current accepted seeded scenarios
 

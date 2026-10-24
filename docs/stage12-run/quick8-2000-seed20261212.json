@@ -1,0 +1,51 @@
+{
+  "metadata": {
+    "players": 8,
+    "mode": "quick",
+    "games": 2000,
+    "seed": 20261212,
+    "bots": "greedy",
+    "maps": 128,
+    "target": 12
+  },
+  "games": 2000,
+  "winnerPrestige": {
+    "mean": 17.27,
+    "median": 17
+  },
+  "earlyTargetPct": 31.85,
+  "winnersAtLeast80Pct": 99.15,
+  "firstPlacePrestigeTiePct": 4.95,
+  "winPctBySeat": [
+    11.3,
+    13.75,
+    13.2,
+    13.6,
+    11.75,
+    12.1,
+    12.2,
+    12.1
+  ],
+  "winnerSources": {
+    "depot": 0.54,
+    "city": 0.77,
+    "rail": 7.92,
+    "tickets": 3.58,
+    "army": 0.56,
+    "longest": 1.43,
+    "grand": 0.31,
+    "bonus": 0,
+    "dividend": 2.16
+  },
+  "meanWinnerResources": {
+    "coal": 2.55,
+    "timber": 2.75,
+    "grain": 1.66,
+    "steel": 0.98,
+    "gold": 17.54
+  },
+  "meanRoutesClaimed": 11.32,
+  "meanWinnerTicketsCompleted": 1.22,
+  "meanUnspentResources": 12.53,
+  "estimatedDurationMinutes": 5.48
+}

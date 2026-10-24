@@ -1,3 +1,12 @@
+## 2.0.0-dev.12 — Stage 12 eight-player fairness and transport resilience (24 October 2026)
+
+- Completed two independent 2,000-game **Quick eight-player** greedy-bot samples, each using 128 recycled map templates. Seat distribution 11.30–13.75% (seed 20261212) and 11.30–13.15% (seed 20261214), within the required 8.5–16.5% bounds; first-place ties 4.95% and 5.05%, below 8%. All four eight-player formal checks passed.
+- Reported eight-player early victories of 31.85% and 31.30%, respectively, as **observational**: the 30–50% gate was specified for four-player scenarios only.
+- Bound outgoing per-socket WebSocket buffers to 512 KiB, terminating stalled clients before serialising more game-state snapshots.
+- Added real eight-human connection tests for lobby capacity, duplicate sign-in takeover, wrong-token rejection and cross-origin/oversized-message security; added an eight-seat server-restart persistence/rejoin test using a test-local state file.
+- Preserved the Stage 11 nine-point Quick early-Crown lead and all existing 17 originals, 17 mastered sounds, nine bespoke recordings, and eight tycoon portraits.
+- Does not certify persistence over Render redeploy/sleep, real phones/TVs or audio licensing; GitHub main/Render production remain unchanged.
+
 ## 2.0.0-dev.11 — Stage 11 Quick four-player pacing (24 October 2026)
 
 - Revised the early-victory trigger for Quick with four or more players: 12 Prestige plus a **9-Prestige advantage** over second place. The match still ends at the planned eighth round if no early Crown is clinched.
